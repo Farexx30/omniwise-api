@@ -12,5 +12,5 @@ public class AssignmentSubmissionComment
     public string Content { get; set; } = default!;
     public DateTime SentDate { get; set; }
     public int AssignmentSubmissionId { get; set; }
-    public string AuthorId { get; set; } = default!;
+    public string? AuthorId { get; set; }
 }

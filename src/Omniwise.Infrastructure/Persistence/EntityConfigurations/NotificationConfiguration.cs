@@ -18,6 +18,6 @@ internal class NotificationConfiguration : IEntityTypeConfiguration<Notification
 
         //Properties:
         builder.Property(n => n.Content)
-            .HasMaxLength(4096);
+            .HasMaxLength(2048);
     }
 }

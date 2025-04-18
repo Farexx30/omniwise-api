@@ -25,7 +25,7 @@ internal class CourseConfiguration : IEntityTypeConfiguration<Course>
 
         //Many-to-many:
         builder.HasMany(c => c.Members)
-            .WithMany(u => u.Courses)
+            .WithMany(u => u.EnrolledCourses)
             .UsingEntity<UserCourse>(
                 l => l.HasOne<User>()
                     .WithMany()

@@ -14,6 +14,9 @@ public class User : IdentityUser
     public bool IsAccepted { get; set; }
 
     //References:
-    public List<Course> Courses { get; set; } = [];
+    public List<Course> OwnedCourses { get; set; } = [];
+    public List<Course> EnrolledCourses { get; set; } = [];
+    public List<AssignmentSubmission> AssignmentSubmissions { get; set; } = [];
+    public List<AssignmentSubmissionComment> AssignmentSubmissionComments { get; set; } = [];
     public List<Notification> Notifications { get; set; } = [];
 }
