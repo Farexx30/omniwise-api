@@ -19,5 +19,9 @@ internal class LectureConfiguration : IEntityTypeConfiguration<Lecture>
             .HasForeignKey(fk => fk.LectureId);
 
         //Important: One-to-many relation with Course is already configured in CourseConfiguration.
+
+        //Properties:
+        builder.Property(l => l.Name)
+            .HasMaxLength(256);
     }
 }
