@@ -17,6 +17,8 @@ internal class FileConfiguration : IEntityTypeConfiguration<File>
         //Relations:
         //Important: One-to-many relation with is already configured in LectureConfiguration.
 
+        builder.UseTptMappingStrategy();
+
         //Properties:
         builder.Property(f => f.Url)
             .HasMaxLength(2048);

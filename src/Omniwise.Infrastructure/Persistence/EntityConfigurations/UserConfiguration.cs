@@ -19,6 +19,21 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
             .WithOne()
             .HasForeignKey(fk => fk.UserId);
 
+        builder.HasMany(u => u.OwnedCourses)
+            .WithOne()
+            .HasForeignKey(fk => fk.OwnerId)
+            .OnDelete(DeleteBehavior.ClientCascade);
+
+        builder.HasMany(u => u.AssignmentSubmissions)
+            .WithOne()
+            .HasForeignKey(fk => fk.AuthorId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasMany(u => u.AssignmentSubmissionComments)
+            .WithOne()
+            .HasForeignKey(fk => fk.AuthorId)
+            .OnDelete(DeleteBehavior.SetNull);
+
         //Important: Many-to-many relation with Course is already configured in CourseConfiguration.
 
         //Properties:
