@@ -6,9 +6,23 @@ using System.Threading.Tasks;
 
 namespace Omniwise.Domain.Entities;
 
-public class AssignmentFile
+public abstract class File
 {
     public int Id { get; set; }
     public string Url { get; set; } = default!;
+}
+
+public class LectureFile : File
+{
+    public int LectureId { get; set; }
+}
+
+public class AssignmentFile : File
+{
     public int AssignmentId { get; set; }
+}
+
+public class AssignmentSubmissionFile : File
+{
+    public int AssignmentSubmissionId { get; set; }
 }

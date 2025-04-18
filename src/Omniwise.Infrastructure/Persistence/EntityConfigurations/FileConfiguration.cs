@@ -6,18 +6,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using File = Omniwise.Domain.Entities.File;
 
 namespace Omniwise.Infrastructure.Persistence.EntityConfigurations;
 
-internal class LectureFileConfiguration : IEntityTypeConfiguration<LectureFile>
+internal class FileConfiguration : IEntityTypeConfiguration<File>
 {
-    public void Configure(EntityTypeBuilder<LectureFile> builder)
+    public void Configure(EntityTypeBuilder<File> builder)
     {
         //Relations:
-        //Important: One-to-many relation with Lecture is already configured in LectureConfiguration.
+        //Important: One-to-many relation with is already configured in LectureConfiguration.
 
         //Properties:
-        builder.Property(lf => lf.Url)
+        builder.Property(f => f.Url)
             .HasMaxLength(2048);
     }
 }
