@@ -23,5 +23,9 @@ internal class AssignmentConfiguration : IEntityTypeConfiguration<Assignment>
             .HasForeignKey(fk => fk.AssignmentId);
 
         //Important: One-to-many relation with Course is already configured in CourseConfiguration.
+
+        //Properties:
+        builder.Property(a => a.Name)
+            .HasMaxLength(256);
     }
 }

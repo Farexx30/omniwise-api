@@ -13,6 +13,7 @@ internal class CourseConfiguration : IEntityTypeConfiguration<Course>
 {
     public void Configure(EntityTypeBuilder<Course> builder)
     {
+        //Relations:
         //One-to-many:
         builder.HasMany(c => c.Lectures)
             .WithOne()
@@ -36,5 +37,12 @@ internal class CourseConfiguration : IEntityTypeConfiguration<Course>
 
                 j => j.HasKey(pk => new { pk.UserId, pk.CourseId })
             );
+
+        //Properties:
+        builder.Property(c => c.Name)
+            .HasMaxLength(256);
+
+        builder.Property(c => c.ImgUrl)
+            .HasMaxLength(2048);
     }
 }

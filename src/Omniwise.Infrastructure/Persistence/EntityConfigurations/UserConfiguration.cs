@@ -13,11 +13,19 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
+        //Relations:
         //One-to-many:
-        builder.HasMany<Notification>(u => u.Notifications)
+        builder.HasMany(u => u.Notifications)
             .WithOne()
             .HasForeignKey(fk => fk.UserId);
 
         //Important: Many-to-many relation with Course is already configured in CourseConfiguration.
+
+        //Properties:
+        builder.Property(u => u.FirstName)
+            .HasMaxLength(256);
+
+        builder.Property(u => u.LastName)
+            .HasMaxLength(256);
     }
 }
