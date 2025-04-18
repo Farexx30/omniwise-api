@@ -12,4 +12,8 @@ public class User : IdentityUser
     public string FirstName { get; set; } = default!;
     public string LastName { get; set; } = default!;
     public bool IsAccepted { get; set; }
+
+    //References:
+    public List<Course> Courses { get; set; } = [];
+    public List<Notification> Notifications { get; set; } = [];
 }
