@@ -13,6 +13,7 @@ internal class LectureConfiguration : IEntityTypeConfiguration<Lecture>
 {
     public void Configure(EntityTypeBuilder<Lecture> builder)
     {
+        //Relations:
         //One-to-many:
         builder.HasMany(l => l.Files)
             .WithOne()

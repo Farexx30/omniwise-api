@@ -13,6 +13,7 @@ internal class AssignmentConfiguration : IEntityTypeConfiguration<Assignment>
 {
     public void Configure(EntityTypeBuilder<Assignment> builder)
     {
+        //Relations:
         //One-to-many:
         builder.HasMany(a => a.Submissions)
             .WithOne()
