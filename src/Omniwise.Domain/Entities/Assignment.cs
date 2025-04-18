@@ -13,7 +13,9 @@ public class Assignment
     public string? Content { get; set; }
     public DateTime Deadline { get; set; }
     public float MaxGrade { get; set; }
-
     public int CourseId { get; set; }
-    public Course Course { get; set; } = default!;
+
+    //References:
+    public List<AssignmentSubmission> Submissions { get; set; } = [];
+    public List<AssignmentFile> Files { get; set; } = [];
 }

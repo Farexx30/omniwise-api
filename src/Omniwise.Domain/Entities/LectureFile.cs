@@ -10,7 +10,5 @@ public class LectureFile
 {
     public int Id { get; set; }
     public string Url { get; set; } = default!;
-
     public int LectureId { get; set; }
-    public Lecture Lecture { get; set; } = default!;
 }

@@ -10,7 +10,5 @@ public class AssignmentSubmissionFile
 {
     public int Id { get; set; }
     public string Url { get; set; } = default!;
-
     public int AssignmentSubmissionId { get; set; }
-    public AssignmentSubmission AssignmentSubmission { get; set; } = default!;
 }
