@@ -17,22 +17,23 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
         //One-to-many:
         builder.HasMany(u => u.Notifications)
             .WithOne()
-            .HasForeignKey(fk => fk.UserId);
+            .HasForeignKey(fk => fk.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(u => u.OwnedCourses)
             .WithOne()
             .HasForeignKey(fk => fk.OwnerId)
-            .OnDelete(DeleteBehavior.ClientCascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(u => u.AssignmentSubmissions)
             .WithOne()
             .HasForeignKey(fk => fk.AuthorId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(u => u.AssignmentSubmissionComments)
             .WithOne()
             .HasForeignKey(fk => fk.AuthorId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.Restrict);
 
         //Important: Many-to-many relation with Course is already configured in CourseConfiguration.
 

@@ -17,11 +17,13 @@ internal class AssignmentSubmissionConfiguration : IEntityTypeConfiguration<Assi
         //One-to-many:
         builder.HasMany(asub => asub.Comments)
             .WithOne()
-            .HasForeignKey(fk => fk.AssignmentSubmissionId);
+            .HasForeignKey(fk => fk.AssignmentSubmissionId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(asub => asub.Files)
             .WithOne()
-            .HasForeignKey(fk => fk.AssignmentSubmissionId);
+            .HasForeignKey(fk => fk.AssignmentSubmissionId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         //Important: One-to-many relation with Assignment is already configured in AssignmentConfiguration.
     }
