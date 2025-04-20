@@ -17,11 +17,13 @@ internal class AssignmentConfiguration : IEntityTypeConfiguration<Assignment>
         //One-to-many:
         builder.HasMany(a => a.Submissions)
             .WithOne()
-            .HasForeignKey(fk => fk.AssignmentId);
+            .HasForeignKey(fk => fk.AssignmentId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(a => a.Files)
             .WithOne()
-            .HasForeignKey(fk => fk.AssignmentId);
+            .HasForeignKey(fk => fk.AssignmentId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         //Important: One-to-many relation with Course is already configured in CourseConfiguration.
 

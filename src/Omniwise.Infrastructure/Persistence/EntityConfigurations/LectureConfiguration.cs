@@ -17,7 +17,8 @@ internal class LectureConfiguration : IEntityTypeConfiguration<Lecture>
         //One-to-many:
         builder.HasMany(l => l.Files)
             .WithOne()
-            .HasForeignKey(fk => fk.LectureId);
+            .HasForeignKey(fk => fk.LectureId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         //Important: One-to-many relation with Course is already configured in CourseConfiguration.
 
