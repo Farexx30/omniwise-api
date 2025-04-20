@@ -7,11 +7,18 @@ using System.Threading.Tasks;
 
 namespace Omniwise.Domain.Entities;
 
+public enum UserStatus
+{
+    Pending = 0,
+    Active = 1,
+    Archived = 2
+}
+
 public class User : IdentityUser
 {
     public string FirstName { get; set; } = default!;
     public string LastName { get; set; } = default!;
-    public bool IsAccepted { get; set; }
+    public UserStatus Status { get; set; } = UserStatus.Pending;
 
     //References:
     public List<Course> OwnedCourses { get; set; } = [];

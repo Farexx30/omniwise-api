@@ -17,11 +17,13 @@ internal class CourseConfiguration : IEntityTypeConfiguration<Course>
         //One-to-many:
         builder.HasMany(c => c.Lectures)
             .WithOne()
-            .HasForeignKey(fk => fk.CourseId);
+            .HasForeignKey(fk => fk.CourseId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(c => c.Assignments)
             .WithOne()
-            .HasForeignKey(fk => fk.CourseId);
+            .HasForeignKey(fk => fk.CourseId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         //Many-to-many:
         builder.HasMany(c => c.Members)
@@ -29,11 +31,13 @@ internal class CourseConfiguration : IEntityTypeConfiguration<Course>
             .UsingEntity<UserCourse>(
                 l => l.HasOne<User>()
                     .WithMany()
-                    .HasForeignKey(fk => fk.UserId),
+                    .HasForeignKey(fk => fk.UserId)
+                    .OnDelete(DeleteBehavior.Restrict),
 
                 r => r.HasOne<Course>()
                     .WithMany()
-                    .HasForeignKey(fk => fk.CourseId),
+                    .HasForeignKey(fk => fk.CourseId)
+                    .OnDelete(DeleteBehavior.Cascade),
 
                 j => j.HasKey(pk => new { pk.UserId, pk.CourseId })
             );
