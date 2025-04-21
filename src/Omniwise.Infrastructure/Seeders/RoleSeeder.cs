@@ -18,7 +18,7 @@ internal class RoleSeeder(OmniwiseDbContext dbContext,
 
     public async Task SeedAsync()
     {
-        if (await dbContext.Database.CanConnectAsync())
+        if (!await dbContext.Database.CanConnectAsync())
         {
             throw new Exception("Cannot connect to the database");
         }
