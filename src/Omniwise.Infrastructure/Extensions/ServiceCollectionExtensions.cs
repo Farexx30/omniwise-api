@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Omniwise.Domain.Entities;
 using Omniwise.Infrastructure.Persistence;
+using Omniwise.Infrastructure.Persistence.MigrationAppliers;
 using Omniwise.Infrastructure.Seeders;
 
 namespace Omniwise.Infrastructure.Extensions;
@@ -21,6 +22,8 @@ public static class ServiceCollectionExtensions
         services.AddIdentityApiEndpoints<User>()
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<OmniwiseDbContext>();
+
+        services.AddScoped<IMigrationApplier, MigrationApplier>();
 
         services.AddScoped<ISeeder<IdentityRole>, RoleSeeder>();
         services.AddScoped<ISeeder<User>, UserSeeder>();
