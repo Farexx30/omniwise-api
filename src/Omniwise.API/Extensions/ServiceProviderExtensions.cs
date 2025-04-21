@@ -8,7 +8,7 @@ namespace Omniwise.API.Extensions;
 
 public static class ServiceProviderExtensions
 {
-    public async static Task InitializeDatabase(this IServiceProvider serviceProvider)
+    public async static Task InitializeDatabaseAsync(this IServiceProvider serviceProvider)
     {
         var scope = serviceProvider.CreateScope();
 
