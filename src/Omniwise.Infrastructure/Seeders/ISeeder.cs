@@ -6,8 +6,12 @@ using System.Threading.Tasks;
 
 namespace Omniwise.Infrastructure.Seeders;
 
-public interface ISeeder<TEntity>
-    where TEntity : class
+public interface ISeeder
 {
     Task SeedAsync();
+}
+
+public interface ISeeder<TEntity> : ISeeder
+    where TEntity : class
+{
 }
