@@ -28,7 +28,12 @@ internal class RoleSeeder(OmniwiseDbContext dbContext,
             if (!await roleManager.RoleExistsAsync(roleName))
             {
                 var role = CreateRole(roleName);
-                await roleManager.CreateAsync(role);
+
+                var roleCreationResult = await roleManager.CreateAsync(role);
+                if (!roleCreationResult.Succeeded)
+                {
+                    throw new Exception($"Failed to create role: {roleName}");
+                }
             }
         }
     }

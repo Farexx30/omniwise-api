@@ -37,8 +37,17 @@ internal class UserSeeder(OmniwiseDbContext dbContext,
         using var transaction = await dbContext.Database.BeginTransactionAsync();
         try
         {
-            await userManager.CreateAsync(admin, adminPassword);
-            await userManager.AddToRoleAsync(admin, Roles.Admin);
+            var userCreationResult = await userManager.CreateAsync(admin, adminPassword);
+            if (!userCreationResult.Succeeded)
+            {
+                throw new Exception("Failed to create admin user");
+            }
+
+            var roleAssignmentResult = await userManager.AddToRoleAsync(admin, Roles.Admin);
+            if (!roleAssignmentResult.Succeeded)
+            {
+                throw new Exception("Failed to add admin role");
+            }
 
             await transaction.CommitAsync();
         }
@@ -54,6 +63,7 @@ internal class UserSeeder(OmniwiseDbContext dbContext,
         return new User
         {
             Email = configuration["SeedAdmin:Email"],
+            UserName = configuration["SeedAdmin:UserName"],
             FirstName = configuration["SeedAdmin:FirstName"]!,
             LastName = configuration["SeedAdmin:LastName"]!,
             Status = UserStatus.Active
