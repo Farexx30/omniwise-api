@@ -3,7 +3,6 @@ using Omniwise.API.Extensions;
 using Omniwise.API.Handlers;
 using Omniwise.Domain.Entities;
 using Omniwise.Infrastructure.Extensions;
-using Omniwise.Infrastructure.Seeders;
 
 var builder = WebApplication.CreateBuilder(args);
 
