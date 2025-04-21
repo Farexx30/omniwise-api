@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Omniwise.Domain.Entities;
 using Omniwise.Infrastructure.Persistence;
 using Omniwise.Infrastructure.Persistence.MigrationAppliers;
-using Omniwise.Infrastructure.Seeders;
+using Omniwise.Infrastructure.Persistence.Seeders;
 
 namespace Omniwise.Infrastructure.Extensions;
 
