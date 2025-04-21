@@ -22,7 +22,7 @@ app.UseHttpsRedirection();
 
 app.MapGroup("api/identity")
     .WithTags("Identity") 
-    .MapIdentityApi<User>();
+    .MapOmniwiseIdentityApi<User>();
 
 app.UseAuthorization();
 
