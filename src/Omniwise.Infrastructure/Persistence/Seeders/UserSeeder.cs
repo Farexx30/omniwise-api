@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Omniwise.Domain.Constants;
@@ -32,11 +33,14 @@ internal class UserSeeder(OmniwiseDbContext dbContext,
         }
 
         var admin = CreateAdmin();
+        var adminEmail = configuration["SeedAdmin:Email"];
         var adminPassword = configuration["SeedAdmin:Password"]!;
         
         using var transaction = await dbContext.Database.BeginTransactionAsync();
         try
         {
+            await userManager.SetUserNameAsync(admin, adminEmail);
+            await userManager.SetEmailAsync(admin, adminEmail);
             var userCreationResult = await userManager.CreateAsync(admin, adminPassword);
             if (!userCreationResult.Succeeded)
             {
@@ -62,8 +66,6 @@ internal class UserSeeder(OmniwiseDbContext dbContext,
     {
         return new User
         {
-            Email = configuration["SeedAdmin:Email"],
-            UserName = configuration["SeedAdmin:UserName"],
             FirstName = configuration["SeedAdmin:FirstName"]!,
             LastName = configuration["SeedAdmin:LastName"]!,
             Status = UserStatus.Active
