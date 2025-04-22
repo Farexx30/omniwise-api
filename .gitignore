@@ -398,3 +398,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# VS2022 http client
+src/Omniwise.API/Omniwise.API.http
