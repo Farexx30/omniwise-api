@@ -1,11 +1,12 @@
 ﻿using Microsoft.OpenApi.Models;
 using Omniwise.API.Handlers;
+using Serilog;
 
 namespace Omniwise.API.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static void AddPresentation (this IServiceCollection services)
+    public static void AddPresentation (this IServiceCollection services, IHostBuilder builder)
     {
         services.AddAuthentication();
 
@@ -17,6 +18,11 @@ public static class ServiceCollectionExtensions
         services.AddExceptionHandler<AppExceptionHandler>();
 
         services.AddEndpointsApiExplorer();
+
+        builder.UseSerilog((context, configuration) =>
+        {
+            configuration.ReadFrom.Configuration(context.Configuration);
+        });
     }
 
     private static void AddSwaggerAuthorization(this IServiceCollection services)

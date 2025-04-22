@@ -6,7 +6,7 @@ using Omniwise.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddPresentation();
+builder.Services.AddPresentation(builder.Host);
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
