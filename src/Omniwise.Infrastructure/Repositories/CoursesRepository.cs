@@ -1,4 +1,5 @@
-﻿using Omniwise.Application.Common.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using Omniwise.Application.Common.Interfaces;
 using Omniwise.Domain.Entities;
 using Omniwise.Infrastructure.Persistence;
 using System;
@@ -11,6 +12,14 @@ namespace Omniwise.Infrastructure.Repositories;
 
 internal class CoursesRepository(OmniwiseDbContext dbContext) : ICoursesRepository
 {
+    public async Task<Course?> GetByIdAsync(int id)
+    {
+        var course = await dbContext.Courses
+            .FirstOrDefaultAsync(c => c.Id == id);
+
+        return course;
+    }
+
     public async Task<int> CreateAsync(Course course)
     {
         dbContext.Courses.Add(course);
@@ -18,4 +27,7 @@ internal class CoursesRepository(OmniwiseDbContext dbContext) : ICoursesReposito
 
         return course.Id;
     }
+
+    public Task SaveChangesAsync()
+       => dbContext.SaveChangesAsync();
 }

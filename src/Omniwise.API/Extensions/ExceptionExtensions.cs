@@ -8,7 +8,8 @@ public static class ExceptionExtensions
     {
         return exception switch
         {
-            NotFoundException => StatusCodes.Status400BadRequest,
+            NotFoundException => StatusCodes.Status404NotFound,
+            ForbiddenException => StatusCodes.Status403Forbidden,
             _ => StatusCodes.Status500InternalServerError
         };
     }

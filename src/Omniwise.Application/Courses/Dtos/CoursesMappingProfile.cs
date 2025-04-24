@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Omniwise.Application.Courses.Commands.CreateCourse;
+using Omniwise.Application.Courses.Commands.UpdateCourse;
 using Omniwise.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -14,5 +15,6 @@ public class CoursesMappingProfile : Profile
     public CoursesMappingProfile()
     {
         CreateMap<CreateCourseCommand, Course>();
+        CreateMap<UpdateCourseCommand, Course>();
     }
 }
