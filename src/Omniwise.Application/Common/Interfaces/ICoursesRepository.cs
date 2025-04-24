@@ -11,5 +11,6 @@ public interface ICoursesRepository
 {
     Task<Course?> GetByIdAsync(int id);
     Task<int> CreateAsync(Course course);
+    Task DeleteAsync(Course course);
     Task SaveChangesAsync();
 }

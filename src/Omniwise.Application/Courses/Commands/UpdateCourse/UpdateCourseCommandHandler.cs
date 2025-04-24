@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace Omniwise.Application.Courses.Commands.UpdateCourse;
 
 public class UpdateCourseCommandHandler(ICoursesRepository coursesRepository,
-        ILogger<CreateCourseCommandHandler> logger,
+        ILogger<UpdateCourseCommandHandler> logger,
         IMapper mapper,
         IUserContext userContext,
         IAuthorizationService authorizationService) : IRequestHandler<UpdateCourseCommand>

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Omniwise.Application.Courses.Commands.CreateCourse;
+using Omniwise.Application.Courses.Commands.DeleteCourse;
 using Omniwise.Application.Courses.Commands.UpdateCourse;
 using Omniwise.Domain.Constants;
 
@@ -25,6 +26,16 @@ public class CoursesController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> UpdateCourse([FromRoute] int id, [FromBody] UpdateCourseCommand command)
     {
         command.Id = id;
+        await mediator.Send(command);
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize(Roles = Roles.Teacher)]
+    public async Task<IActionResult> DeleteCourse([FromRoute] int id)
+    {
+        var command = new DeleteCourseCommand { Id = id };
         await mediator.Send(command);
 
         return NoContent();

@@ -28,6 +28,12 @@ internal class CoursesRepository(OmniwiseDbContext dbContext) : ICoursesReposito
         return course.Id;
     }
 
+    public async Task DeleteAsync(Course course)
+    {
+        dbContext.Courses.Remove(course);
+        await dbContext.SaveChangesAsync();
+    }
+
     public Task SaveChangesAsync()
        => dbContext.SaveChangesAsync();
 }
