@@ -13,9 +13,14 @@ namespace Omniwise.Infrastructure.Identity;
 
 internal class UserContext(IHttpContextAccessor httpContextAccessor) : IUserContext
 {
+    public ClaimsPrincipal? ClaimsPrincipalUser
+    {
+        get => httpContextAccessor?.HttpContext?.User;
+    }
+
     public CurrentUser GetCurrentUser()
     {
-        var user = (httpContextAccessor?.HttpContext?.User) 
+        var user = ClaimsPrincipalUser 
             ?? throw new InvalidOperationException("User context is not present");
 
         if (user.Identity is null || !user.Identity.IsAuthenticated)
