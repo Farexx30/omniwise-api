@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Identity;
 using Omniwise.API.Extensions;
 using Omniwise.API.Handlers;
+using Omniwise.Application.Extensions;
 using Omniwise.Domain.Entities;
 using Omniwise.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddPresentation(builder.Host);
+builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
