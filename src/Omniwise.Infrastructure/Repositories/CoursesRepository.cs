@@ -12,4 +12,14 @@ internal class CoursesRepository(OmniwiseDbContext dbContext) : ICoursesReposito
         var course = await dbContext.Courses.FirstOrDefaultAsync(c => c.Id == id);
         return course;
     }
+
+    public async Task<IEnumerable<Course>> GetAllEnrolledCoursesAsync(string id)
+    {
+        var enrolledCourses = await dbContext.Courses
+            .Include(c => c.Members)
+            .Where(c => c.Members.Any(m => m.Id == id))
+            .ToListAsync();
+
+        return enrolledCourses;
+    }
 }

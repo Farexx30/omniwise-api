@@ -1,7 +1,8 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Omniwise.Application.Courses.Queries;
+using Omniwise.Application.Courses.Queries.GetCourseById;
+using Omniwise.Application.Courses.Queries.GetEnrolledCourses;
 using Omniwise.Domain.Constants;
 
 namespace Omniwise.API.Controllers;
@@ -16,5 +17,19 @@ public class CoursesController(IMediator mediator) : ControllerBase
     {
         var course = await mediator.Send(new GetCourseByIdQuery(courseId));
         return Ok(course);
+    }
+
+    [HttpGet("enrolled/{userId}")]
+    public async Task<IActionResult> GetEnrolledCourses([FromRoute] string userId)
+    {
+        var user = await mediator.Send(new GetEnrolledCoursesQuery(userId));
+        return Ok(user);
+    }
+
+    [HttpGet("owned/{userId}")]
+    public async Task<IActionResult> GetOwnedCourses([FromRoute] string userId)
+    {
+        var user = await mediator.Send(new GetOwnedCoursesQuery(userId));
+        return Ok(user);
     }
 }
