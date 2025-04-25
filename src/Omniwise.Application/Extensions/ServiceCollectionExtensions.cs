@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.Extensions.DependencyInjection;
 
 
 namespace Omniwise.Application.Extensions;
@@ -12,5 +14,8 @@ public static class ServiceCollectionExtensions
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(applicationAssembly));
 
         services.AddAutoMapper(typeof(ServiceCollectionExtensions).Assembly);
+
+        services.AddValidatorsFromAssembly(applicationAssembly)
+                .AddFluentValidationAutoValidation();
     }
 }

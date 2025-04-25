@@ -9,12 +9,15 @@ namespace Omniwise.Application.Courses.Queries.GetAvailableToEnrollCourses;
 
 public class GetAvailableToEnrollCoursesQueryHandler(ILogger<GetAvailableToEnrollCoursesQueryHandler> logger,
     IMapper mapper,
-    ICoursesRepository coursesRepository) : IRequestHandler<GetAvailableToEnrollCoursesQuery, IEnumerable<CourseDto>>
+    ICoursesRepository coursesRepository,
+    IUserContext userContext) : IRequestHandler<GetAvailableToEnrollCoursesQuery, IEnumerable<CourseDto>>
 {
     public async Task<IEnumerable<CourseDto>> Handle(GetAvailableToEnrollCoursesQuery request, CancellationToken cancellationToken)
     {
+        var currentUser = userContext.GetCurrentUser();
+
         logger.LogInformation("Getting available to enroll courses");
-        var availableCourses = await coursesRepository.GetAvailableToEnrollCoursesMatchingAsync(request.SearchPhrase, request.Id);
+        var availableCourses = await coursesRepository.GetAvailableToEnrollCoursesMatchingAsync(request.SearchPhrase, currentUser.Id!);
 
         var availableCoursesDtos = mapper.Map<IEnumerable<CourseDto>>(availableCourses);
 
