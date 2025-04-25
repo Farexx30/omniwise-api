@@ -24,14 +24,14 @@ public class CoursesController(IMediator mediator) : ControllerBase
     [HttpGet("enrolled/{userId}")]
     public async Task<IActionResult> GetEnrolledCourses([FromRoute] string userId)
     {
-        var course = await mediator.Send(new GetEnrolledCoursesQuery(userId));
-        return Ok(course);
+        var enrolledCourses = await mediator.Send(new GetEnrolledCoursesQuery(userId));
+        return Ok(enrolledCourses);
     }
 
     [HttpGet("owned/{userId}")]
     public async Task<IActionResult> GetOwnedCourses([FromRoute] string userId)
     {
-        var course = await mediator.Send(new GetOwnedCoursesQuery(userId));
-        return Ok(course);
+        var ownedCourses = await mediator.Send(new GetOwnedCoursesQuery(userId));
+        return Ok(ownedCourses);
     }
 }
