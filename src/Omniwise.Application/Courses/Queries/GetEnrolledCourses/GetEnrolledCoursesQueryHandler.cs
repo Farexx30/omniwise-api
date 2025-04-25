@@ -8,12 +8,15 @@ namespace Omniwise.Application.Courses.Queries.GetEnrolledCourses;
 
 public class GetEnrolledCoursesQueryHandler(ILogger<GetEnrolledCoursesQueryHandler> logger,
     IMapper mapper,
-    ICoursesRepository coursesRepository) : IRequestHandler<GetEnrolledCoursesQuery, IEnumerable<CourseDto>>
+    ICoursesRepository coursesRepository,
+    IUserContext userContext) : IRequestHandler<GetEnrolledCoursesQuery, IEnumerable<CourseDto>>
 {
     public async Task<IEnumerable<CourseDto>> Handle(GetEnrolledCoursesQuery request, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Fetching all enrolled courses for user with id: {UserId} from the repository.", request.Id);
-        var enrolledCourses = await coursesRepository.GetAllEnrolledCoursesAsync(request.Id);
+        var currentUser = userContext.GetCurrentUser();
+
+        logger.LogInformation("Fetching all enrolled courses for user with id: {UserId} from the repository.", currentUser.Id);
+        var enrolledCourses = await coursesRepository.GetAllEnrolledCoursesAsync(currentUser.Id!);
         var enrolledCoursesDtos = mapper.Map<IEnumerable<CourseDto>>(enrolledCourses);
 
         return enrolledCoursesDtos;

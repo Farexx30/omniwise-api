@@ -7,6 +7,22 @@ namespace Omniwise.Infrastructure.Repositories;
 
 internal class CoursesRepository(OmniwiseDbContext dbContext) : ICoursesRepository
 {
+    public async Task<int> CreateAsync(Course course)
+    {
+        dbContext.Courses.Add(course);
+        await dbContext.SaveChangesAsync();
+
+        return course.Id;
+    }
+
+    public async Task DeleteAsync(Course course)
+    {
+        dbContext.Courses.Remove(course);
+        await dbContext.SaveChangesAsync();
+    }
+
+    public Task SaveChangesAsync()
+       => dbContext.SaveChangesAsync();
     public async Task<Course?> GetCourseByIdAsync(int id)
     {
         var course = await dbContext.Courses.FirstOrDefaultAsync(c => c.Id == id);
@@ -26,7 +42,7 @@ internal class CoursesRepository(OmniwiseDbContext dbContext) : ICoursesReposito
     public async Task<IEnumerable<Course>> GetAllOwnedCoursesAsync(string id)
     {
         var ownedCourses = await dbContext.Courses
-            .Where(dbContext => dbContext.OwnerId == id)
+            .Where(c => c.OwnerId == id)
             .ToListAsync();
 
         return ownedCourses;
