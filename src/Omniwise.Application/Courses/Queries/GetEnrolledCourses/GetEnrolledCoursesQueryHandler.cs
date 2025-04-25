@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Omniwise.Application.Common.Interfaces;
 using Omniwise.Application.Courses.Dtos;
-using Omniwise.Application.Courses.Queries.GetCourseById;
-using Omniwise.Domain.Repositories;
 
 namespace Omniwise.Application.Courses.Queries.GetEnrolledCourses;
 

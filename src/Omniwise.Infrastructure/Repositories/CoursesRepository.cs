@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Omniwise.Domain.Entities;
 using Omniwise.Infrastructure.Persistence;
-using Omniwise.Domain.Repositories;
+using Omniwise.Application.Common.Interfaces;
 
 namespace Omniwise.Infrastructure.Repositories;
 
@@ -21,5 +21,14 @@ internal class CoursesRepository(OmniwiseDbContext dbContext) : ICoursesReposito
             .ToListAsync();
 
         return enrolledCourses;
+    }
+
+    public async Task<IEnumerable<Course>> GetAllOwnedCoursesAsync(string id)
+    {
+        var ownedCourses = await dbContext.Courses
+            .Where(dbContext => dbContext.OwnerId == id)
+            .ToListAsync();
+
+        return ownedCourses;
     }
 }
