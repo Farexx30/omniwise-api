@@ -31,4 +31,19 @@ internal class CoursesRepository(OmniwiseDbContext dbContext) : ICoursesReposito
 
         return ownedCourses;
     }
+
+    public async Task<IEnumerable<Course>> GetAvailableToEnrollCoursesMatchingAsync(string? searchPhrase, string id)
+    {
+        var searchPhraseLower = searchPhrase?.ToLower();
+
+        var availableCourses = await dbContext.Courses
+            .Include(c => c.Members)
+            .Where(c => c.OwnerId != id)
+            .Where(c => !c.Members.Any(m => m.Id == id))
+            .Where(c => string.IsNullOrWhiteSpace(searchPhraseLower)
+                || c.Name.Contains(searchPhraseLower))
+            .ToListAsync();
+
+        return availableCourses;
+    }
 }

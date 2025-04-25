@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Omniwise.Application.Courses.Queries.GetAvailableToEnrollCourses;
 using Omniwise.Application.Courses.Queries.GetCourseById;
 using Omniwise.Application.Courses.Queries.GetEnrolledCourses;
 using Omniwise.Application.Courses.Queries.GetOwnedCourses;
@@ -33,5 +34,13 @@ public class CoursesController(IMediator mediator) : ControllerBase
     {
         var ownedCourses = await mediator.Send(new GetOwnedCoursesQuery(userId));
         return Ok(ownedCourses);
+    }
+    [AllowAnonymous]
+    [HttpGet("available/{userId}")]
+    public async Task<IActionResult> GetAvailableToEnrollCourses([FromRoute] string userId, [FromQuery] GetAvailableToEnrollCoursesQuery query)
+    {
+        query.Id = userId;
+        var availableCourses = await mediator.Send(query);
+        return Ok(availableCourses);
     }
 }
