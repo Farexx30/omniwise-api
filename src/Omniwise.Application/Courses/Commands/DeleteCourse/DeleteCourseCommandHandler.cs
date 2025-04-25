@@ -21,7 +21,7 @@ public class DeleteCourseCommandHandler(ICoursesRepository coursesRepository,
 {
     public async Task Handle(DeleteCourseCommand request, CancellationToken cancellationToken)
     {
-        var course = await coursesRepository.GetByIdAsync(request.Id)
+        var course = await coursesRepository.GetCourseByIdAsync(request.Id)
         ?? throw new NotFoundException($"Course with id = {request.Id} not found.");
 
         var authorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, course, Policies.SameOwner);
