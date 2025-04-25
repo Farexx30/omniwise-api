@@ -5,7 +5,7 @@ using Omniwise.Application.Courses.Dtos;
 using Omniwise.Domain.Exceptions;
 using Omniwise.Domain.Repositories;
 
-namespace Omniwise.Application.Courses.Queries;
+namespace Omniwise.Application.Courses.Queries.GetCourseById;
 
 public class GetCourseByIdQueryHandler(ILogger<GetCourseByIdQueryHandler> logger,
     IMapper mapper,
