@@ -14,6 +14,7 @@ namespace Omniwise.API.Controllers;
 public class CoursesController(IMediator mediator) : ControllerBase
 {
     [HttpGet("{courseId}")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetCourseById([FromRoute] int courseId)
     {
         var course = await mediator.Send(new GetCourseByIdQuery(courseId));
@@ -23,14 +24,14 @@ public class CoursesController(IMediator mediator) : ControllerBase
     [HttpGet("enrolled/{userId}")]
     public async Task<IActionResult> GetEnrolledCourses([FromRoute] string userId)
     {
-        var user = await mediator.Send(new GetEnrolledCoursesQuery(userId));
-        return Ok(user);
+        var course = await mediator.Send(new GetEnrolledCoursesQuery(userId));
+        return Ok(course);
     }
 
     [HttpGet("owned/{userId}")]
     public async Task<IActionResult> GetOwnedCourses([FromRoute] string userId)
     {
-        var user = await mediator.Send(new GetOwnedCoursesQuery(userId));
-        return Ok(user);
+        var course = await mediator.Send(new GetOwnedCoursesQuery(userId));
+        return Ok(course);
     }
 }
