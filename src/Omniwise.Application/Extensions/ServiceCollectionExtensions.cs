@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
-using Omniwise.Domain.Repositories;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 
 namespace Omniwise.Application.Extensions;
