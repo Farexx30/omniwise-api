@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Omniwise.Application.Courses.Queries.GetCourseById;
 using Omniwise.Application.Courses.Queries.GetEnrolledCourses;
+using Omniwise.Application.Courses.Queries.GetOwnedCourses;
 using Omniwise.Domain.Constants;
 
 namespace Omniwise.API.Controllers;

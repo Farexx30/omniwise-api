@@ -2,8 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Omniwise.Application.Common.Interfaces;
 using Omniwise.Domain.Entities;
-using Omniwise.Domain.Repositories;
 using Omniwise.Infrastructure.Persistence;
 using Omniwise.Infrastructure.Persistence.MigrationAppliers;
 using Omniwise.Infrastructure.Persistence.Seeders;

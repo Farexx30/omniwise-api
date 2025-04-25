@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Omniwise.Application.Common.Interfaces;
 using Omniwise.Application.Courses.Dtos;
 using Omniwise.Domain.Exceptions;
-using Omniwise.Domain.Repositories;
 
 namespace Omniwise.Application.Courses.Queries.GetCourseById;
 
@@ -15,7 +15,7 @@ public class GetCourseByIdQueryHandler(ILogger<GetCourseByIdQueryHandler> logger
     {
         logger.LogInformation("Fetching course with ID {CourseId} from the repository.", request.Id);
         var course = await coursesRepository.GetCourseByIdAsync(request.Id)
-            ?? throw new NotFoundException();
+            ?? throw new NotFoundException($"Course with ID {request.Id} doesn't exist");
         var courseDto = mapper.Map<CourseDto>(course);
 
         return courseDto;

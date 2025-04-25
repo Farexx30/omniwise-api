@@ -1,9 +1,10 @@
 ﻿using Omniwise.Domain.Entities;
 
-namespace Omniwise.Domain.Repositories;
+namespace Omniwise.Application.Common.Interfaces;
 
 public interface ICoursesRepository
 {
     Task<Course?> GetCourseByIdAsync(int id);
     Task<IEnumerable<Course>> GetAllEnrolledCoursesAsync(string id);
+    Task<IEnumerable<Course>> GetAllOwnedCoursesAsync(string id);
 }
