@@ -8,8 +8,7 @@ namespace Omniwise.API.Controllers;
 
 [ApiController]
 [Route("api/courses")]
-[Authorize(Roles = Roles.Teacher)] //TODO: Needs to be checked if works, currently I can't do it due to lack of accounts in database
-[Authorize(Roles = Roles.Student)]
+[Authorize(Roles = $"{Roles.Teacher},{Roles.Student}")]
 public class CoursesController(IMediator mediator) : ControllerBase
 {
     [HttpGet("{courseId}")]
