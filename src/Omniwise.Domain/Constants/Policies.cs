@@ -9,4 +9,5 @@ namespace Omniwise.Domain.Constants;
 public static class Policies
 {
     public const string SameOwner = "SameOwner";
+    public const string MustBeEnrolledInCourse = "MustBeEnrolledInCourse";
 }
