@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Omniwise.Application.Assignments.Commands.CreateAssignment;
 using Omniwise.Application.Assignments.Dtos;
+using Omniwise.Application.Assignments.Queries.GetAllCourseAssignments;
 using Omniwise.Application.Assignments.Queries.GetAssignmentById;
 using Omniwise.Domain.Constants;
 
@@ -34,5 +35,14 @@ public class AssignmentsController(IMediator mediator) : ControllerBase
         var assignment = await mediator.Send(query);
 
         return Ok(assignment);
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<BasicAssignmentDto>>> GetAllCourseAssignments([FromRoute] int courseId)
+    {
+        var query = new GetAllCourseAssignmentsQuery { CourseId = courseId };
+        var assignments = await mediator.Send(query);
+
+        return Ok(assignments);
     }
 }

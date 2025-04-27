@@ -7,14 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Omniwise.Application.Assignments.Dtos
+namespace Omniwise.Application.Assignments.Dtos;
+
+public class AssignmentsMappingProfile : Profile
 {
-    public class AssignmentsMappingProfile : Profile
+    public AssignmentsMappingProfile()
     {
-        public AssignmentsMappingProfile()
-        {
-            CreateMap<CreateAssignmentCommand, Assignment>();
-            CreateMap<Assignment, AssignmentDto>();
-        }
+        CreateMap<CreateAssignmentCommand, Assignment>();
+        CreateMap<Assignment, AssignmentDto>();
+        CreateMap<Assignment, BasicAssignmentDto>();
     }
 }

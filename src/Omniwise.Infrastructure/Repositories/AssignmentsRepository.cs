@@ -28,4 +28,13 @@ internal class AssignmentsRepository(OmniwiseDbContext dbContext) : IAssignments
 
         return assignment;
     }
+
+    public async Task<IEnumerable<Assignment>> GetAllCourseAssignmentsAsync(int courseId)
+    {
+       var assignments = await dbContext.Assignments
+            .Where(c => c.CourseId == courseId)
+            .ToListAsync();
+
+        return assignments;
+    }
 }
