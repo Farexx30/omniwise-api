@@ -30,4 +30,12 @@ internal class LecturesRepository(OmniwiseDbContext dbContext) : ILecturesReposi
         return lecture;
     }
 
+    public async Task<IEnumerable<Lecture>> GetAllLecturesAsync(int courseId)
+    {
+        var lectures = await dbContext.Lectures
+            .Where(l => l.CourseId == courseId)
+            .ToListAsync();
+
+        return lectures;
+    }
 }

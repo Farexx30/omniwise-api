@@ -10,6 +10,7 @@ public class LecturesMappingProfile : Profile
     public LecturesMappingProfile()
     {
         CreateMap<Lecture, LectureDto>();
+        CreateMap<Lecture, LectureToGetAllDto>();
         CreateMap<CreateLectureCommand, Lecture>();
         CreateMap<UpdateLectureCommand, Lecture>();
     }

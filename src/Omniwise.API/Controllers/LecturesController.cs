@@ -6,6 +6,7 @@ using Omniwise.Application.Lectures.Commands.CreateLecture;
 using Omniwise.Application.Lectures.Commands.DeleteLecture;
 using Omniwise.Application.Lectures.Commands.UpdateLecture;
 using Omniwise.Application.Lectures.Queries.GetLectureById;
+using Omniwise.Application.Lectures.Queries.GetLectures;
 using Omniwise.Domain.Constants;
 
 namespace Omniwise.API.Controllers;
@@ -50,5 +51,12 @@ public class LecturesController(IMediator mediator) : ControllerBase
         var lecture = await mediator.Send(new GetLectureByIdQuery(courseId, lectureId)); ;
 
         return Ok(lecture);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetLectures([FromRoute] int courseId)
+    {
+        var lectures = await mediator.Send(new GetLecturesQuery(courseId));
+        return Ok(lectures);
     }
 }
