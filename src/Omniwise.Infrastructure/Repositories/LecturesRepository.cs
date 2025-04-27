@@ -22,4 +22,6 @@ internal class LecturesRepository(OmniwiseDbContext dbContext) : ILecturesReposi
                                   && l.CourseId == courseId);
         return lecture;
     }
+
+    public Task SaveChangesAsync() => dbContext.SaveChangesAsync();
 }

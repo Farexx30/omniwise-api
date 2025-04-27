@@ -1,6 +1,7 @@
 ﻿using Omniwise.Domain.Entities;
 using AutoMapper;
 using Omniwise.Application.Lectures.Commands.CreateLecture;
+using Omniwise.Application.Lectures.Commands.UpdateLecture;
 
 namespace Omniwise.Application.Lectures.Dtos;
 
@@ -10,5 +11,6 @@ public class LecturesMappingProfile : Profile
     {
         CreateMap<Lecture, LectureDto>();
         CreateMap<CreateLectureCommand, Lecture>();
+        CreateMap<UpdateLectureCommand, Lecture>();
     }
 }

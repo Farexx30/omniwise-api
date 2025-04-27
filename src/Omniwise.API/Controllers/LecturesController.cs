@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Omniwise.Application.Assignments.Dtos;
 using Omniwise.Application.Lectures.Commands.CreateLecture;
+using Omniwise.Application.Lectures.Commands.UpdateLecture;
 using Omniwise.Application.Lectures.Queries.GetLectureById;
 using Omniwise.Domain.Constants;
 
@@ -20,6 +21,16 @@ public class LecturesController(IMediator mediator) : ControllerBase
         command.CourseId = courseId;
         int lectureId = await mediator.Send(command);
         return CreatedAtAction(nameof(GetLectureById), new { courseId, lectureId }, null);
+    }
+
+    [HttpPatch("{lectureId}")]
+    [Authorize(Roles = Roles.Teacher)]
+    public async Task<IActionResult> UpdateLecture([FromRoute] int courseId, [FromRoute] int lectureId, [FromBody] UpdateLectureCommand command)
+    {
+        command.CourseId = courseId;
+        command.Id = lectureId;
+        await mediator.Send(command);
+        return NoContent();
     }
 
 
