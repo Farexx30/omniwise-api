@@ -40,7 +40,7 @@ public class GetAssignmentByIdQueryHandler(IAssignmentsRepository assignmentsRep
         var authorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, assignment, Policies.MustBeEnrolledInCourse);
         if (!authorizationResult.Succeeded)
         {
-            throw new ForbiddenException($"You are not allowed to get {nameof(Assignment)} with id = {assignmentId}.");
+            throw new ForbiddenException($"You are not allowed to get {nameof(Assignment)} with id = {assignmentId} in {nameof(Course)} with id = {courseId}.");
         }
 
         logger.LogInformation("Getting assignment with id = {assignmentId} for course with id = {courseId}",

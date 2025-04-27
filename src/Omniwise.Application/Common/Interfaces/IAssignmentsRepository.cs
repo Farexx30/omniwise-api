@@ -9,5 +9,6 @@ namespace Omniwise.Application.Common.Interfaces;
 
 public interface IAssignmentsRepository
 {
+    Task<int> CreateAsync(Assignment assignment);
     Task<Assignment?> GetByIdAsync(int assignmentId, int courseId);
 }

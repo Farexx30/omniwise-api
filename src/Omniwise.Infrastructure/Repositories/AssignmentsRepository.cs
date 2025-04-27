@@ -12,6 +12,14 @@ namespace Omniwise.Infrastructure.Repositories;
 
 internal class AssignmentsRepository(OmniwiseDbContext dbContext) : IAssignmentsRepository
 {
+    public async Task<int> CreateAsync(Assignment assignment)
+    {
+        dbContext.Assignments.Add(assignment);
+        await dbContext.SaveChangesAsync();
+
+        return assignment.Id;
+    }
+
     public async Task<Assignment?> GetByIdAsync(int assignmentId, int courseId)
     {
         var assignment = await dbContext.Assignments
