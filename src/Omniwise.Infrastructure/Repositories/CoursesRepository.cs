@@ -62,4 +62,12 @@ internal class CoursesRepository(OmniwiseDbContext dbContext) : ICoursesReposito
 
         return availableCourses;
     }
+
+    public Task<bool> ExistsAsync(int courseId)
+    {
+        var exists = dbContext.Courses
+            .AnyAsync(c => c.Id == courseId);
+
+        return exists;
+    }
 }

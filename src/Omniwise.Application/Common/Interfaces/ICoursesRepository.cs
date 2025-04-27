@@ -11,4 +11,5 @@ public interface ICoursesRepository
     Task<IEnumerable<Course>> GetAllEnrolledCoursesAsync(string id);
     Task<IEnumerable<Course>> GetAllOwnedCoursesAsync(string id);
     Task<IEnumerable<Course>> GetAvailableToEnrollCoursesMatchingAsync(string? searchPhrase, string id);
+    Task<bool> ExistsAsync(int courseId);
 }
