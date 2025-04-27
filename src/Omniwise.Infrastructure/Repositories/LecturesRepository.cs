@@ -7,6 +7,14 @@ namespace Omniwise.Infrastructure.Repositories;
 
 internal class LecturesRepository(OmniwiseDbContext dbContext) : ILecturesRepository
 {
+    public async Task<int> CreateAsync(Lecture lecture)
+    {
+        dbContext.Lectures.Add(lecture);
+        await dbContext.SaveChangesAsync();
+
+        return lecture.Id;
+    }
+
     public async Task<Lecture?> GetByIdAsync(int courseId, int lectureId)
     {
         var lecture = await dbContext.Lectures
