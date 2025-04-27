@@ -21,8 +21,8 @@ public class CreateLectureCommandHandler(ILogger<CreateLectureCommandHandler> lo
         var currentUser = userContext.GetCurrentUser();
         var courseId = request.CourseId;
 
-        var isCourseExist = await coursesRepository.ExistsAsync(courseId);
-        if (!isCourseExist)
+        var isCourseExisting = await coursesRepository.ExistsAsync(courseId);
+        if (!isCourseExisting)
         {
             logger.LogWarning("Course with id = {courseId} doesn't exist.", courseId);
             throw new NotFoundException($"Course with id = {courseId} doesn't exist.");

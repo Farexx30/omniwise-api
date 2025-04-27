@@ -14,6 +14,13 @@ internal class LecturesRepository(OmniwiseDbContext dbContext) : ILecturesReposi
 
         return lecture.Id;
     }
+    public Task SaveChangesAsync() => dbContext.SaveChangesAsync();
+
+    public async Task DeleteAsync(Lecture lecture)
+    {
+        dbContext.Lectures.Remove(lecture);
+        await dbContext.SaveChangesAsync();
+    }
 
     public async Task<Lecture?> GetByIdAsync(int courseId, int lectureId)
     {
@@ -23,5 +30,4 @@ internal class LecturesRepository(OmniwiseDbContext dbContext) : ILecturesReposi
         return lecture;
     }
 
-    public Task SaveChangesAsync() => dbContext.SaveChangesAsync();
 }

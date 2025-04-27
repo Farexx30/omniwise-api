@@ -20,8 +20,8 @@ public class UpdateLectureCommandHandler(ILogger<UpdateLectureCommandHandler> lo
         var courseId = request.CourseId;
         var lectureId = request.Id;
 
-        var isCourseExist = await coursesRepository.ExistsAsync(courseId);
-        if (!isCourseExist)
+        var isCourseExisting = await coursesRepository.ExistsAsync(courseId);
+        if (!isCourseExisting)
         {
             logger.LogWarning("Course with id = {courseId} doesn't exist.", courseId);
             throw new NotFoundException($"Course with id = {courseId} doesn't exist.");

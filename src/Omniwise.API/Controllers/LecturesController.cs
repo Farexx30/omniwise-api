@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Omniwise.Application.Assignments.Dtos;
 using Omniwise.Application.Lectures.Commands.CreateLecture;
+using Omniwise.Application.Lectures.Commands.DeleteLecture;
 using Omniwise.Application.Lectures.Commands.UpdateLecture;
 using Omniwise.Application.Lectures.Queries.GetLectureById;
 using Omniwise.Domain.Constants;
@@ -29,6 +30,15 @@ public class LecturesController(IMediator mediator) : ControllerBase
     {
         command.CourseId = courseId;
         command.Id = lectureId;
+        await mediator.Send(command);
+        return NoContent();
+    }
+
+    [HttpDelete("{lectureId}")]
+    [Authorize(Roles = Roles.Teacher)]
+    public async Task<IActionResult> DeleteLecture([FromRoute] int courseId, [FromRoute] int lectureId)
+    {
+        var command = new DeleteLectureCommand { CourseId = courseId, Id = lectureId };
         await mediator.Send(command);
         return NoContent();
     }
