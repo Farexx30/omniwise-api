@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Omniwise.Application.Assignments.Commands.CreateAssignment;
+using Omniwise.Application.Assignments.Commands.DeleteAssignment;
 using Omniwise.Application.Assignments.Commands.UpdateAssignment;
 using Omniwise.Application.Assignments.Dtos;
 using Omniwise.Application.Assignments.Queries.GetAllCourseAssignments;
@@ -31,6 +32,20 @@ public class AssignmentsController(IMediator mediator) : ControllerBase
     {
         command.AssignmentId = assignmentId;
         command.CourseId = courseId;
+        await mediator.Send(command);
+
+        return NoContent();
+    }
+
+    [HttpDelete("{assignmentId}")]
+    [Authorize(Roles = Roles.Teacher)]
+    public async Task<IActionResult> DeleteAssignment([FromRoute] int assignmentId, [FromRoute] int courseId)
+    {
+        var command = new DeleteAssignmentCommand 
+        { 
+            AssignmentId = assignmentId,
+            CourseId = courseId 
+        };
         await mediator.Send(command);
 
         return NoContent();
