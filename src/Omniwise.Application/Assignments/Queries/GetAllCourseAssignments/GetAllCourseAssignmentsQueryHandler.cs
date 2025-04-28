@@ -17,11 +17,11 @@ using System.Threading.Tasks;
 namespace Omniwise.Application.Assignments.Queries.GetAllCourseAssignments;
 
 public class GetAllCourseAssignmentsQueryHandler(IAssignmentsRepository assignmentsRepository,
-ICoursesRepository coursesRepository,
-ILogger<CreateAssignmentCommandHandler> logger,
-IMapper mapper,
-IUserContext userContext,
-IAuthorizationService authorizationService) : IRequestHandler<GetAllCourseAssignmentsQuery, IEnumerable<BasicAssignmentDto>>
+    ICoursesRepository coursesRepository,
+    ILogger<GetAllCourseAssignmentsQueryHandler> logger,
+    IMapper mapper,
+    IUserContext userContext,
+    IAuthorizationService authorizationService) : IRequestHandler<GetAllCourseAssignmentsQuery, IEnumerable<BasicAssignmentDto>>
 {
     public async Task<IEnumerable<BasicAssignmentDto>> Handle(GetAllCourseAssignmentsQuery request, CancellationToken cancellationToken)
     {

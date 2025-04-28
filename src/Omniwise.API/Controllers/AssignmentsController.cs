@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Omniwise.Application.Assignments.Commands.CreateAssignment;
+using Omniwise.Application.Assignments.Commands.UpdateAssignment;
 using Omniwise.Application.Assignments.Dtos;
 using Omniwise.Application.Assignments.Queries.GetAllCourseAssignments;
 using Omniwise.Application.Assignments.Queries.GetAssignmentById;
@@ -22,6 +23,17 @@ public class AssignmentsController(IMediator mediator) : ControllerBase
         var assignmentId = await mediator.Send(command);
 
         return CreatedAtAction(nameof(GetAssignmentById), new { assignmentId, courseId }, null);
+    }
+
+    [HttpPatch("{assignmentId}")]
+    [Authorize(Roles = Roles.Teacher)]
+    public async Task<IActionResult> UpdateAssignment([FromBody] UpdateAssignmentCommand command, [FromRoute] int assignmentId, [FromRoute] int courseId)
+    {
+        command.AssignmentId = assignmentId;
+        command.CourseId = courseId;
+        await mediator.Send(command);
+
+        return NoContent();
     }
 
     [HttpGet("{assignmentId}")]

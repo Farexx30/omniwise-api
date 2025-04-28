@@ -37,4 +37,7 @@ internal class AssignmentsRepository(OmniwiseDbContext dbContext) : IAssignments
 
         return assignments;
     }
+
+    public Task SaveChangesAsync()
+        => dbContext.SaveChangesAsync();
 }

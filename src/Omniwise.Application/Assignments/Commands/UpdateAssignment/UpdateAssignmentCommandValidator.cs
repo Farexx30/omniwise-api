@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Omniwise.Application.Assignments.Commands.CreateAssignment;
+namespace Omniwise.Application.Assignments.Commands.UpdateAssignment;
 
-public class CreateAssignmentCommandValidator : AbstractValidator<CreateAssignmentCommand>
+public class UpdateAssignmentCommandValidator : AbstractValidator<UpdateAssignmentCommand>
 {
-    public CreateAssignmentCommandValidator()
+    public UpdateAssignmentCommandValidator()
     {
         RuleFor(a => a.Name)
             .Length(3, 256);
