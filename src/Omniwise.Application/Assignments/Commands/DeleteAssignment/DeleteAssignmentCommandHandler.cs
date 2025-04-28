@@ -2,7 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
-using Omniwise.Application.Assignments.Dtos;
+using Omniwise.Application.Assignments.Commands.UpdateAssignment;
 using Omniwise.Application.Common.Interfaces;
 using Omniwise.Domain.Constants;
 using Omniwise.Domain.Entities;
@@ -13,16 +13,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Omniwise.Application.Assignments.Queries.GetAssignmentById;
+namespace Omniwise.Application.Assignments.Commands.DeleteAssignment;
 
-public class GetAssignmentByIdQueryHandler(IAssignmentsRepository assignmentsRepository,
+public class DeleteAssignmentCommandHandler(IAssignmentsRepository assignmentsRepository,
     ICoursesRepository coursesRepository,
-    ILogger<GetAssignmentByIdQueryHandler> logger,
-    IMapper mapper,
+    ILogger<UpdateAssignmentCommandHandler> logger,
     IUserContext userContext,
-    IAuthorizationService authorizationService) : IRequestHandler<GetAssignmentByIdQuery, AssignmentDto>
+    IAuthorizationService authorizationService) : IRequestHandler<DeleteAssignmentCommand>
 {
-    public async Task<AssignmentDto> Handle(GetAssignmentByIdQuery request, CancellationToken cancellationToken)
+    public async Task Handle(DeleteAssignmentCommand request, CancellationToken cancellationToken)
     {
         var assignmentId = request.AssignmentId;
         var courseId = request.CourseId;
@@ -35,20 +34,18 @@ public class GetAssignmentByIdQueryHandler(IAssignmentsRepository assignmentsRep
         }
 
         var assignment = await assignmentsRepository.GetByIdAsync(assignmentId, courseId)
-            ?? throw new NotFoundException($"{nameof(Assignment)} with id = {assignmentId} for {nameof(Course)} with id = {courseId} doesn't exist.");
+            ?? throw new NotFoundException($"{nameof(Assignment)} with id = {assignmentId} in {nameof(Course)} with id = {courseId} not found.");
 
         var authorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, assignment, Policies.MustBeEnrolledInCourse);
         if (!authorizationResult.Succeeded)
         {
-            throw new ForbiddenException($"You are not allowed to get {nameof(Assignment)} with id = {assignmentId} in {nameof(Course)} with id = {courseId}.");
+            logger.LogWarning("You are not allowed to delete assignment with id = {assignmentId} in course with id = {courseId}.", 
+                assignmentId, 
+                courseId);
+
+            throw new ForbiddenException($"You are not allowed to delete {nameof(Assignment)} with id = {assignmentId} in {nameof(Course)} with id = {courseId}.");
         }
 
-        logger.LogInformation("Getting assignment with id = {assignmentId} for course with id = {courseId}",
-            assignmentId,
-            courseId);
-
-        var assignmentDto = mapper.Map<AssignmentDto>(assignment);
-
-        return assignmentDto;
+        await assignmentsRepository.DeleteAsync(assignment);
     }
 }

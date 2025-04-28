@@ -12,6 +12,20 @@ namespace Omniwise.Infrastructure.Repositories;
 
 internal class AssignmentsRepository(OmniwiseDbContext dbContext) : IAssignmentsRepository
 {
+    public async Task<int> CreateAsync(Assignment assignment)
+    {
+        dbContext.Assignments.Add(assignment);
+        await dbContext.SaveChangesAsync();
+
+        return assignment.Id;
+    }
+
+    public async Task DeleteAsync(Assignment assignment)
+    {
+        dbContext.Assignments.Remove(assignment);
+        await dbContext.SaveChangesAsync();
+    }
+
     public async Task<Assignment?> GetByIdAsync(int assignmentId, int courseId)
     {
         var assignment = await dbContext.Assignments
@@ -20,4 +34,16 @@ internal class AssignmentsRepository(OmniwiseDbContext dbContext) : IAssignments
 
         return assignment;
     }
+
+    public async Task<IEnumerable<Assignment>> GetAllCourseAssignmentsAsync(int courseId)
+    {
+       var assignments = await dbContext.Assignments
+            .Where(c => c.CourseId == courseId)
+            .ToListAsync();
+
+        return assignments;
+    }
+
+    public Task SaveChangesAsync()
+        => dbContext.SaveChangesAsync();
 }
