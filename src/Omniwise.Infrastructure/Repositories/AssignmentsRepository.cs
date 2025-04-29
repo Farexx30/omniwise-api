@@ -44,6 +44,14 @@ internal class AssignmentsRepository(OmniwiseDbContext dbContext) : IAssignments
         return assignments;
     }
 
+    public async Task<bool> ExistsAsync(int assignmentId)
+    {
+        var isExist = await dbContext.Assignments
+            .AnyAsync(a => a.Id == assignmentId);
+
+        return isExist;
+    }
+
     public Task SaveChangesAsync()
         => dbContext.SaveChangesAsync();
 }
