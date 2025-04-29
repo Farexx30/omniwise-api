@@ -8,9 +8,4 @@ public class CourseDto
     public string Name { get; set; } = default!;
     public string? ImgUrl { get; set; }
     public string OwnerId { get; set; } = default!;
-
-    //References:
-    public List<User> Members { get; set; } = [];
-    public List<Lecture> Lectures { get; set; } = [];
-    public List<Assignment> Assignments { get; set; } = [];
 }
