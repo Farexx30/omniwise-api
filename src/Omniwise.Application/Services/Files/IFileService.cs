@@ -13,5 +13,6 @@ public interface IFileService
     Task<TFile> UploadFileAsync<TFile>(IFormFile file, int parentId)
         where TFile : File, new();
     Task DeleteFileAsync(string fileName);
+    string GetFileSasUrl(string fileName);
     void ValidateFiles(IEnumerable<IFormFile> files);
 }

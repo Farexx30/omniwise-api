@@ -10,5 +10,6 @@ namespace Omniwise.Application.Common.Interfaces;
 public interface IAssignmentSubmissionsRepository
 {
     Task<int> CreateAsync(AssignmentSubmission assignmentSubmission);
-    Task<bool> IsAlreadySubmitted(int assignmentId, string userId);
+    Task<AssignmentSubmission?> GetByIdAsync(int assignmentSubmissionId);
+    Task<bool> IsAlreadySubmitted(int assignmentSubmissionId, string userId);
 }

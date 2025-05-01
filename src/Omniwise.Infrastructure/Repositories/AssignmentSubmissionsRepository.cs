@@ -20,10 +20,19 @@ internal class AssignmentSubmissionsRepository(OmniwiseDbContext dbContext) : IA
         return assignmentSubmission.Id;
     }
 
-    public async Task<bool> IsAlreadySubmitted(int assignmentId, string userId)
+    public async Task<AssignmentSubmission?> GetByIdAsync(int assignmentSubmissionId)
+    {
+        var assignmentSubmission = await dbContext.AssignmentSubmissions
+            .Include(asub => asub.Files)
+            .FirstOrDefaultAsync(asub => asub.Id == assignmentSubmissionId);
+
+        return assignmentSubmission;
+    }
+
+    public async Task<bool> IsAlreadySubmitted(int assignmentSubmissionId, string userId)
     {
         var isAlreadySubmitted = await dbContext.AssignmentSubmissions
-            .AnyAsync(asub => asub.AssignmentId == assignmentId
+            .AnyAsync(asub => asub.AssignmentId == assignmentSubmissionId
                       && asub.AuthorId == userId);
 
         return isAlreadySubmitted;

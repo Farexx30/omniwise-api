@@ -54,6 +54,7 @@ public static class ServiceCollectionExtensions
                 policy.Requirements.Add(new MustBeEnrolledInCourseRequirement()));
 
         services.AddSingleton<IAuthorizationHandler, SameOwnerRequirementHandler>();
+        services.AddSingleton<IAuthorizationHandler, SameOwnerForAssignmentSubmissionRequirementHandler>();
         services.AddScoped<IAuthorizationHandler, MustBeEnrolledInCourseRequirementHandler>();
         services.AddScoped<IAuthorizationHandler, MustBeEnrolledInCourseForAssignmentSubmissionRequirementHandler>();
 

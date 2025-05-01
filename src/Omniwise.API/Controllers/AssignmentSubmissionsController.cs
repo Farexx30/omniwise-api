@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Omniwise.Application.AssignmentSubmissions.Commands.CreateAssignmentSubmission;
+using Omniwise.Application.AssignmentSubmissions.Dtos;
+using Omniwise.Application.AssignmentSubmissions.Queries.GetAssignmentSubmissionById;
 using Omniwise.Domain.Constants;
 
 namespace Omniwise.API.Controllers;
@@ -18,6 +20,15 @@ public class AssignmentSubmissionsController(IMediator mediator) : ControllerBas
         command.AssignmentId = assignmentId;
         var assignmentSubmissionId = await mediator.Send(command);
 
-        return CreatedAtAction(/*nameof(GetAssignmentSubmissionById)*/ null, new { assignmentSubmissionId }, null);
+        return CreatedAtAction(nameof(GetAssignmentSubmissionById), new { assignmentSubmissionId }, null);
+    }
+
+    [HttpGet("assignment-submissions/{assignmentSubmissionId}")]
+    public async Task<ActionResult<AssignmentSubmissionDto>> GetAssignmentSubmissionById([FromRoute] int assignmentSubmissionId)
+    {
+        var query = new GetAssignmentSubmissionByIdQuery { AssignmentSubmissionId = assignmentSubmissionId };
+        var assignmentSubmission = await mediator.Send(query);
+
+        return Ok(assignmentSubmission);
     }
 }

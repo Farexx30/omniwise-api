@@ -1,4 +1,5 @@
 ﻿using Azure.Storage.Blobs;
+using Azure.Storage.Sas;
 using Microsoft.Extensions.Options;
 using Omniwise.Application.Common.Interfaces;
 using System;
@@ -13,14 +14,9 @@ internal class BlobStorageService(IOptions<BlobStorageSettings> settingsOptions)
 {
     private readonly BlobStorageSettings _settings = settingsOptions.Value;
 
-    public async Task<string> UploadFileAsync(Stream fileContent, string fileName)
+    public async Task<string> UploadFileAsync(Stream fileContent, string blobName)
     {
-        var blobServiceClient = new BlobServiceClient(_settings.ConnectionString);
-
-        var blobContainerClient = blobServiceClient.GetBlobContainerClient(_settings.ContainerName);
-        await blobContainerClient.CreateIfNotExistsAsync();
-
-        var blobClient = blobContainerClient.GetBlobClient(fileName);
+        var blobClient = GetBlobClient(blobName);
 
         await blobClient.UploadAsync(fileContent);
 
@@ -28,13 +24,35 @@ internal class BlobStorageService(IOptions<BlobStorageSettings> settingsOptions)
         return blobUri;
     }
 
-    public async Task DeleteFileAsync(string fileName)
+    public async Task DeleteFileAsync(string blobName)
+    {
+        var blobClient = GetBlobClient(blobName);
+        await blobClient.DeleteIfExistsAsync();
+    }
+
+    public string GetBlobSasUrl(string blobName)
+    {   
+        var blobClient = GetBlobClient(blobName);
+
+        var blobSasUri = blobClient.GenerateSasUri(BlobSasPermissions.Read, DateTimeOffset.UtcNow.AddHours(1));
+        return blobSasUri.ToString();
+    }
+
+    public async Task CreateBlobContainerIfNotExistsAsync()
+    {
+        var blobServiceClient = new BlobServiceClient(_settings.ConnectionString);
+
+        var blobContainerClient = blobServiceClient.GetBlobContainerClient(_settings.ContainerName);
+        await blobContainerClient.CreateIfNotExistsAsync();
+    }
+
+    private BlobClient GetBlobClient(string blobName)
     {
         var blobServiceClient = new BlobServiceClient(_settings.ConnectionString);
 
         var blobContainerClient = blobServiceClient.GetBlobContainerClient(_settings.ContainerName);
 
-        var blobClient = blobContainerClient.GetBlobClient(fileName);
-        await blobClient.DeleteIfExistsAsync();
+        var blobClient = blobContainerClient.GetBlobClient(blobName);
+        return blobClient;
     }
 }

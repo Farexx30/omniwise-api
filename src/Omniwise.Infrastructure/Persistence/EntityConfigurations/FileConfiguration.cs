@@ -23,9 +23,6 @@ internal class FileConfiguration : IEntityTypeConfiguration<File>
         builder.Property(f => f.Name)
             .HasMaxLength(256);
 
-        builder.Property(f => f.Url)
-            .HasMaxLength(2048);
-
         builder.Property(f => f.ContentHash)
             .HasMaxLength(64)
             .HasColumnType("varchar(64)");

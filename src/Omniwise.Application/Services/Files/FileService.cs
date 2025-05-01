@@ -36,7 +36,6 @@ internal class FileService(ILogger<FileService> logger,
         return new TFile
         {
             Name = fileName,
-            Url = fileUrl,
             ContentHash = contentHash,
         };
     }
@@ -48,6 +47,7 @@ internal class FileService(ILogger<FileService> logger,
         await blobStorageService.DeleteFileAsync(fileName);
     }
 
+    //Remember to add potential file length check!
     public void ValidateFiles(IEnumerable<IFormFile> files)
     {
         //Check if there is at least one file in the collection:
@@ -65,6 +65,21 @@ internal class FileService(ILogger<FileService> logger,
         {
             throw new BadRequestException("Files with the exact same name and extension are not allowed.");
         }
+
+        //Check if any file name is not too long:
+        var isAnyFileNameTooLong = files
+            .Any(f => f.FileName.Length > 256);
+
+        if (isAnyFileNameTooLong)
+        {
+            throw new BadHttpRequestException("File name is too long. Maximum length is 256 characters.");
+        }
+    }
+
+    public string GetFileSasUrl(string fileName)
+    {
+        var fileSasUrl = blobStorageService.GetBlobSasUrl(fileName);
+        return fileSasUrl;
     }
 
     private static string GetFolderName(Type fileType)

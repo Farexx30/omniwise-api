@@ -15,6 +15,7 @@ builder.Services.AddInfrastructure(builder.Configuration);
 var app = builder.Build();
 
 await app.Services.InitializeDatabaseAsync();
+await app.Services.InitializeBlobStorageAsync();
 
 if (app.Environment.IsDevelopment())
 {

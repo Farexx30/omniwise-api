@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Omniwise.Application.AssignmentSubmissions.Commands.Dtos;
+namespace Omniwise.Application.AssignmentSubmissions.Dtos;
 
 public class AssignmentSubmissionsMappingProfile : Profile
 {
@@ -15,5 +15,7 @@ public class AssignmentSubmissionsMappingProfile : Profile
     {
         CreateMap<CreateAssignmentSubmissionCommand, AssignmentSubmission>()
             .ForMember(dest => dest.Files, opt => opt.Ignore());
+
+        CreateMap<AssignmentSubmission, AssignmentSubmissionDto>();
     }
 }
