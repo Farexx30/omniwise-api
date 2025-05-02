@@ -16,4 +16,10 @@ internal class FilesRepository(OmniwiseDbContext dbContext) : IFilesRepository
         dbContext.Files.AddRange(files);
         await dbContext.SaveChangesAsync();
     }
+
+    public async Task DeleteManyAsync(IEnumerable<File> files)
+    {
+        dbContext.Files.RemoveRange(files);
+        await dbContext.SaveChangesAsync();
+    }
 }

@@ -20,6 +20,12 @@ internal class AssignmentSubmissionsRepository(OmniwiseDbContext dbContext) : IA
         return assignmentSubmission.Id;
     }
 
+    public async Task DeleteAsync(AssignmentSubmission assignmentSubmission)
+    {
+        dbContext.AssignmentSubmissions.Remove(assignmentSubmission);
+        await dbContext.SaveChangesAsync();
+    }
+
     public async Task<AssignmentSubmission?> GetByIdAsync(int assignmentSubmissionId)
     {
         var assignmentSubmission = await dbContext.AssignmentSubmissions

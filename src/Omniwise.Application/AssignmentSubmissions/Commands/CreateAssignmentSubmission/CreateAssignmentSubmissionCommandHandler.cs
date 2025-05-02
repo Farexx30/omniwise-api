@@ -89,10 +89,7 @@ public class CreateAssignmentSubmissionCommandHandler(IAssignmentSubmissionsRepo
         }
         catch (Exception)
         {
-            foreach (var file in assignmentSubmissionFiles)
-            {
-                await fileService.DeleteFileAsync(file.Name);
-            }
+            await fileService.RollbackChangesAsync();
 
             throw new Exception("An unexpected error occurred while creating assignment submission.");
         }

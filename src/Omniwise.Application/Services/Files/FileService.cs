@@ -19,19 +19,33 @@ namespace Omniwise.Application.Services.Files;
 internal class FileService(ILogger<FileService> logger,
         IBlobStorageService blobStorageService) : IFileService
 {
+    private readonly Stack<Func<Task>> _rollbackOperations = [];
+    private readonly List<string> _createdSnapshotsFileNames = [];
+
     public async Task<TFile> UploadFileAsync<TFile>(IFormFile file, int parentId)
         where TFile : File, new()
     {
         var folderName = GetFolderName(typeof(TFile));
-
         var fileName = $"{folderName}/{parentId}-{file.FileName}";
 
-        logger.LogInformation("Uploading file {fileName}.",
-            file.FileName);
+        logger.LogInformation("Uploading file {fileName}.", file.FileName);
+
+        //TRY to create a snapshot of the blob to be able to restore it later if needed.
+        //The snapshot will be created only when blob already exists - if it is not the reverse operation is delete then.
+        var snapshot = await blobStorageService.CreateBlobSnapshotAsync(fileName);
+        if (snapshot is not null)
+        {
+            _rollbackOperations.Push(() => blobStorageService.RestoreBlobFromSnapshotAsync(fileName, snapshot));
+            _createdSnapshotsFileNames.Add(fileName);
+        }
+        else
+        {
+            _rollbackOperations.Push(() => blobStorageService.DeleteBlobAsync(fileName));
+        }
 
         using var stream = file.OpenReadStream();
         var contentHash = OmniwiseCryptography.ComputeSha256Hash(stream);
-        var fileUrl = await blobStorageService.UploadFileAsync(stream, fileName);
+        await blobStorageService.UploadBlobAsync(stream, fileName);
 
         return new TFile
         {
@@ -44,10 +58,37 @@ internal class FileService(ILogger<FileService> logger,
     {
         logger.LogInformation("Deleting file {fileName}.", fileName);
 
-        await blobStorageService.DeleteFileAsync(fileName);
+        _rollbackOperations.Push(() => blobStorageService.RestoreFromTrashAsync(fileName));
+
+        await blobStorageService.MoveToTrashAsync(fileName);
     }
 
-    //Remember to add potential file length check!
+    public string GetFileSasUrl(string fileName)
+    {
+        var fileSasUrl = blobStorageService.GetBlobSasUrl(fileName);
+        return fileSasUrl;
+    }
+
+    public async Task CleanUpAsync()
+    {
+        foreach (var fileName in _createdSnapshotsFileNames)
+        {
+            await blobStorageService.DeleteBlobSnapshotsAsync(fileName);
+        }
+        _createdSnapshotsFileNames.Clear();
+      
+        await blobStorageService.ClearTrashAsync();
+    }
+
+    public async Task RollbackChangesAsync()
+    {
+        while (_rollbackOperations.Count != 0)
+        {
+            var rollbackOperation = _rollbackOperations.Pop();
+            await rollbackOperation();
+        }
+    }
+
     public void ValidateFiles(IEnumerable<IFormFile> files)
     {
         //Check if there is at least one file in the collection:
@@ -74,12 +115,6 @@ internal class FileService(ILogger<FileService> logger,
         {
             throw new BadHttpRequestException("File name is too long. Maximum length is 256 characters.");
         }
-    }
-
-    public string GetFileSasUrl(string fileName)
-    {
-        var fileSasUrl = blobStorageService.GetBlobSasUrl(fileName);
-        return fileSasUrl;
     }
 
     private static string GetFolderName(Type fileType)

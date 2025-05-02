@@ -11,5 +11,6 @@ namespace Omniwise.Application.Common.Interfaces
     public interface IFilesRepository
     {
         Task CreateManyAsync(IEnumerable<File> files);
+        Task DeleteManyAsync(IEnumerable<File> files);
     }
 }

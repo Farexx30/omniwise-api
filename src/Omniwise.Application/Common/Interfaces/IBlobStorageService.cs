@@ -8,8 +8,14 @@ namespace Omniwise.Application.Common.Interfaces;
 
 public interface IBlobStorageService
 {
-    Task<string> UploadFileAsync(Stream blobContent, string blobName);
-    Task DeleteFileAsync(string blobName);
+    Task UploadBlobAsync(Stream blobContent, string blobName);
+    Task DeleteBlobAsync(string blobName);
+    Task<string?> CreateBlobSnapshotAsync(string blobName);
+    Task RestoreBlobFromSnapshotAsync(string blobName, string snapshot);
+    Task DeleteBlobSnapshotsAsync(string blobName);
+    Task MoveToTrashAsync(string blobName);
+    Task RestoreFromTrashAsync(string blobName);
+    Task ClearTrashAsync();
     string GetBlobSasUrl(string blobName);
     Task CreateBlobContainerIfNotExistsAsync();
 }
