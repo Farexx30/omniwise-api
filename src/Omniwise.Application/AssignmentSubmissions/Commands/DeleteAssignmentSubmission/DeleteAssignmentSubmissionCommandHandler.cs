@@ -53,6 +53,11 @@ public class DeleteAssignmentSubmissionCommandHandler(IAssignmentSubmissionsRepo
             throw new ForbiddenException($"You are not allowed to delete {nameof(AssignmentSubmission)} with id = {assignmentSubmissionId}");
         }
 
+        if (assignmentSubmission.Grade is not null)
+        {
+            throw new ForbiddenException($"You cannot delete {nameof(AssignmentSubmission)} with id = {assignmentSubmissionId} because it has already been graded.");
+        }
+
         var fileNamesToDelete = assignmentSubmission.Files
             .Select(f => f.BlobName)
             .ToList();

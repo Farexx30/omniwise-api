@@ -44,6 +44,16 @@ internal class AssignmentsRepository(OmniwiseDbContext dbContext) : IAssignments
         return assignments;
     }
 
+    public async Task<float> GetMaxGradeAsync(int assignmentId)
+    {
+        var maxGrade = await dbContext.Assignments
+            .Where(a => a.Id == assignmentId)
+            .Select(a => a.MaxGrade)
+            .FirstAsync(); //We can use FirstAsync here because we are sure that the assignment exists.
+
+        return maxGrade;
+    }
+
     public async Task<bool> ExistsAsync(int assignmentId)
     {
         var isExist = await dbContext.Assignments

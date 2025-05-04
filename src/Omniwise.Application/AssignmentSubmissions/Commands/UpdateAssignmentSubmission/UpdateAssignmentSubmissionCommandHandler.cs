@@ -42,6 +42,11 @@ class UpdateAssignmentSubmissionCommandHandler(IAssignmentSubmissionsRepository 
             throw new ForbiddenException($"You are not allowed to update {nameof(AssignmentSubmission)} with id = {assignmentSubmissionId}");
         }
 
+        if (assignmentSubmission.Grade is not null)
+        {
+            throw new ForbiddenException($"You cannot update {nameof(AssignmentSubmission)} with id = {assignmentSubmissionId} because it has already been graded.");
+        }
+
         var newFiles = request.Files;
         fileService.ValidateFiles(newFiles); //Will throw BadRequestException if validation fails
 

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Omniwise.Application.AssignmentSubmissions.Commands.CreateAssignmentSubmission;
 using Omniwise.Application.AssignmentSubmissions.Commands.DeleteAssignmentSubmission;
+using Omniwise.Application.AssignmentSubmissions.Commands.GradeAssignmentSubmission;
 using Omniwise.Application.AssignmentSubmissions.Commands.UpdateAssignmentSubmission;
 using Omniwise.Application.AssignmentSubmissions.Dtos;
 using Omniwise.Application.AssignmentSubmissions.Queries.GetAssignmentSubmissionById;
@@ -29,7 +30,17 @@ public class AssignmentSubmissionsController(IMediator mediator) : ControllerBas
     [HttpPatch("assignment-submissions/{assignmentSubmissionId}")]
     [Authorize(Roles = Roles.Student)]
     [RequestSizeLimit(50_000_000)]
-    public async Task<IActionResult> UpdateAssignmentSubmission([FromForm] UpdateAssignmentSubmissionCommand command, int assignmentSubmissionId)
+    public async Task<IActionResult> UpdateAssignmentSubmission([FromForm] UpdateAssignmentSubmissionCommand command, [FromRoute] int assignmentSubmissionId)
+    {
+        command.AssignmentSubmissionId = assignmentSubmissionId;
+        await mediator.Send(command);
+
+        return NoContent();
+    }
+
+    [HttpPatch("assignment-submissions/{assignmentSubmissionId}/grade")]
+    [Authorize(Roles = Roles.Teacher)]
+    public async Task<IActionResult> GradeAssignmentSubmission([FromBody] GradeAssignmentSubmissionCommand command, [FromRoute] int assignmentSubmissionId)
     {
         command.AssignmentSubmissionId = assignmentSubmissionId;
         await mediator.Send(command);
