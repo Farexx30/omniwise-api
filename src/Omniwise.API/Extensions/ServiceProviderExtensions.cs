@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Omniwise.Application.Common.Interfaces;
 using Omniwise.Domain.Entities;
 using Omniwise.Infrastructure.Persistence.MigrationAppliers;
 using Omniwise.Infrastructure.Persistence.Seeders;
@@ -8,12 +9,12 @@ namespace Omniwise.API.Extensions;
 
 public static class ServiceProviderExtensions
 {
-    public async static Task InitializeDatabaseAsync(this IServiceProvider serviceProvider)
+    public static async Task InitializeDatabaseAsync(this IServiceProvider serviceProvider)
     {
         var scope = serviceProvider.CreateScope();
 
         //First apply any pending migrations:
-        var migrationApplier = scope.ServiceProvider.GetMigrationApplier();
+        var migrationApplier = scope.ServiceProvider.GetRequiredService<IMigrationApplier>();
         await migrationApplier.ApplyAsync();
 
         //Then seed the database with initial data:
@@ -24,11 +25,6 @@ public static class ServiceProviderExtensions
         }
     }
 
-    private static IMigrationApplier GetMigrationApplier(this IServiceProvider serviceProvider)
-    {
-        return serviceProvider.GetRequiredService<IMigrationApplier>();
-    }
-
     private static IEnumerable<ISeeder> GetSeederServices(this IServiceProvider serviceProvider)
     {
         IEnumerable<ISeeder> seeders = [
@@ -37,5 +33,13 @@ public static class ServiceProviderExtensions
         ];
 
         return seeders;
+    }
+
+    public static async Task InitializeBlobStorageAsync(this IServiceProvider serviceProvider)
+    {
+        var scope = serviceProvider.CreateScope();
+
+        var blobStorageService = scope.ServiceProvider.GetRequiredService<IBlobStorageService>();
+        await blobStorageService.CreateBlobContainerIfNotExistsAsync();
     }
 }

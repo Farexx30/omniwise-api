@@ -1,6 +1,7 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.Extensions.DependencyInjection;
+using Omniwise.Application.Services.Files;
 
 
 namespace Omniwise.Application.Extensions;
@@ -17,5 +18,7 @@ public static class ServiceCollectionExtensions
 
         services.AddValidatorsFromAssembly(applicationAssembly)
                 .AddFluentValidationAutoValidation();
+
+        services.AddScoped<IFileService, FileService>();
     }
 }

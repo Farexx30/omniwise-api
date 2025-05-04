@@ -9,7 +9,9 @@ namespace Omniwise.Domain.Entities;
 public abstract class File
 {
     public int Id { get; set; }
-    public string Url { get; set; } = default!;
+    public string OriginalName { get; set; } = default!;
+    public string BlobName { get; set; } = default!;
+    public string ContentHash { get; set; } = default!;
 }
 
 public class LectureFile : File

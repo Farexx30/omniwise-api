@@ -13,6 +13,7 @@ using Omniwise.Infrastructure.Persistence;
 using Omniwise.Infrastructure.Persistence.MigrationAppliers;
 using Omniwise.Infrastructure.Persistence.Seeders;
 using Omniwise.Infrastructure.Repositories;
+using Omniwise.Infrastructure.Storage;
 
 namespace Omniwise.Infrastructure.Extensions;
 
@@ -41,6 +42,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICoursesRepository, CoursesRepository>();
         services.AddScoped<ILecturesRepository, LecturesRepository>();
         services.AddScoped<IAssignmentsRepository, AssignmentsRepository>();
+        services.AddScoped<IAssignmentSubmissionsRepository, AssignmentSubmissionsRepository>();
+
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddAuthorizationBuilder()
             .AddPolicy(Policies.SameOwner, policy =>
@@ -49,6 +53,11 @@ public static class ServiceCollectionExtensions
                 policy.Requirements.Add(new MustBeEnrolledInCourseRequirement()));
 
         services.AddSingleton<IAuthorizationHandler, SameOwnerRequirementHandler>();
+        services.AddSingleton<IAuthorizationHandler, SameOwnerForAssignmentSubmissionRequirementHandler>();
         services.AddScoped<IAuthorizationHandler, MustBeEnrolledInCourseRequirementHandler>();
+        services.AddScoped<IAuthorizationHandler, MustBeEnrolledInCourseForAssignmentSubmissionRequirementHandler>();
+
+        services.Configure<BlobStorageSettings>(configuration.GetSection("BlobStorage"));
+        services.AddScoped<IBlobStorageService, BlobStorageService>();
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Omniwise.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using Omniwise.Infrastructure.Persistence;
 namespace Omniwise.Infrastructure.Migrations
 {
     [DbContext(typeof(OmniwiseDbContext))]
-    partial class OmniwiseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250429150449_SubmissionAndSubmissionCommentAuthorIdFKFixedAndAddedFewNeccessaryColumnsToFileTable")]
+    partial class SubmissionAndSubmissionCommentAuthorIdFKFixedAndAddedFewNeccessaryColumnsToFileTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -285,20 +288,20 @@ namespace Omniwise.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("BlobName")
-                        .IsRequired()
-                        .HasMaxLength(512)
-                        .HasColumnType("nvarchar(512)");
-
                     b.Property<string>("ContentHash")
                         .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("varchar(64)");
 
-                    b.Property<string>("OriginalName")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
 
                     b.HasKey("Id");
 
