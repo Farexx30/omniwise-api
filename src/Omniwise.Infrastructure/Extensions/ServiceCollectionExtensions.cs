@@ -43,7 +43,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ILecturesRepository, LecturesRepository>();
         services.AddScoped<IAssignmentsRepository, AssignmentsRepository>();
         services.AddScoped<IAssignmentSubmissionsRepository, AssignmentSubmissionsRepository>();
-        services.AddScoped<IFilesRepository, FilesRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 

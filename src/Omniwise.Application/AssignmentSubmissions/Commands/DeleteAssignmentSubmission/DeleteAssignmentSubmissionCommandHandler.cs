@@ -17,7 +17,6 @@ using System.Threading.Tasks;
 namespace Omniwise.Application.AssignmentSubmissions.Commands.DeleteAssignmentSubmission;
 
 public class DeleteAssignmentSubmissionCommandHandler(IAssignmentSubmissionsRepository assignmentSubmissionsRepository,
-    IFilesRepository filesRepository,
     ILogger<DeleteAssignmentSubmissionCommandHandler> logger,
     IUserContext userContext,
     IAuthorizationService authorizationService,
@@ -54,29 +53,15 @@ public class DeleteAssignmentSubmissionCommandHandler(IAssignmentSubmissionsRepo
             throw new ForbiddenException($"You are not allowed to delete {nameof(AssignmentSubmission)} with id = {assignmentSubmissionId}");
         }
 
-        var files = assignmentSubmission.Files;
-        try
+        var fileNamesToDelete = assignmentSubmission.Files
+            .Select(f => f.BlobName)
+            .ToList();
+
+        await unitOfWork.ExecuteTransactionalAsync(async () =>
         {
-            await unitOfWork.ExecuteTransactionalAsync(async () =>
-            {
-                foreach (var file in files)
-                {
-                    await fileService.DeleteFileAsync(file.Name);
-                }
+            await fileService.DeleteAllAsync(fileNamesToDelete);
 
-                await filesRepository.DeleteManyAsync(assignmentSubmission.Files);
-
-                await assignmentSubmissionsRepository.DeleteAsync(assignmentSubmission);
-
-                //If everything went ok, we delete any temporary created backups/snapshots:
-                await fileService.CleanUpAsync();
-            });
-        }
-        catch (Exception)
-        {
-            await fileService.RollbackChangesAsync(); //Already cleans everything up.
-
-            throw new Exception("An unexpected error occurred while deleting assignment submission.");
-        }
+            await assignmentSubmissionsRepository.DeleteAsync(assignmentSubmission);
+        });
     }
 }

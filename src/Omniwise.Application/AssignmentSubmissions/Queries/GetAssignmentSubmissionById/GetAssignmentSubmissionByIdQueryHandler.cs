@@ -61,7 +61,7 @@ public class GetAssignmentSubmissionByIdQueryHandler(IAssignmentSubmissionsRepos
         var assignmentSubmissionDto = mapper.Map<AssignmentSubmissionDto>(assignmentSubmission);
         foreach (var file in assignmentSubmission.Files)
         {
-            var fileSasUrl = fileService.GetFileSasUrl(file.Name);
+            var fileSasUrl = await fileService.GetFileSasUrl(file.BlobName);
             assignmentSubmissionDto.FileUrls.Add(fileSasUrl);
         }
 

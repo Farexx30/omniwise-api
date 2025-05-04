@@ -10,11 +10,11 @@ namespace Omniwise.Application.Services.Files;
 
 public interface IFileService
 {
-    Task<TFile> UploadFileAsync<TFile>(IFormFile file, int parentId)
+    Task<List<TFile>> UploadAllAsync<TFile>(List<IFormFile> files, int parentId)
         where TFile : File, new();
-    Task DeleteFileAsync(string fileName);
-    string GetFileSasUrl(string fileName);
-    Task CleanUpAsync();
-    Task RollbackChangesAsync();
+    Task CompareAndUpdateAsync<TFile>(List<IFormFile> newFiles, List<TFile> currentFiles, int parentId)
+        where TFile : File, new();
+    Task DeleteAllAsync(List<string> fileNames);
+    Task<string> GetFileSasUrl(string fileName);
     void ValidateFiles(IEnumerable<IFormFile> files);
 }

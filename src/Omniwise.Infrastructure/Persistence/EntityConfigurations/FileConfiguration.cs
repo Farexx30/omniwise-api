@@ -20,8 +20,11 @@ internal class FileConfiguration : IEntityTypeConfiguration<File>
         builder.UseTptMappingStrategy();
 
         //Properties:
-        builder.Property(f => f.Name)
+        builder.Property(f => f.OriginalName)
             .HasMaxLength(256);
+
+        builder.Property(f => f.BlobName)
+            .HasMaxLength(512);
 
         builder.Property(f => f.ContentHash)
             .HasMaxLength(64)

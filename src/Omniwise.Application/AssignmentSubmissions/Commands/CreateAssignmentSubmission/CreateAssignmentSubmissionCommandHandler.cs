@@ -21,7 +21,6 @@ namespace Omniwise.Application.AssignmentSubmissions.Commands.CreateAssignmentSu
 
 public class CreateAssignmentSubmissionCommandHandler(IAssignmentSubmissionsRepository assignmentSubmissionsRepository,
     IAssignmentsRepository assignmentsRepository,
-    IFilesRepository filesRepository,
     ILogger<CreateAssignmentSubmissionCommandHandler> logger,
     IMapper mapper,
     IUserContext userContext,
@@ -68,30 +67,15 @@ public class CreateAssignmentSubmissionCommandHandler(IAssignmentSubmissionsRepo
 
         //If everything is ok update database and upload files:
         int assignmentSubmissionId = 0;
-        List<AssignmentSubmissionFile> assignmentSubmissionFiles = [];
-        try
+        await unitOfWork.ExecuteTransactionalAsync(async () =>
         {
-            await unitOfWork.ExecuteTransactionalAsync(async () =>
-            {
-                assignmentSubmissionId = await assignmentSubmissionsRepository.CreateAsync(assignmentSubmission);
+            assignmentSubmissionId = await assignmentSubmissionsRepository.CreateAsync(assignmentSubmission);
+            
+            var assignmentSubmissionFiles = await fileService.UploadAllAsync<AssignmentSubmissionFile>(files, assignmentSubmissionId);
+            assignmentSubmission.Files.AddRange(assignmentSubmissionFiles);
+            await assignmentSubmissionsRepository.SaveChangesAsync();
+        });
 
-                foreach (var file in files)
-                {
-                    var assignmentSubmissionFile = await fileService.UploadFileAsync<AssignmentSubmissionFile>(file, assignmentSubmissionId);
-                    assignmentSubmissionFile.AssignmentSubmissionId = assignmentSubmissionId;
-                    assignmentSubmissionFiles.Add(assignmentSubmissionFile);
-                }
-
-                await filesRepository.CreateManyAsync(assignmentSubmissionFiles);
-            });
-
-            return assignmentSubmissionId;
-        }
-        catch (Exception)
-        {
-            await fileService.RollbackChangesAsync();
-
-            throw new Exception("An unexpected error occurred while creating assignment submission.");
-        }
+        return assignmentSubmissionId;
     }
 }

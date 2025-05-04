@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
 using Omniwise.Application.AssignmentSubmissions.Commands.CreateAssignmentSubmission;
 using Omniwise.Application.Common.Interfaces;
@@ -19,74 +21,95 @@ namespace Omniwise.Application.Services.Files;
 internal class FileService(ILogger<FileService> logger,
         IBlobStorageService blobStorageService) : IFileService
 {
-    private readonly Stack<Func<Task>> _rollbackOperations = [];
-    private readonly List<string> _createdSnapshotsFileNames = [];
-
-    public async Task<TFile> UploadFileAsync<TFile>(IFormFile file, int parentId)
+    public async Task<List<TFile>> UploadAllAsync<TFile>(List<IFormFile> files, int parentId)
         where TFile : File, new()
     {
         var folderName = GetFolderName(typeof(TFile));
-        var fileName = $"{folderName}/{parentId}-{file.FileName}";
 
-        logger.LogInformation("Uploading file {fileName}.", file.FileName);
-
-        //TRY to create a snapshot of the blob to be able to restore it later if needed.
-        //The snapshot will be created only when blob already exists - if it is not the reverse operation is delete then.
-        var snapshot = await blobStorageService.CreateBlobSnapshotAsync(fileName);
-        if (snapshot is not null)
+        List<TFile> uploadedFiles = [];
+        foreach (var file in files)
         {
-            _rollbackOperations.Push(() => blobStorageService.RestoreBlobFromSnapshotAsync(fileName, snapshot));
-            _createdSnapshotsFileNames.Add(fileName);
+            var originalFileName = file.FileName;
+            var blobName = $"{folderName}/{parentId}-{originalFileName}";
+
+            using var stream = file.OpenReadStream();
+            var contentHash = OmniwiseCryptography.ComputeSha256Hash(stream);
+            await blobStorageService.UploadBlobAsync(stream, blobName);
+
+            uploadedFiles.Add(new TFile
+            {
+                OriginalName = originalFileName,
+                BlobName = blobName,
+                ContentHash = contentHash,
+            });
         }
-        else
-        {
-            _rollbackOperations.Push(() => blobStorageService.DeleteBlobAsync(fileName));
-        }
 
-        using var stream = file.OpenReadStream();
-        var contentHash = OmniwiseCryptography.ComputeSha256Hash(stream);
-        await blobStorageService.UploadBlobAsync(stream, fileName);
-
-        return new TFile
-        {
-            Name = fileName,
-            ContentHash = contentHash,
-        };
+        return uploadedFiles;
     }
 
-    public async Task DeleteFileAsync(string fileName)
+    public async Task CompareAndUpdateAsync<TFile>(List<IFormFile> newFiles, List<TFile> currentFiles, int parentId)
+        where TFile : File, new()
     {
-        logger.LogInformation("Deleting file {fileName}.", fileName);
+        var folderName = GetFolderName(typeof(TFile));
 
-        _rollbackOperations.Push(() => blobStorageService.RestoreFromTrashAsync(fileName));
+        var oldFiles = currentFiles.ToList();
+        foreach (var newFile in newFiles)
+        {
+            var newFileOriginalName = newFile.FileName;
+            var newFileBlobName = $"{folderName}/{parentId}-{newFileOriginalName}";
 
-        await blobStorageService.MoveToTrashAsync(fileName);
+            using var stream = newFile.OpenReadStream();
+            var newFileContentHash = OmniwiseCryptography.ComputeSha256Hash(stream);
+
+            var pairedByContentHashOldFile = oldFiles.FirstOrDefault(cf => cf.ContentHash == newFileContentHash);
+            var pairedByOriginalNameOldFile = oldFiles.FirstOrDefault(of => of.OriginalName == newFileOriginalName);
+
+            //If the new file is exactly the same as the old one, we can skip uploading it:
+            if (pairedByContentHashOldFile is not null
+                && pairedByContentHashOldFile == pairedByOriginalNameOldFile)
+            {
+                oldFiles.Remove(pairedByContentHashOldFile);
+                continue;
+            }  
+
+            await blobStorageService.UploadBlobAsync(stream, newFileBlobName);
+
+            //If there is already a record with such name, just perform an update without unnecessary insert + delete.
+            if (pairedByOriginalNameOldFile is not null)
+            {
+                pairedByOriginalNameOldFile.ContentHash = newFileContentHash;
+                oldFiles.Remove(pairedByOriginalNameOldFile);
+                continue;
+            }
+
+            currentFiles.Add(new TFile
+            {
+                OriginalName = newFileOriginalName,
+                BlobName = newFileBlobName,
+                ContentHash = newFileContentHash,
+            });
+        }
+
+        //Delete any "leftovers" if needed:
+        foreach (var oldFile in oldFiles)
+        {
+            await blobStorageService.DeleteBlobAsync(oldFile.BlobName);
+            currentFiles.Remove(oldFile);
+        }
     }
 
-    public string GetFileSasUrl(string fileName)
+    public async Task DeleteAllAsync(List<string> fileNames)
     {
-        var fileSasUrl = blobStorageService.GetBlobSasUrl(fileName);
+        foreach (var fileName in fileNames)
+        {
+            await blobStorageService.DeleteBlobAsync(fileName);
+        }
+    }
+
+    public async Task<string> GetFileSasUrl(string fileName)
+    {
+        var fileSasUrl = await blobStorageService.GetBlobSasUrl(fileName);
         return fileSasUrl;
-    }
-
-    public async Task CleanUpAsync()
-    {
-        foreach (var fileName in _createdSnapshotsFileNames)
-        {
-            await blobStorageService.DeleteBlobSnapshotsAsync(fileName);
-        }
-        _createdSnapshotsFileNames.Clear();
-      
-        await blobStorageService.ClearTrashAsync();
-    }
-
-    public async Task RollbackChangesAsync()
-    {
-        while (_rollbackOperations.Count != 0)
-        {
-            var rollbackOperation = _rollbackOperations.Pop();
-            await rollbackOperation();
-        }
     }
 
     public void ValidateFiles(IEnumerable<IFormFile> files)

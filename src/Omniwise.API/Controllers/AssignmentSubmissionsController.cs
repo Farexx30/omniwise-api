@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Omniwise.Application.AssignmentSubmissions.Commands.CreateAssignmentSubmission;
 using Omniwise.Application.AssignmentSubmissions.Commands.DeleteAssignmentSubmission;
+using Omniwise.Application.AssignmentSubmissions.Commands.UpdateAssignmentSubmission;
 using Omniwise.Application.AssignmentSubmissions.Dtos;
 using Omniwise.Application.AssignmentSubmissions.Queries.GetAssignmentSubmissionById;
 using Omniwise.Domain.Constants;
@@ -23,6 +24,17 @@ public class AssignmentSubmissionsController(IMediator mediator) : ControllerBas
         var assignmentSubmissionId = await mediator.Send(command);
 
         return CreatedAtAction(nameof(GetAssignmentSubmissionById), new { assignmentSubmissionId }, null);
+    }
+
+    [HttpPatch("assignment-submissions/{assignmentSubmissionId}")]
+    [Authorize(Roles = Roles.Student)]
+    [RequestSizeLimit(50_000_000)]
+    public async Task<IActionResult> UpdateAssignmentSubmission([FromForm] UpdateAssignmentSubmissionCommand command, int assignmentSubmissionId)
+    {
+        command.AssignmentSubmissionId = assignmentSubmissionId;
+        await mediator.Send(command);
+
+        return NoContent();
     }
 
     [HttpDelete("assignment-submissions/{assignmentSubmissionId}")]

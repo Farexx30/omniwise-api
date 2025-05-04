@@ -43,4 +43,7 @@ internal class AssignmentSubmissionsRepository(OmniwiseDbContext dbContext) : IA
 
         return isAlreadySubmitted;
     }
+
+    public Task SaveChangesAsync()
+        => dbContext.SaveChangesAsync();
 }
