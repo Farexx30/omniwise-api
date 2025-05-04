@@ -27,7 +27,7 @@ internal class BlobStorageService(IOptions<BlobStorageSettings> settingsOptions,
     public async Task DeleteBlobAsync(string blobName)
     {
         var blobClient = GetBlobClient(blobName);
-        await blobClient.DeleteAsync();
+        await blobClient.DeleteIfExistsAsync();
     }
 
     public async Task<string> GetBlobSasUrl(string blobName)
@@ -36,8 +36,8 @@ internal class BlobStorageService(IOptions<BlobStorageSettings> settingsOptions,
 
         if (!await blobClient.ExistsAsync())
         {
-            //If this error even occurs, it means that somehow database is not in sync with blob storage.
             //This error should never happen!
+            //But if, it means that somehow database is not in sync with blob storage.
             logger.LogCritical("Blob with {blobName} not found.", blobName); 
             throw new NotFoundException($"Blob with {blobName} not found.");
         }

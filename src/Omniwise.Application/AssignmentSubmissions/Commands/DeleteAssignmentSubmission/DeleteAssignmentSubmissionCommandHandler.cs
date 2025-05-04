@@ -32,17 +32,6 @@ public class DeleteAssignmentSubmissionCommandHandler(IAssignmentSubmissionsRepo
         var assignmentSubmission = await assignmentSubmissionsRepository.GetByIdAsync(assignmentSubmissionId)
             ?? throw new NotFoundException($"Assignment submission with id = {assignmentSubmissionId} not found.");
 
-        //??? only if we won't delete all user submissions when he is being deleted from the course
-        //var authorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, assignmentSubmission, Policies.MustBeEnrolledInCourse);
-        //if (!authorizationResult.Succeeded)
-        //{
-        //    logger.LogWarning("User with id = {userId} is not authorized to delete assignment submission with id = {assignmentSubmissionId}.",
-        //        currentUser.Id,
-        //        assignmentSubmissionId);
-
-        //    throw new ForbiddenException($"You are not allowed to delete {nameof(AssignmentSubmission)} with id = {assignmentSubmissionId}");
-        //}
-
         var authorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, assignmentSubmission, Policies.SameOwner);
         if (!authorizationResult.Succeeded)
         {

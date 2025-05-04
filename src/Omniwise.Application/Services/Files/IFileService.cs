@@ -16,5 +16,4 @@ public interface IFileService
         where TFile : File, new();
     Task DeleteAllAsync(List<string> fileNames);
     Task<string> GetFileSasUrl(string fileName);
-    void ValidateFiles(IEnumerable<IFormFile> files);
 }

@@ -61,11 +61,8 @@ public class CreateAssignmentSubmissionCommandHandler(IAssignmentSubmissionsRepo
             throw new ForbiddenException("You can't create new submission for the same assignment again.");
         }
 
-        //Validate files:
         var files = request.Files;
-        fileService.ValidateFiles(files); //Will throw BadRequestException if validation fails
 
-        //If everything is ok update database and upload files:
         int assignmentSubmissionId = 0;
         await unitOfWork.ExecuteTransactionalAsync(async () =>
         {

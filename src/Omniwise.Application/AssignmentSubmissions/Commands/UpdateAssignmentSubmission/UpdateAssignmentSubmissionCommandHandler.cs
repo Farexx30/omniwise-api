@@ -48,12 +48,8 @@ class UpdateAssignmentSubmissionCommandHandler(IAssignmentSubmissionsRepository 
         }
 
         var newFiles = request.Files;
-        fileService.ValidateFiles(newFiles); //Will throw BadRequestException if validation fails
-
-        mapper.Map(request, assignmentSubmission);
-
-        //Implement update logic:
         var currentFiles = assignmentSubmission.Files;
+
         await unitOfWork.ExecuteTransactionalAsync(async () =>
         {
             await fileService.CompareAndUpdateAsync(newFiles, currentFiles, assignmentSubmissionId); //This will internally modify the currentFiles List as follow with comparing and updating logic.

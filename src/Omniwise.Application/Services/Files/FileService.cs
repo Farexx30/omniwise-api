@@ -112,34 +112,6 @@ internal class FileService(ILogger<FileService> logger,
         return fileSasUrl;
     }
 
-    public void ValidateFiles(IEnumerable<IFormFile> files)
-    {
-        //Check if there is at least one file in the collection:
-        if (!files.Any())
-        {
-            throw new BadRequestException("At least one file is required.");
-        }
-
-        //Check if all files have unique names:
-        var hasDuplicatedNames = files
-            .GroupBy(f => f.FileName)
-            .Any(g => g.Count() > 1);
-
-        if (hasDuplicatedNames)
-        {
-            throw new BadRequestException("Files with the exact same name and extension are not allowed.");
-        }
-
-        //Check if any file name is not too long:
-        var isAnyFileNameTooLong = files
-            .Any(f => f.FileName.Length > 256);
-
-        if (isAnyFileNameTooLong)
-        {
-            throw new BadHttpRequestException("File name is too long. Maximum length is 256 characters.");
-        }
-    }
-
     private static string GetFolderName(Type fileType)
     {
         return fileType switch
