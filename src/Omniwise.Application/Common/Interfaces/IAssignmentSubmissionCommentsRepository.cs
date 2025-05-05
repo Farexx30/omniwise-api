@@ -10,4 +10,6 @@ namespace Omniwise.Application.Common.Interfaces;
 public interface IAssignmentSubmissionCommentsRepository
 {
     Task<int> CreateAsync(AssignmentSubmissionComment comment);
+    Task<AssignmentSubmissionComment?> GetByIdAsync(int assignmentSubmissionCommentId);
+    Task SaveChangesAsync();
 }

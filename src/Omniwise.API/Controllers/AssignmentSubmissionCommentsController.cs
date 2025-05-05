@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Omniwise.Application.AssignmentSubmissionComments.Commands.CreateAssignmentSubmissionComment;
+using Omniwise.Application.AssignmentSubmissionComments.Commands.UpdateAssignmentSubmissionComment;
 using Omniwise.Domain.Constants;
 
 namespace Omniwise.API.Controllers;
@@ -19,5 +20,14 @@ public class AssignmentSubmissionCommentsController(IMediator mediator) : Contro
 
         var uri = $"assignment-submissions/{assignmentSubmissionId}/assignment-submission-comments/{assignmentSubmissionCommentId}";
         return Created(uri, null);
+    }
+
+    [HttpPatch("assignment-submission-comments/{assignmentSubmissionCommentId}")]
+    public async Task<IActionResult> UpdateAssignmentSubmissionComment([FromBody] UpdateAssignmentSubmissionCommentCommand command, [FromRoute] int assignmentSubmissionCommentId)
+    {
+        command.AssignmentSubmissionCommentId = assignmentSubmissionCommentId;
+        await mediator.Send(command);
+
+        return NoContent();
     }
 }

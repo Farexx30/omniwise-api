@@ -1,4 +1,5 @@
-﻿using Omniwise.Application.Common.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using Omniwise.Application.Common.Interfaces;
 using Omniwise.Domain.Entities;
 using Omniwise.Infrastructure.Persistence;
 using System;
@@ -18,4 +19,15 @@ internal class AssignmentSubmissionCommentsRepository(OmniwiseDbContext dbContex
 
         return comment.Id;
     }
+
+    public async Task<AssignmentSubmissionComment?> GetByIdAsync(int assignmentSubmissionCommentId)
+    {
+        var comment = await dbContext.AssignmentSubmissionComments
+            .FirstOrDefaultAsync(asc => asc.Id == assignmentSubmissionCommentId);
+
+        return comment;
+    }
+
+    public Task SaveChangesAsync()
+        => dbContext.SaveChangesAsync();
 }
