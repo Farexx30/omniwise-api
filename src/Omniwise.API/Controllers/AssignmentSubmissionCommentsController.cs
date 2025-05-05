@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Omniwise.Application.AssignmentSubmissionComments.Commands.CreateAssignmentSubmissionComment;
+using Omniwise.Application.AssignmentSubmissionComments.Commands.DeleteAssignmentSubmissionComment;
 using Omniwise.Application.AssignmentSubmissionComments.Commands.UpdateAssignmentSubmissionComment;
 using Omniwise.Domain.Constants;
 
@@ -26,6 +27,15 @@ public class AssignmentSubmissionCommentsController(IMediator mediator) : Contro
     public async Task<IActionResult> UpdateAssignmentSubmissionComment([FromBody] UpdateAssignmentSubmissionCommentCommand command, [FromRoute] int assignmentSubmissionCommentId)
     {
         command.AssignmentSubmissionCommentId = assignmentSubmissionCommentId;
+        await mediator.Send(command);
+
+        return NoContent();
+    }
+
+    [HttpDelete("assignment-submission-comments/{assignmentSubmissionCommentId}")]
+    public async Task<IActionResult> DeleteAssignmentSubmissionComment([FromRoute] int assignmentSubmissionCommentId)
+    {
+        var command = new DeleteAssignmentSubmissionCommentCommand { AssignmentSubmissionCommentId = assignmentSubmissionCommentId };
         await mediator.Send(command);
 
         return NoContent();

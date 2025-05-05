@@ -20,6 +20,12 @@ internal class AssignmentSubmissionCommentsRepository(OmniwiseDbContext dbContex
         return comment.Id;
     }
 
+    public async Task DeleteAsync(AssignmentSubmissionComment comment)
+    {
+        dbContext.AssignmentSubmissionComments.Remove(comment);
+        await dbContext.SaveChangesAsync();
+    }
+
     public async Task<AssignmentSubmissionComment?> GetByIdAsync(int assignmentSubmissionCommentId)
     {
         var comment = await dbContext.AssignmentSubmissionComments
