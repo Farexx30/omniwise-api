@@ -13,5 +13,6 @@ public interface IAssignmentSubmissionsRepository
     Task DeleteAsync(AssignmentSubmission assignmentSubmission);
     Task<AssignmentSubmission?> GetByIdAsync(int assignmentSubmissionId);
     Task<bool> IsAlreadySubmitted(int assignmentSubmissionId, string userId);
+    Task<bool> ExistsAsync(int assignmentSubmissionId);
     Task SaveChangesAsync();
 }

@@ -43,6 +43,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ILecturesRepository, LecturesRepository>();
         services.AddScoped<IAssignmentsRepository, AssignmentsRepository>();
         services.AddScoped<IAssignmentSubmissionsRepository, AssignmentSubmissionsRepository>();
+        services.AddScoped<IAssignmentSubmissionCommentsRepository, AssignmentSubmissionCommentsRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
@@ -54,8 +55,10 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<IAuthorizationHandler, SameOwnerRequirementHandler>();
         services.AddSingleton<IAuthorizationHandler, SameOwnerForAssignmentSubmissionRequirementHandler>();
+        services.AddSingleton<IAuthorizationHandler, SameOwnerForAssignmentSubmissionCommentRequirementHandler>();
         services.AddScoped<IAuthorizationHandler, MustBeEnrolledInCourseRequirementHandler>();
         services.AddScoped<IAuthorizationHandler, MustBeEnrolledInCourseForAssignmentSubmissionRequirementHandler>();
+        services.AddScoped<IAuthorizationHandler, MustBeEnrolledInCourseForAssignmentSubmissionCommentRequirementHandler>();
 
         services.Configure<BlobStorageSettings>(configuration.GetSection("BlobStorage"));
         services.AddScoped<IBlobStorageService, BlobStorageService>();

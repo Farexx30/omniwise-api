@@ -43,6 +43,13 @@ internal class AssignmentSubmissionsRepository(OmniwiseDbContext dbContext) : IA
 
         return isAlreadySubmitted;
     }
+    public async Task<bool> ExistsAsync(int assignmentSubmissionId)
+    {
+        var exists = await dbContext.AssignmentSubmissions
+            .AnyAsync(asub => asub.Id == assignmentSubmissionId);
+
+        return exists;
+    }
 
     public Task SaveChangesAsync()
         => dbContext.SaveChangesAsync();
