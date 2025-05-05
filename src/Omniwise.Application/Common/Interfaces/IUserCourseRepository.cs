@@ -6,4 +6,5 @@ public interface IUserCourseRepository
 {
     Task<bool> ExistsAsync(int courseId, string userId);
     Task AddPendingCourseMemberAsync(UserCourse courseMember);
+    Task<IEnumerable<UserCourse>> GetPendingCourseMembersAsync(int courseId);
 }

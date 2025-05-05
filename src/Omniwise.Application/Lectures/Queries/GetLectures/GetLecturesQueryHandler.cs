@@ -19,7 +19,6 @@ public class GetLecturesQueryHandler(ILogger<GetLecturesQueryHandler> logger,
 {
     public async Task<IEnumerable<LectureToGetAllDto>> Handle(GetLecturesQuery request, CancellationToken cancellationToken)
     {
-        var currentUser = userContext.GetCurrentUser();
         var courseId = request.CourseId;
 
         var isCourseExisting = await coursesRepository.ExistsAsync(courseId);
@@ -36,9 +35,9 @@ public class GetLecturesQueryHandler(ILogger<GetLecturesQueryHandler> logger,
             throw new ForbiddenException($"You are not allowed to get Lectures in course with id = {courseId}.");
         }
 
-        logger.LogInformation("Fetching all lectures for course with id: {CourseId} from the repository.", request.CourseId);
+        logger.LogInformation("Fetching all lectures for course with id: {CourseId} from the repository.", courseId);
 
-        var lectures = await lecturesRepository.GetAllLecturesAsync(request.CourseId);
+        var lectures = await lecturesRepository.GetAllLecturesAsync(courseId);
         var lecturesDtos = mapper.Map<IEnumerable<LectureToGetAllDto>>(lectures);
 
 

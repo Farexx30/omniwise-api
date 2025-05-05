@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Omniwise.Application.UserCourses.Commands.AddPendingCourseMember;
+using Omniwise.Application.UserCourses.Queries.GetPendingCourseMembers;
 using Omniwise.Domain.Constants;
 
 namespace Omniwise.API.Controllers;
@@ -21,5 +22,16 @@ public class UserCourseController(IMediator mediator) : ControllerBase
         await mediator.Send(command);
 
         return NoContent();
+    }
+
+    [HttpGet]
+    [Route("pending")]
+    [Authorize(Roles = Roles.Teacher)]
+    public async Task<IActionResult> GetPendingCourseMembers([FromRoute] int courseId)
+    {
+        var query = new GetPendingCourseMembersQuery { CourseId = courseId };
+        var pendingCourseMembers = await mediator.Send(query);
+
+        return Ok(pendingCourseMembers);
     }
 }
