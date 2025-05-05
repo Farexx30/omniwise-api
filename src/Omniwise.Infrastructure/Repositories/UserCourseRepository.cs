@@ -19,6 +19,16 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
             .AnyAsync(uc => uc.CourseId == courseId && uc.UserId == userId);
     }
 
+    public async Task<IEnumerable<UserCourse>> GetEnrolledCourseMembersAsync(int courseId)
+    {
+        var enrolledCourseMembers = await dbContext.UserCourses
+            .Include(uc => uc.User)
+            .Where(uc => uc.CourseId == courseId && uc.IsAccepted == true)
+            .ToListAsync();
+
+        return enrolledCourseMembers;
+    }
+
     public async Task<IEnumerable<UserCourse>> GetPendingCourseMembersAsync(int courseId)
     {
         var pendingCourseMembers = await dbContext.UserCourses
