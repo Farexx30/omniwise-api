@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Omniwise.Application.AssignmentSubmissionComments.Dtos;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,4 +13,5 @@ public class AssignmentSubmissionDto
     public float? Grade { get; set; }
     public DateTime LatestSubmissionDate { get; set; }
     public List<string> FileUrls { get; set; } = [];
+    public List<AssignmentSubmissionCommentDto> Comments { get; set; } = [];
 }

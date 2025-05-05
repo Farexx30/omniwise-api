@@ -26,6 +26,8 @@ internal class FileService(ILogger<FileService> logger,
     {
         var folderName = GetFolderName(typeof(TFile));
 
+        logger.LogInformation("Uploading files to {folderName} folder.", folderName);
+
         List<TFile> uploadedFiles = [];
         foreach (var file in files)
         {

@@ -19,7 +19,6 @@ namespace Omniwise.Application.AssignmentSubmissions.Commands.UpdateAssignmentSu
 class UpdateAssignmentSubmissionCommandHandler(IAssignmentSubmissionsRepository assignmentSubmissionsRepository,
     ILogger<UpdateAssignmentSubmissionCommandHandler> logger,
     IUserContext userContext,
-    IMapper mapper,
     IAuthorizationService authorizationService,
     IFileService fileService,
     IUnitOfWork unitOfWork) : IRequestHandler<UpdateAssignmentSubmissionCommand>

@@ -30,7 +30,14 @@ internal class AssignmentSubmissionsRepository(OmniwiseDbContext dbContext) : IA
     {
         var assignmentSubmission = await dbContext.AssignmentSubmissions
             .Include(asub => asub.Files)
+            .Include(asub => asub.Comments)
+                .ThenInclude(c => c.Author)
             .FirstOrDefaultAsync(asub => asub.Id == assignmentSubmissionId);
+
+        if (assignmentSubmission is not null)
+        {
+            assignmentSubmission.Comments = [.. assignmentSubmission.Comments.OrderBy(c => c.SentDate)];
+        }
 
         return assignmentSubmission;
     }

@@ -13,4 +13,7 @@ public class AssignmentSubmissionComment
     public DateTime SentDate { get; set; }
     public int AssignmentSubmissionId { get; set; }
     public string AuthorId { get; set; } = default!;
+
+    //References:
+    public User Author { get; set; } = default!;
 }

@@ -16,5 +16,7 @@ public class AssignmentSubmissionCommentsMappingProfile : Profile
     {
         CreateMap<CreateAssignmentSubmissionCommentCommand, AssignmentSubmissionComment>();
         CreateMap<UpdateAssignmentSubmissionCommentCommand, AssignmentSubmissionComment>();
+
+        CreateMap<AssignmentSubmissionComment, AssignmentSubmissionCommentDto>();
     }
 }
