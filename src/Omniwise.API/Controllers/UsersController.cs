@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Omniwise.Application.Users.Commands.DeleteUser;
 using Omniwise.Application.Users.Commands.UpdateUserStatus;
 using Omniwise.Application.Users.Dtos;
 using Omniwise.Application.Users.Queries.GetAllUsersByStatus;
@@ -18,6 +19,15 @@ public class UsersController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> UpdateUserStatus([FromBody] UpdateUserStatusCommand command, [FromRoute] string userId)
     {
         command.UserId = userId;
+        await mediator.Send(command);
+
+        return NoContent();
+    }
+
+    [HttpDelete("{userId}")]
+    public async Task<IActionResult> DeleteUser([FromRoute] string userId)
+    {
+        var command = new DeleteUserCommand { UserId = userId };
         await mediator.Send(command);
 
         return NoContent();

@@ -32,6 +32,12 @@ internal class UsersRepository(OmniwiseDbContext dbContext) : IUsersRepository
         return statusObj?.Status;
     }
 
+    public async Task DeleteAsync(User user)
+    {
+        dbContext.Users.Remove(user);
+        await dbContext.SaveChangesAsync();
+    }
+
     public async Task<IEnumerable<UserWithRoleDto>> GetAllByStatusAsync(UserStatus status)
     {
         var userDtos = await dbContext.Users

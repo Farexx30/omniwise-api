@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Omniwise.Application.Common.Interfaces;
 using Omniwise.Application.Users.Queries.GetAllUsersByStatus;
+using Omniwise.Domain.Entities;
 using Omniwise.Domain.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ public class UpdateUserStatusCommandHandler(IUsersRepository usersRepository,
         var user = await usersRepository.GetByIdAsync(userId)
             ?? throw new NotFoundException($"User with id = {userId} not found.");
 
-        logger.LogInformation("Updating user status: {Status} for userId: {UserId}", 
+        logger.LogInformation("Updating user status to {Status} for user with id = {UserId}", 
             status, 
             userId);
 

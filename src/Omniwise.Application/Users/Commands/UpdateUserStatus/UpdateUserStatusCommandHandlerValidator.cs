@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Omniwise.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,8 @@ public class UpdateUserStatusCommandHandlerValidator : AbstractValidator<UpdateU
     {
         RuleFor(u => u.Status)
             .IsInEnum()
-            .WithMessage("Invalid user status.");
+            .WithMessage("Invalid user status.")
+            .Must(s => s != UserStatus.Pending)
+            .WithMessage("Not allowed user status.");
     }
 }
