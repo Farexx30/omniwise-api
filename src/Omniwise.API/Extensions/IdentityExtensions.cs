@@ -13,6 +13,7 @@ using System.Text;
 using Omniwise.Domain.Entities;
 using Omniwise.Infrastructure.Extensions;
 using Omniwise.Application.Identity.Requests;
+using Omniwise.Application.Common.Interfaces;
 
 namespace Omniwise.API.Extensions;
 
@@ -121,8 +122,25 @@ public static class IdentityExtensions
         });
 
         routeGroup.MapPost("/login", async Task<Results<Ok<AccessTokenResponse>, EmptyHttpResult, ProblemHttpResult>>
-            ([FromBody] LoginRequest login, [FromQuery] bool? useCookies, [FromQuery] bool? useSessionCookies, [FromServices] IServiceProvider sp) =>
+            ([FromBody] LoginRequest login, [FromQuery] bool? useCookies, [FromQuery] bool? useSessionCookies, [FromServices] IUsersRepository usersRepository, [FromServices] IServiceProvider sp) =>
         {
+            var userStatus = await usersRepository.GetStatusByEmailAsync(login.Email);
+
+            if (userStatus == null)
+            {
+                return TypedResults.Problem("Incorrect email or password.", statusCode: StatusCodes.Status401Unauthorized);
+            }
+
+            if (userStatus == UserStatus.Pending)
+            {
+                return TypedResults.Problem("User is pending approval.", statusCode: StatusCodes.Status403Forbidden);
+            }
+
+            if (userStatus == UserStatus.Archived)
+            {
+                return TypedResults.Problem("User is archived.", statusCode: StatusCodes.Status403Forbidden);
+            }
+
             var signInManager = sp.GetRequiredService<SignInManager<TUser>>();
 
             var useCookieScheme = (useCookies == true) || (useSessionCookies == true);

@@ -22,6 +22,16 @@ internal class UsersRepository(OmniwiseDbContext dbContext) : IUsersRepository
         return user;
     }
 
+    public async Task<UserStatus?> GetStatusByEmailAsync(string email)
+    {
+        var statusObj = await dbContext.Users
+            .Where(u => u.Email == email)
+            .Select(u => new { u.Status })
+            .FirstOrDefaultAsync();     
+
+        return statusObj?.Status;
+    }
+
     public async Task<IEnumerable<UserWithRoleDto>> GetAllByStatusAsync(UserStatus status)
     {
         var userDtos = await dbContext.Users
