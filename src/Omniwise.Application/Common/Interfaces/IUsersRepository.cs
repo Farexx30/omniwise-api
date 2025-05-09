@@ -11,7 +11,6 @@ namespace Omniwise.Application.Common.Interfaces;
 public interface IUsersRepository
 {
     Task<User?> GetByIdAsync(string userId);
-    Task<UserStatus?> GetStatusByEmailAsync(string email);
     Task DeleteAsync(User user);
     Task<IEnumerable<UserWithRoleDto>> GetAllByStatusAsync(UserStatus status);
     Task SaveChangesAsync();
