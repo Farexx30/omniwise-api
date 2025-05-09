@@ -14,14 +14,6 @@ namespace Omniwise.API.Controllers;
 [Authorize(Roles = Roles.Admin)]
 public class UsersController(IMediator mediator) : ControllerBase
 {
-    [HttpGet]
-    public async Task<ActionResult<UserWithRoleDto>> GetAllUsersByStatus([FromQuery] GetAllUsersByStatusCommand command)
-    {
-        var users = await mediator.Send(command);
-
-        return Ok(users);
-    }
-
     [HttpPatch("{userId}/status")]
     public async Task<IActionResult> UpdateUserStatus([FromBody] UpdateUserStatusCommand command, [FromRoute] string userId)
     {
@@ -29,5 +21,13 @@ public class UsersController(IMediator mediator) : ControllerBase
         await mediator.Send(command);
 
         return NoContent();
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<UserWithRoleDto>> GetAllUsersByStatus([FromQuery] GetAllUsersByStatusQuery query)
+    {
+        var users = await mediator.Send(query);
+
+        return Ok(users);
     }
 }

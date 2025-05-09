@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Omniwise.Application.Users.Queries.GetAllUsersByStatus;
 
-public class GetAllUsersByStatusCommand : IRequest<IEnumerable<UserWithRoleDto>>
+public class GetAllUsersByStatusQuery : IRequest<IEnumerable<UserWithRoleDto>>
 {
     public required UserStatus Status { get; init; }
 }

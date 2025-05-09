@@ -11,10 +11,10 @@ using System.Threading.Tasks;
 
 namespace Omniwise.Application.Users.Queries.GetAllUsersByStatus;
 
-public class GetAllUsersByStatusCommandHandler(IUsersRepository usersRepository,
-    ILogger<GetAllUsersByStatusCommandHandler> logger) : IRequestHandler<GetAllUsersByStatusCommand, IEnumerable<UserWithRoleDto>>
+public class GetAllUsersByStatusQueryHandler(IUsersRepository usersRepository,
+    ILogger<GetAllUsersByStatusQueryHandler> logger) : IRequestHandler<GetAllUsersByStatusQuery, IEnumerable<UserWithRoleDto>>
 {
-    public async Task<IEnumerable<UserWithRoleDto>> Handle(GetAllUsersByStatusCommand request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<UserWithRoleDto>> Handle(GetAllUsersByStatusQuery request, CancellationToken cancellationToken)
     {
         var status = request.Status;
 
