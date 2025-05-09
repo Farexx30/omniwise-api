@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Omniwise.Application.Users.Commands.UpdateUserStatus;
 using Omniwise.Application.Users.Dtos;
 using Omniwise.Application.Users.Queries.GetAllUsersByStatus;
 using Omniwise.Domain.Constants;
@@ -19,5 +20,14 @@ public class UsersController(IMediator mediator) : ControllerBase
         var users = await mediator.Send(command);
 
         return Ok(users);
+    }
+
+    [HttpPatch("{userId}/status")]
+    public async Task<IActionResult> UpdateUserStatus([FromBody] UpdateUserStatusCommand command, [FromRoute] string userId)
+    {
+        command.UserId = userId;
+        await mediator.Send(command);
+
+        return NoContent();
     }
 }

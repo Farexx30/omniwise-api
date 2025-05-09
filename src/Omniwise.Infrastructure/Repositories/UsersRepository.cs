@@ -14,6 +14,14 @@ namespace Omniwise.Infrastructure.Repositories;
 
 internal class UsersRepository(OmniwiseDbContext dbContext) : IUsersRepository
 {
+    public async Task<User?> GetByIdAsync(string userId)
+    {
+        var user = await dbContext.Users
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        return user;
+    }
+
     public async Task<IEnumerable<UserWithRoleDto>> GetAllByStatusAsync(UserStatus status)
     {
         var userDtos = await dbContext.Users
@@ -40,4 +48,7 @@ internal class UsersRepository(OmniwiseDbContext dbContext) : IUsersRepository
 
         return userDtos;
     }
+
+    public Task SaveChangesAsync()
+        => dbContext.SaveChangesAsync();
 }
