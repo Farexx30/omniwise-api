@@ -17,6 +17,8 @@ public class AssignmentSubmissionCommentsMappingProfile : Profile
         CreateMap<CreateAssignmentSubmissionCommentCommand, AssignmentSubmissionComment>();
         CreateMap<UpdateAssignmentSubmissionCommentCommand, AssignmentSubmissionComment>();
 
-        CreateMap<AssignmentSubmissionComment, AssignmentSubmissionCommentDto>();
+        CreateMap<AssignmentSubmissionComment, AssignmentSubmissionCommentDto>()
+            .ForMember(dest => dest.AuthorFullName, 
+                       opt => opt.MapFrom(src => $"{src.Author.FirstName} {src.Author.LastName}"));
     }
 }
