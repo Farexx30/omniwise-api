@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Omniwise.Application.CourseMembers.Commands.AcceptCourseMember;
 using Omniwise.Application.CourseMembers.Commands.AddPendingCourseMember;
 using Omniwise.Application.CourseMembers.Queries.GetCourseMemberById;
 using Omniwise.Application.CourseMembers.Queries.GetEnrolledCourseMembers;
@@ -61,4 +62,17 @@ public class CourseMembersController(IMediator mediator) : ControllerBase
         return Ok(courseMember);
     }
 
+    [HttpPatch]
+    [Route("{memberId}/accept")]
+    [Authorize(Roles = Roles.Teacher)]
+    public async Task<IActionResult> AcceptCourseMember([FromRoute] string memberId, [FromRoute] int courseId)
+    {
+        var command = new AcceptCourseMemberCommand
+        {
+            CourseId = courseId,
+            UserId = memberId
+        };
+        await mediator.Send(command);
+        return NoContent();
+    }
 }

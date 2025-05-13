@@ -80,6 +80,14 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
         return enrolledCourseMembers;
     }
 
+    public async Task<UserCourse?> GetPendingCourseMemberAsync(int courseId, string userId)
+    {
+        var pendingCourseMember = await dbContext.UserCourses
+            .FirstOrDefaultAsync(uc => uc.CourseId == courseId && uc.UserId == userId && uc.IsAccepted == false);
+
+        return pendingCourseMember;
+    }
+
     public async Task<IEnumerable<UserCourse>> GetPendingCourseMembersAsync(int courseId)
     {
         var pendingCourseMembers = await dbContext.UserCourses
@@ -89,4 +97,8 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
 
         return pendingCourseMembers;
     }
+
+    public Task SaveChangesAsync()
+        => dbContext.SaveChangesAsync();
+
 }

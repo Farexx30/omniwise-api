@@ -11,4 +11,6 @@ public interface IUserCourseRepository
     Task<IEnumerable<UserCourse>> GetPendingCourseMembersAsync(int courseId);
     Task<IEnumerable<UserCourse>> GetEnrolledCourseMembersAsync(int courseId);
     Task<CourseMemberDetailsDto?> GetByIdAsync(string memberId, int courseId, CurrentUser currentUser);
+    Task<UserCourse?> GetPendingCourseMemberAsync(int courseId, string userId);
+    Task SaveChangesAsync();
 }
