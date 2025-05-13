@@ -1,9 +1,9 @@
 ﻿using Omniwise.Application.Assignments.Dtos;
 using Omniwise.Domain.Interfaces;
 
-namespace Omniwise.Application.UserCourses.Dtos;
+namespace Omniwise.Application.CourseMembers.Dtos;
 
-public class CourseMemberDto : ICourseResource
+public class CourseMemberDetailsDto : ICourseResource
 {
     public string UserId { get; set; } = default!;
     public DateOnly? JoinDate { get; set; }

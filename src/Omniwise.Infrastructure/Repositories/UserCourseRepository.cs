@@ -2,7 +2,7 @@
 using Omniwise.Application.Assignments.Dtos;
 using Omniwise.Application.Common.Interfaces;
 using Omniwise.Application.Common.Types;
-using Omniwise.Application.UserCourses.Dtos;
+using Omniwise.Application.CourseMembers.Dtos;
 using Omniwise.Domain.Constants;
 using Omniwise.Domain.Entities;
 using Omniwise.Infrastructure.Persistence;
@@ -23,7 +23,7 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
             .AnyAsync(uc => uc.CourseId == courseId && uc.UserId == userId);
     }
 
-    public async Task<CourseMemberDto?> GetByIdAsync(string memberId, int courseId, CurrentUser currentUser)
+    public async Task<CourseMemberDetailsDto?> GetByIdAsync(string memberId, int courseId, CurrentUser currentUser)
     {
         var currentUserId = currentUser.Id!;
         var currentUserRoleName = currentUser.Roles.First();
@@ -41,7 +41,7 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
                   firstJoinResult => firstJoinResult.UserRole.RoleId,
                   role => role.Id,
                   (firstJoinResult, role) => new { firstJoinResult.Member, Role = role })
-            .Select(result => new CourseMemberDto
+            .Select(result => new CourseMemberDetailsDto
             {
                 UserId = result.Member.Id,
                 JoinDate = result.Member.UserCourses

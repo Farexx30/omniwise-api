@@ -1,10 +1,10 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Omniwise.Application.UserCourses.Commands.AddPendingCourseMember;
-using Omniwise.Application.UserCourses.Queries.GetCourseMemberById;
-using Omniwise.Application.UserCourses.Queries.GetEnrolledCourseMembers;
-using Omniwise.Application.UserCourses.Queries.GetPendingCourseMembers;
+using Omniwise.Application.CourseMembers.Commands.AddPendingCourseMember;
+using Omniwise.Application.CourseMembers.Queries.GetCourseMemberById;
+using Omniwise.Application.CourseMembers.Queries.GetEnrolledCourseMembers;
+using Omniwise.Application.CourseMembers.Queries.GetPendingCourseMembers;
 using Omniwise.Domain.Constants;
 
 namespace Omniwise.API.Controllers;
@@ -12,7 +12,7 @@ namespace Omniwise.API.Controllers;
 [ApiController]
 [Route("api/courses/{courseId}/members")]
 [Authorize(Roles = $"{Roles.Teacher},{Roles.Student}")]
-public class UserCourseController(IMediator mediator) : ControllerBase
+public class CourseMembersController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> AddPendingCourseMember([FromRoute] int courseId)

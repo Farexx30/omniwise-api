@@ -5,7 +5,7 @@ using Omniwise.Application.Common.Interfaces;
 using Omniwise.Domain.Entities;
 using Omniwise.Domain.Exceptions;
 
-namespace Omniwise.Application.UserCourses.Commands.AddPendingCourseMember;
+namespace Omniwise.Application.CourseMembers.Commands.AddPendingCourseMember;
 
 public class AddPendingCourseMemberCommandHandler(ILogger<AddPendingCourseMemberCommandHandler> logger,
     IMapper mapper,

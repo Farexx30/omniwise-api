@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Omniwise.Application.UserCourses.Commands.AddPendingCourseMember;
+namespace Omniwise.Application.CourseMembers.Commands.AddPendingCourseMember;
 
 public class AddPendingCourseMemberCommand : IRequest
 {

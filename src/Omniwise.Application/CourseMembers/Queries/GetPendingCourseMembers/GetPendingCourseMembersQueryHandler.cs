@@ -3,21 +3,21 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Omniwise.Application.Common.Interfaces;
-using Omniwise.Application.UserCourses.Dtos;
+using Omniwise.Application.CourseMembers.Dtos;
 using Omniwise.Domain.Constants;
 using Omniwise.Domain.Entities;
 using Omniwise.Domain.Exceptions;
 
-namespace Omniwise.Application.UserCourses.Queries.GetPendingCourseMembers;
+namespace Omniwise.Application.CourseMembers.Queries.GetPendingCourseMembers;
 
 public class GetPendingCourseMembersQueryHandler(ILogger<GetPendingCourseMembersQueryHandler> logger,
     IMapper mapper,
     IUserContext userContext,
     ICoursesRepository coursesRepository,
     IUserCourseRepository userCourseRepository,
-    IAuthorizationService authorizationService) : IRequestHandler<GetPendingCourseMembersQuery, IEnumerable<PendingUserCourseDto>>
+    IAuthorizationService authorizationService) : IRequestHandler<GetPendingCourseMembersQuery, IEnumerable<PendingCourseMemberDto>>
 {
-    public async Task<IEnumerable<PendingUserCourseDto>> Handle(GetPendingCourseMembersQuery request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<PendingCourseMemberDto>> Handle(GetPendingCourseMembersQuery request, CancellationToken cancellationToken)
     {
         var courseId = request.CourseId;
 
@@ -28,8 +28,8 @@ public class GetPendingCourseMembersQueryHandler(ILogger<GetPendingCourseMembers
             throw new NotFoundException($"Course with id = {courseId} doesn't exist.");
         }
 
-        var authorizationUserCourse = new UserCourse { CourseId = courseId };
-        var authorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, authorizationUserCourse, Policies.MustBeEnrolledInCourse);
+        var authorizationCourseMember = new UserCourse { CourseId = courseId };
+        var authorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, authorizationCourseMember, Policies.MustBeEnrolledInCourse);
         if (!authorizationResult.Succeeded)
         {
             throw new ForbiddenException($"You are not allowed to get pending course members for course with id = {courseId}.");
@@ -38,7 +38,7 @@ public class GetPendingCourseMembersQueryHandler(ILogger<GetPendingCourseMembers
         logger.LogInformation("Fetching all pending course members for course with id: {CourseId} from the repository.", request.CourseId);
         
         var pendingCourseMembers = await userCourseRepository.GetPendingCourseMembersAsync(courseId);
-        var pendingCourseMembersDtos = mapper.Map<IEnumerable<PendingUserCourseDto>>(pendingCourseMembers);
+        var pendingCourseMembersDtos = mapper.Map<IEnumerable<PendingCourseMemberDto>>(pendingCourseMembers);
 
         return pendingCourseMembersDtos;
     }

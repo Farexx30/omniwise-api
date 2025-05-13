@@ -1,6 +1,6 @@
-﻿namespace Omniwise.Application.UserCourses.Dtos;
+﻿namespace Omniwise.Application.CourseMembers.Dtos;
 
-public class UserCourseDto
+public class CourseMemberDto
 {
     public string UserId { get; set; } = default!;
     public int CourseId { get; set; }

@@ -3,19 +3,19 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Omniwise.Application.Common.Interfaces;
-using Omniwise.Application.UserCourses.Dtos;
+using Omniwise.Application.CourseMembers.Dtos;
 using Omniwise.Domain.Constants;
 using Omniwise.Domain.Exceptions;
 
-namespace Omniwise.Application.UserCourses.Queries.GetCourseMemberById;
+namespace Omniwise.Application.CourseMembers.Queries.GetCourseMemberById;
 
 public class GetCourseMemberByIdQueryHandler(ILogger<GetCourseMemberByIdQueryHandler> logger,
     ICoursesRepository coursesRepository,
     IUserCourseRepository userCourseRepository,
     IUserContext userContext,
-    IAuthorizationService authorizationService) : IRequestHandler<GetCourseMemberByIdQuery, CourseMemberDto>
+    IAuthorizationService authorizationService) : IRequestHandler<GetCourseMemberByIdQuery, CourseMemberDetailsDto>
 {
-    public async Task<CourseMemberDto> Handle(GetCourseMemberByIdQuery request, CancellationToken cancellationToken)
+    public async Task<CourseMemberDetailsDto> Handle(GetCourseMemberByIdQuery request, CancellationToken cancellationToken)
     {
         var currentUser = userContext.GetCurrentUser();
         var courseId = request.CourseId;

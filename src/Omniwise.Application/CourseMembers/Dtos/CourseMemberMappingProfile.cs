@@ -1,18 +1,18 @@
 ﻿using AutoMapper;
 using Omniwise.Domain.Entities;
-using Omniwise.Application.UserCourses.Commands.AddPendingCourseMember;
+using Omniwise.Application.CourseMembers.Commands.AddPendingCourseMember;
 
-namespace Omniwise.Application.UserCourses.Dtos;
+namespace Omniwise.Application.CourseMembers.Dtos;
 
-public class UserCourseMappingProfile : Profile
+public class CourseMemberMappingProfile : Profile
 {
-    public UserCourseMappingProfile()
+    public CourseMemberMappingProfile()
     {
         CreateMap<AddPendingCourseMemberCommand, UserCourse>();
-        CreateMap<UserCourse, PendingUserCourseDto>()
+        CreateMap<UserCourse, PendingCourseMemberDto>()
             .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.User.FirstName))
             .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.User.LastName));
-        CreateMap<UserCourse, EnrolledUserCourseDto>()
+        CreateMap<UserCourse, EnrolledCourseMemberDto>()
             .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.User.FirstName))
             .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.User.LastName));
     }
