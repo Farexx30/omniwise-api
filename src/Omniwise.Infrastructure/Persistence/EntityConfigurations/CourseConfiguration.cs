@@ -29,8 +29,8 @@ internal class CourseConfiguration : IEntityTypeConfiguration<Course>
         builder.HasMany(c => c.Members)
             .WithMany(u => u.EnrolledCourses)
             .UsingEntity<UserCourse>(
-                l => l.HasOne<User>()
-                    .WithMany()
+                l => l.HasOne<User>(uc => uc.User)
+                    .WithMany(u => u.UserCourses)
                     .HasForeignKey(fk => fk.UserId)
                     .OnDelete(DeleteBehavior.Restrict),
 

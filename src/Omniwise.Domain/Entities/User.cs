@@ -21,6 +21,7 @@ public class User : IdentityUser
     public UserStatus Status { get; set; } = UserStatus.Pending;
 
     //References:
+    public List<UserCourse> UserCourses { get; set; } = [];
     public List<Course> OwnedCourses { get; set; } = [];
     public List<Course> EnrolledCourses { get; set; } = [];
     public List<AssignmentSubmission> AssignmentSubmissions { get; set; } = [];
