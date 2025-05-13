@@ -13,6 +13,7 @@ using Omniwise.Infrastructure.Persistence;
 using Omniwise.Infrastructure.Persistence.MigrationAppliers;
 using Omniwise.Infrastructure.Persistence.Seeders;
 using Omniwise.Infrastructure.Repositories;
+using Omniwise.Infrastructure.Storage;
 
 namespace Omniwise.Infrastructure.Extensions;
 
@@ -38,10 +39,15 @@ public static class ServiceCollectionExtensions
         services.AddHttpContextAccessor();
         services.AddScoped<IUserContext, UserContext>();
 
+        services.AddScoped<IUsersRepository, UsersRepository>();
         services.AddScoped<ICoursesRepository, CoursesRepository>();
         services.AddScoped<IUserCourseRepository, UserCourseRepository>();
         services.AddScoped<ILecturesRepository, LecturesRepository>();
         services.AddScoped<IAssignmentsRepository, AssignmentsRepository>();
+        services.AddScoped<IAssignmentSubmissionsRepository, AssignmentSubmissionsRepository>();
+        services.AddScoped<IAssignmentSubmissionCommentsRepository, AssignmentSubmissionCommentsRepository>();
+
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddAuthorizationBuilder()
             .AddPolicy(Policies.SameOwner, policy =>
@@ -50,6 +56,13 @@ public static class ServiceCollectionExtensions
                 policy.Requirements.Add(new MustBeEnrolledInCourseRequirement()));
 
         services.AddSingleton<IAuthorizationHandler, SameOwnerRequirementHandler>();
+        services.AddSingleton<IAuthorizationHandler, SameOwnerForAssignmentSubmissionRequirementHandler>();
+        services.AddSingleton<IAuthorizationHandler, SameOwnerForAssignmentSubmissionCommentRequirementHandler>();
         services.AddScoped<IAuthorizationHandler, MustBeEnrolledInCourseRequirementHandler>();
+        services.AddScoped<IAuthorizationHandler, MustBeEnrolledInCourseForAssignmentSubmissionRequirementHandler>();
+        services.AddScoped<IAuthorizationHandler, MustBeEnrolledInCourseForAssignmentSubmissionCommentRequirementHandler>();
+
+        services.Configure<BlobStorageSettings>(configuration.GetSection("BlobStorage"));
+        services.AddScoped<IBlobStorageService, BlobStorageService>();
     }
 }

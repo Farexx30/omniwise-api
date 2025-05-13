@@ -199,6 +199,7 @@ namespace Omniwise.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("AuthorId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<float?>("Grade")
@@ -228,6 +229,7 @@ namespace Omniwise.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("AuthorId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Content")
@@ -283,10 +285,20 @@ namespace Omniwise.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Url")
+                    b.Property<string>("BlobName")
                         .IsRequired()
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.Property<string>("ContentHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<string>("OriginalName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
 
@@ -554,7 +566,8 @@ namespace Omniwise.Infrastructure.Migrations
                     b.HasOne("Omniwise.Domain.Entities.User", null)
                         .WithMany("AssignmentSubmissions")
                         .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Omniwise.Domain.Entities.AssignmentSubmissionComment", b =>
@@ -568,7 +581,8 @@ namespace Omniwise.Infrastructure.Migrations
                     b.HasOne("Omniwise.Domain.Entities.User", null)
                         .WithMany("AssignmentSubmissionComments")
                         .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Omniwise.Domain.Entities.Course", b =>

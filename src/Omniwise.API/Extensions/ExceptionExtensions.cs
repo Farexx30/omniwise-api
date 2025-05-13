@@ -10,6 +10,7 @@ public static class ExceptionExtensions
         {
             NotFoundException => StatusCodes.Status404NotFound,
             ForbiddenException => StatusCodes.Status403Forbidden,
+            BadRequestException => StatusCodes.Status400BadRequest,
             _ => StatusCodes.Status500InternalServerError
         };
     }

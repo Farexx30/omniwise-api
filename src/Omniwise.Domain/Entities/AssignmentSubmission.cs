@@ -12,7 +12,7 @@ public class AssignmentSubmission
     public float? Grade { get; set; }
     public DateTime LatestSubmissionDate { get; set; }
     public int AssignmentId { get; set; }
-    public string? AuthorId { get; set; }
+    public string AuthorId { get; set; } = default!;
 
     //References:
     public Assignment Assignment { get; set; } = default!;

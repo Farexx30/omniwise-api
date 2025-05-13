@@ -13,6 +13,7 @@ using System.Text;
 using Omniwise.Domain.Entities;
 using Omniwise.Infrastructure.Extensions;
 using Omniwise.Application.Identity.Requests;
+using Omniwise.Application.Common.Interfaces;
 
 namespace Omniwise.API.Extensions;
 
@@ -123,29 +124,62 @@ public static class IdentityExtensions
         routeGroup.MapPost("/login", async Task<Results<Ok<AccessTokenResponse>, EmptyHttpResult, ProblemHttpResult>>
             ([FromBody] LoginRequest login, [FromQuery] bool? useCookies, [FromQuery] bool? useSessionCookies, [FromServices] IServiceProvider sp) =>
         {
+            var email = login.Email;
+            var password = login.Password;
+
+            //Check user credentials:
+            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+
+            var user = await userManager.FindByNameAsync(email);
+            if (user is null)
+            {
+                return TypedResults.Problem("Incorrect email or password.", statusCode: StatusCodes.Status401Unauthorized);
+            }
+
+            var passwordCheckResult = await userManager.CheckPasswordAsync(user, password);
+            if (!passwordCheckResult)
+            {
+                return TypedResults.Problem("Incorrect email or password.", statusCode: StatusCodes.Status401Unauthorized);
+            }
+
+            //Check if user has appropriate status to sign in:
+            var userStatus = user.Status;
+
+            if (userStatus == UserStatus.Pending)
+            {
+                return TypedResults.Problem("User is pending approval.", statusCode: StatusCodes.Status403Forbidden);
+            }
+
+            if (userStatus == UserStatus.Archived)
+            {
+                return TypedResults.Problem("User is archived.", statusCode: StatusCodes.Status403Forbidden);
+            }
+
+            //If everything is ok, sign in the user:
             var signInManager = sp.GetRequiredService<SignInManager<TUser>>();
 
             var useCookieScheme = (useCookies == true) || (useSessionCookies == true);
             var isPersistent = (useCookies == true) && (useSessionCookies != true);
             signInManager.AuthenticationScheme = useCookieScheme ? IdentityConstants.ApplicationScheme : IdentityConstants.BearerScheme;
 
-            var result = await signInManager.PasswordSignInAsync(login.Email, login.Password, isPersistent, lockoutOnFailure: true);
+            //Despite the fact that we already checked user credentials we still use this method for both security and simplicity.
+            var signInResult = await signInManager.PasswordSignInAsync(user, password, isPersistent, lockoutOnFailure: true);
 
-            if (result.RequiresTwoFactor)
+            if (signInResult.RequiresTwoFactor)
             {
                 if (!string.IsNullOrEmpty(login.TwoFactorCode))
                 {
-                    result = await signInManager.TwoFactorAuthenticatorSignInAsync(login.TwoFactorCode, isPersistent, rememberClient: isPersistent);
+                    signInResult = await signInManager.TwoFactorAuthenticatorSignInAsync(login.TwoFactorCode, isPersistent, rememberClient: isPersistent);
                 }
                 else if (!string.IsNullOrEmpty(login.TwoFactorRecoveryCode))
                 {
-                    result = await signInManager.TwoFactorRecoveryCodeSignInAsync(login.TwoFactorRecoveryCode);
+                    signInResult = await signInManager.TwoFactorRecoveryCodeSignInAsync(login.TwoFactorRecoveryCode);
                 }
-            }
+            }         
 
-            if (!result.Succeeded)
+            if (!signInResult.Succeeded)
             {
-                return TypedResults.Problem(result.ToString(), statusCode: StatusCodes.Status401Unauthorized);
+                return TypedResults.Problem(signInResult.ToString(), statusCode: StatusCodes.Status401Unauthorized);
             }
 
             // The signInManager already produced the needed response in the form of a cookie or bearer token.

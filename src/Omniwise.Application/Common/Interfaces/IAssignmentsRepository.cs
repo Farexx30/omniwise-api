@@ -13,5 +13,7 @@ public interface IAssignmentsRepository
     Task DeleteAsync(Assignment assignment);
     Task<Assignment?> GetByIdAsync(int assignmentId, int courseId);
     Task<IEnumerable<Assignment>> GetAllCourseAssignmentsAsync(int courseId);
+    Task<float> GetMaxGradeAsync(int assignmentId);
+    Task<bool> ExistsAsync(int assignmentId);
     Task SaveChangesAsync();
 }
