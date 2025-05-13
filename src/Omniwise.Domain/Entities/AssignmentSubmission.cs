@@ -15,6 +15,7 @@ public class AssignmentSubmission
     public string? AuthorId { get; set; }
 
     //References:
+    public Assignment Assignment { get; set; } = default!;
     public List<AssignmentSubmissionComment> Comments { get; set; } = [];
     public List<AssignmentSubmissionFile> Files { get; set; } = [];
 }

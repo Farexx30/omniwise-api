@@ -30,7 +30,7 @@ internal class CourseConfiguration : IEntityTypeConfiguration<Course>
             .WithMany(u => u.EnrolledCourses)
             .UsingEntity<UserCourse>(
                 l => l.HasOne<User>(uc => uc.User)
-                    .WithMany()
+                    .WithMany(u => u.UserCourses)
                     .HasForeignKey(fk => fk.UserId)
                     .OnDelete(DeleteBehavior.Restrict),
 

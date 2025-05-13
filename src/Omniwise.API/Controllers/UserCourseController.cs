@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Omniwise.Application.UserCourses.Commands.AddPendingCourseMember;
+using Omniwise.Application.UserCourses.Queries.GetCourseMemberById;
 using Omniwise.Application.UserCourses.Queries.GetEnrolledCourseMembers;
 using Omniwise.Application.UserCourses.Queries.GetPendingCourseMembers;
 using Omniwise.Domain.Constants;
@@ -46,5 +47,18 @@ public class UserCourseController(IMediator mediator) : ControllerBase
         return Ok(enrolledMembers);
     }
 
+    [HttpGet]
+    [Route("{memberId}")]
+    public async Task<IActionResult> GetCourseMemberById([FromRoute] string memberId, [FromRoute] int courseId)
+    {
+        var query = new GetCourseMemberByIdQuery 
+        { 
+            MemberId = memberId, 
+            CourseId = courseId 
+        };
+        var courseMember = await mediator.Send(query);
+
+        return Ok(courseMember);
+    }
 
 }

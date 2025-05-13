@@ -1,5 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Omniwise.Application.Assignments.Dtos;
 using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Common.Types;
+using Omniwise.Application.UserCourses.Dtos;
+using Omniwise.Domain.Constants;
 using Omniwise.Domain.Entities;
 using Omniwise.Infrastructure.Persistence;
 
@@ -17,6 +21,53 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
     {
         return await dbContext.UserCourses
             .AnyAsync(uc => uc.CourseId == courseId && uc.UserId == userId);
+    }
+
+    public async Task<CourseMemberDto?> GetByIdAsync(string memberId, int courseId, CurrentUser currentUser)
+    {
+        var currentUserId = currentUser.Id!;
+        var currentUserRoleName = currentUser.Roles.First();
+
+        var result = await dbContext.Users
+             .Where(u => u.Id == memberId)
+             .Include(member => member.UserCourses)
+             .Include(member => member.AssignmentSubmissions)
+                    .ThenInclude(a => a.Assignment)
+            .Join(dbContext.UserRoles,
+                  member => member.Id,
+                  userRole => userRole.UserId,
+                  (member, userRole) => new { Member = member, UserRole = userRole })
+            .Join(dbContext.Roles,
+                  firstJoinResult => firstJoinResult.UserRole.RoleId,
+                  role => role.Id,
+                  (firstJoinResult, role) => new { firstJoinResult.Member, Role = role })
+            .Select(result => new CourseMemberDto
+            {
+                UserId = result.Member.Id,
+                JoinDate = result.Member.UserCourses
+                    .Where(uc => uc.CourseId == courseId)
+                    .Select(uc => uc.JoinDate)
+                    .First(),
+                FirstName = result.Member.FirstName,
+                LastName = result.Member.LastName,
+                Email = result.Member.Email!,
+                RoleName = result.Role.Name!,
+                AssignmentSubmissions = currentUserRoleName.Equals(Roles.Teacher, StringComparison.CurrentCultureIgnoreCase)
+                                        || currentUserId.Equals(memberId, StringComparison.CurrentCultureIgnoreCase)
+                ? result.Member.AssignmentSubmissions.Select(asub => new AssignmentMemberSubmissionDto
+                {
+                    Id = asub.Id,
+                    Name = asub.Assignment.Name,
+                    Deadline = asub.Assignment.Deadline,
+                    Grade = asub.Grade,
+                })
+                .ToList()
+                : default,
+                CourseId = courseId
+            })
+            .FirstOrDefaultAsync();
+
+        return result;
     }
 
     public async Task<IEnumerable<UserCourse>> GetEnrolledCourseMembersAsync(int courseId)
