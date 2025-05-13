@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Omniwise.Application.CourseMembers.Commands.AcceptCourseMember;
 using Omniwise.Application.CourseMembers.Commands.AddPendingCourseMember;
+using Omniwise.Application.CourseMembers.Commands.RemoveCourseMember;
 using Omniwise.Application.CourseMembers.Queries.GetCourseMemberById;
 using Omniwise.Application.CourseMembers.Queries.GetEnrolledCourseMembers;
 using Omniwise.Application.CourseMembers.Queries.GetPendingCourseMembers;
@@ -52,10 +53,10 @@ public class CourseMembersController(IMediator mediator) : ControllerBase
     [Route("{memberId}")]
     public async Task<IActionResult> GetCourseMemberById([FromRoute] string memberId, [FromRoute] int courseId)
     {
-        var query = new GetCourseMemberByIdQuery 
-        { 
-            MemberId = memberId, 
-            CourseId = courseId 
+        var query = new GetCourseMemberByIdQuery
+        {
+            MemberId = memberId,
+            CourseId = courseId
         };
         var courseMember = await mediator.Send(query);
 
@@ -68,6 +69,20 @@ public class CourseMembersController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> AcceptCourseMember([FromRoute] string memberId, [FromRoute] int courseId)
     {
         var command = new AcceptCourseMemberCommand
+        {
+            CourseId = courseId,
+            UserId = memberId
+        };
+        await mediator.Send(command);
+        return NoContent();
+    }
+
+    [HttpDelete]
+    [Route("{memberId}")]
+    [Authorize(Roles = Roles.Teacher)]
+    public async Task<IActionResult> RemoveCourseMember([FromRoute] string memberId, [FromRoute] int courseId)
+    {
+        var command = new RemoveCourseMemberCommand
         {
             CourseId = courseId,
             UserId = memberId
