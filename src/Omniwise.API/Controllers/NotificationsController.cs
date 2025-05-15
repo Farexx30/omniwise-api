@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Omniwise.Application.Notifications.Commands.DeleteNotification;
 using Omniwise.Application.Notifications.Queries.GetNotifications;
 using Omniwise.Domain.Constants;
 
@@ -18,5 +19,13 @@ public class NotificationsController(IMediator mediator) : ControllerBase
         return Ok(notifications);
     }
 
+    [HttpDelete]
+    [Route("{notificationId}")]
+    public async Task<IActionResult> DeleteNotification([FromRoute] int notificationId)
+    {
+        var command = new DeleteNotificationCommand { NotificationId = notificationId };
+        await mediator.Send(command);
+        return NoContent();
+    }
 
 }

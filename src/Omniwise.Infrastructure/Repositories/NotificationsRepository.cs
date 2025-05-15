@@ -16,4 +16,18 @@ internal class NotificationsRepository(OmniwiseDbContext dbContext) : INotificat
         return notifications;
     }
 
+    public async Task<Notification?> GetByIdAsync(int notificationId, string userId)
+    {
+        var notification = await dbContext.Notifications
+            .FirstOrDefaultAsync(n => n.Id == notificationId && n.UserId == userId);
+
+        return notification;
+    }
+
+    public async Task DeleteNotificationAsync(Notification notification)
+    {
+        dbContext.Notifications.Remove(notification);
+        await dbContext.SaveChangesAsync();
+    }
+
 }
