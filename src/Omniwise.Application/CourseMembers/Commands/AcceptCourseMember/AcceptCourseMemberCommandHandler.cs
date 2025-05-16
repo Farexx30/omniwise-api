@@ -23,19 +23,19 @@ public class AcceptCourseMemberCommandHandler(ILogger<AcceptCourseMemberCommandH
 
         //change to get course by id
         var course = await coursesRepository.GetCourseByIdAsync(courseId) ??
-            throw new NotFoundException($"Course with id = {courseId} not found.");
+            throw new NotFoundException($"Course not found.");
 
         var authorizationCourseMember = new UserCourse { CourseId = courseId };
         var authorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, authorizationCourseMember, Policies.MustBeEnrolledInCourse);
         if (!authorizationResult.Succeeded)
         {
-            throw new ForbiddenException($"You are not allowed to accept course member for course with id = {courseId}.");
+            throw new ForbiddenException($"You are not allowed to accept course member for course.");
         }
 
         var pendingCourseMember = await userCoursesRepository.GetPendingCourseMemberAsync(courseId, request.UserId)
-            ?? throw new NotFoundException($"Pending course member with id = {request.UserId} not found.");
+            ?? throw new NotFoundException($"Pending course member not found.");
 
-        logger.LogInformation("Accepting course member with id = {userId} for course with id = {courseId}.", request.UserId, courseId);
+        logger.LogInformation("Accepting course member for course {courseName}.", course.Name);
 
         pendingCourseMember.IsAccepted = true;
         pendingCourseMember.JoinDate = DateOnly.FromDateTime(DateTime.UtcNow);

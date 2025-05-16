@@ -23,12 +23,12 @@ public class RemoveCourseMemberCommandHandler(ILogger<RemoveCourseMemberCommandH
         var isCourseExist = await courseRepository.ExistsAsync(courseId);
         if (!isCourseExist)
         {
-            logger.LogWarning("Course with id = {courseId} doesn't exist.", courseId);
-            throw new NotFoundException($"Course with id = {courseId} doesn't exist.");
+            logger.LogWarning("Course doesn't exist.");
+            throw new NotFoundException($"Course doesn't exist.");
         }
 
-        var courseMember = await userCourseRepository.GetEnrolledCourseMemberAsync(courseId, memberId)
-            ?? throw new NotFoundException($"Course member with id = {memberId} in course with id = {courseId} not found.");
+        var courseMember = await userCourseRepository.GetCourseMemberAsync(courseId, memberId)
+            ?? throw new NotFoundException($"Course member not found.");
 
 
 
@@ -36,8 +36,8 @@ public class RemoveCourseMemberCommandHandler(ILogger<RemoveCourseMemberCommandH
         var authorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, authorizationCourseMember, Policies.MustBeEnrolledInCourse);
         if (!authorizationResult.Succeeded)
         {
-            logger.LogWarning("You are not allowed to remove course member with id = {memberId} from course with id = {courseId}.", memberId, courseId);
-            throw new ForbiddenException($"You are not allowed to remove course member with id = {memberId} from course with id = {courseId}.");
+            logger.LogWarning("You are not allowed to remove course member from course.");
+            throw new ForbiddenException($"You are not allowed to remove course member.");
         }
 
 

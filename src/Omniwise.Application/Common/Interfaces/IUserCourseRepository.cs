@@ -13,7 +13,7 @@ public interface IUserCourseRepository
     Task<IEnumerable<UserCourse>> GetEnrolledCourseMembersAsync(int courseId);
     Task<CourseMemberDetailsDto?> GetByIdAsync(string memberId, int courseId, CurrentUser currentUser);
     Task<UserCourse?> GetPendingCourseMemberAsync(int courseId, string userId);
-    Task<UserCourse?> GetEnrolledCourseMemberAsync(int courseId, string userId);
+    Task<UserCourse?> GetCourseMemberAsync(int courseId, string userId);
     Task DeleteAsync(UserCourse courseMember);
     Task SaveChangesAsync();
 }

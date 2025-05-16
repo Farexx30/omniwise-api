@@ -101,12 +101,12 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
     public Task SaveChangesAsync()
         => dbContext.SaveChangesAsync();
 
-    public async Task<UserCourse?> GetEnrolledCourseMemberAsync(int courseId, string userId)
+    public async Task<UserCourse?> GetCourseMemberAsync(int courseId, string userId)
     {
-        var enrolledCourseMember = await dbContext.UserCourses
-            .FirstOrDefaultAsync(uc => uc.CourseId == courseId && uc.UserId == userId && uc.IsAccepted == true);
+        var courseMember = await dbContext.UserCourses
+            .FirstOrDefaultAsync(uc => uc.CourseId == courseId && uc.UserId == userId);
 
-        return enrolledCourseMember;
+        return courseMember;
     }
 
     public async Task DeleteAsync(UserCourse courseMember)
