@@ -30,4 +30,10 @@ internal class NotificationsRepository(OmniwiseDbContext dbContext) : INotificat
         await dbContext.SaveChangesAsync();
     }
 
+    public async Task AddNotificationAsync(Notification notification)
+    {
+        dbContext.Notifications.Add(notification);
+        await dbContext.SaveChangesAsync();
+    }
+
 }
