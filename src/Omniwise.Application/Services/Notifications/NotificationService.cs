@@ -4,8 +4,7 @@ using Omniwise.Domain.Entities;
 
 namespace Omniwise.Application.Services.Notifications;
 
-internal class NotificationService(ILogger<NotificationService> logger,
-    INotificationsRepository notificationsRepository) : INotificationService
+internal class NotificationService(INotificationsRepository notificationsRepository) : INotificationService
 {
     public async Task NotifyUserAsync(string content, string userId)
     {
@@ -17,5 +16,13 @@ internal class NotificationService(ILogger<NotificationService> logger,
         };
 
         await notificationsRepository.AddNotificationAsync(notification);
+    }
+
+    public async Task NotifyUsersAsync(string content, List<string> userIds)
+    {
+        foreach (var userId in userIds)
+        {
+            await NotifyUserAsync(content, userId);
+        }
     }
 }
