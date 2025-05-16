@@ -20,8 +20,6 @@ public class AcceptCourseMemberCommandHandler(ILogger<AcceptCourseMemberCommandH
     {
         var courseId = request.CourseId;
 
-
-        //change to get course by id
         var course = await coursesRepository.GetCourseByIdAsync(courseId) ??
             throw new NotFoundException($"Course not found.");
 
