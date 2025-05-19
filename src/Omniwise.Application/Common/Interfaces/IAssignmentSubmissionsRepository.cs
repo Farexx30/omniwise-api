@@ -1,4 +1,5 @@
-﻿using Omniwise.Domain.Entities;
+﻿using Omniwise.Application.AssignmentSubmissions.Dtos;
+using Omniwise.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,4 +16,5 @@ public interface IAssignmentSubmissionsRepository
     Task<bool> IsAlreadySubmitted(int assignmentSubmissionId, string userId);
     Task<bool> ExistsAsync(int assignmentSubmissionId);
     Task SaveChangesAsync();
+    Task<AssignmentSubmissionNotificationDetailsDto?> GetAssignmentAndCourseNames(int assignmentSubmissionId);
 }

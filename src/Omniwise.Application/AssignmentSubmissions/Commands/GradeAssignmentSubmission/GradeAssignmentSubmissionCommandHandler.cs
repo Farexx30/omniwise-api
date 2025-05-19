@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Omniwise.Application.AssignmentSubmissions.Commands.UpdateAssignmentSubmission;
 using Omniwise.Application.Common.Interfaces;
 using Omniwise.Application.Services.Files;
+using Omniwise.Application.Services.Notifications;
 using Omniwise.Domain.Constants;
 using Omniwise.Domain.Entities;
 using Omniwise.Domain.Exceptions;
@@ -20,7 +21,8 @@ public class GradeAssignmentSubmissionCommandHandler(IAssignmentSubmissionsRepos
     IAssignmentsRepository assignmentsRepository,
     ILogger<GradeAssignmentSubmissionCommandHandler> logger,
     IUserContext userContext,
-    IAuthorizationService authorizationService) : IRequestHandler<GradeAssignmentSubmissionCommand>
+    IAuthorizationService authorizationService,
+    INotificationService notificationService) : IRequestHandler<GradeAssignmentSubmissionCommand>
 {
     public async Task Handle(GradeAssignmentSubmissionCommand request, CancellationToken cancellationToken)
     {
@@ -55,5 +57,14 @@ public class GradeAssignmentSubmissionCommandHandler(IAssignmentSubmissionsRepos
         assignmentSubmission.Grade = grade;
 
         await assignmentSubmissionsRepository.SaveChangesAsync();
+
+        var notificationDetails = await assignmentSubmissionsRepository.GetAssignmentAndCourseNames(assignmentSubmissionId) 
+            ?? throw new NotFoundException($"Assignment submission with id = {assignmentSubmissionId} not found.");
+        var courseName = notificationDetails.CourseName;
+        var assignmentName = notificationDetails.AssignmentName;
+        var notificationContent = $"Assignment \"{assignmentName}\" in course \"{courseName}\" was graded. " +
+            $"Grade: {assignmentSubmission.Grade}";
+
+        await notificationService.NotifyUserAsync(notificationContent, assignmentSubmission.AuthorId);
     }
 }
