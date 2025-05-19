@@ -22,7 +22,8 @@ public class CreateAssignmentCommandHandler(IAssignmentsRepository assignmentsRe
     IMapper mapper,
     IUserContext userContext,
     IAuthorizationService authorizationService,
-    INotificationService notificationService) : IRequestHandler<CreateAssignmentCommand, int>
+    INotificationService notificationService,
+    IQuartzSchedulerService quartzSchedulerService) : IRequestHandler<CreateAssignmentCommand, int>
 {
     public async Task<int> Handle(CreateAssignmentCommand request, CancellationToken cancellationToken)
     {
@@ -46,6 +47,8 @@ public class CreateAssignmentCommandHandler(IAssignmentsRepository assignmentsRe
 
         var notificationContent = $"New assignment added in course {course.Name}.";
         await notificationService.NotifyUsersAsync(notificationContent, userIds);
+
+        await quartzSchedulerService.ScheduleAssignmentCheckJob(assignmentId, assignment.Deadline);
 
         return assignmentId;
     }

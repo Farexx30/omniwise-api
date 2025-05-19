@@ -79,7 +79,29 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
 
         return enrolledCourseMembers;
     }
+    public async Task<IEnumerable<EnrolledCourseMemberWithRoleDto>> GetEnrolledCourseMembersWithRolesAsync(int courseId)
+    {
+        var enrolledCourseMembers = await dbContext.UserCourses
+            .Include(uc => uc.User)
+            .Where(uc => uc.CourseId == courseId && uc.IsAccepted == true)
+            .Join(dbContext.UserRoles,
+                  member => member.UserId,
+                  userRole => userRole.UserId,
+                  (member, userRole) => new { Member = member, UserRole = userRole })
+            .Join(dbContext.Roles,
+                  firstJoinResult => firstJoinResult.UserRole.RoleId,
+                  role => role.Id,
+                  (firstJoinResult, role) => new EnrolledCourseMemberWithRoleDto
+                  {
+                      UserId = firstJoinResult.Member.UserId,
+                      FirstName = firstJoinResult.Member.User.FirstName,
+                      LastName = firstJoinResult.Member.User.LastName,
+                      RoleName = role.Name!
+                  })
+            .ToListAsync();
 
+        return enrolledCourseMembers;
+    }
     public async Task<UserCourse?> GetPendingCourseMemberAsync(int courseId, string userId)
     {
         var pendingCourseMember = await dbContext.UserCourses

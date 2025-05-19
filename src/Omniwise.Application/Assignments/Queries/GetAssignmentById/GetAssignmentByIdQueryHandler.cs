@@ -34,7 +34,7 @@ public class GetAssignmentByIdQueryHandler(IAssignmentsRepository assignmentsRep
             throw new NotFoundException($"{nameof(Course)} with id = {courseId} doesn't exist.");
         }
 
-        var assignment = await assignmentsRepository.GetByIdAsync(assignmentId, courseId)
+        var assignment = await assignmentsRepository.GetByIdAsync(assignmentId)
             ?? throw new NotFoundException($"{nameof(Assignment)} with id = {assignmentId} for {nameof(Course)} with id = {courseId} doesn't exist.");
 
         var authorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, assignment, Policies.MustBeEnrolledInCourse);
