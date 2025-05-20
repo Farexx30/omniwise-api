@@ -34,7 +34,7 @@ public class QuartzSchedulerService(ISchedulerFactory schedulerFactory) : IQuart
         var triggerKey = new TriggerKey($"Trigger-Assignment-{assignmentId}");
         var trigger = TriggerBuilder.Create()
                 .WithIdentity(triggerKey)
-                .StartAt(dateTime)
+                .StartAt(dateTime.AddMinutes(1))
                 .Build();
 
         await _scheduler.RescheduleJob(triggerKey, trigger);
