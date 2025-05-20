@@ -13,4 +13,5 @@ public class AssignmentDto
     public string? Content { get; set; }
     public DateTime Deadline { get; set; }
     public float MaxGrade { get; set; }
+    public List<string> FileUrls { get; set; } = [];
 }

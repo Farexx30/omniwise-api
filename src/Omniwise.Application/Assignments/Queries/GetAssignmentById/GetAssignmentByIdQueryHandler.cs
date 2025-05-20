@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Omniwise.Application.Assignments.Dtos;
 using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Lectures.Dtos;
+using Omniwise.Application.Services.Files;
 using Omniwise.Domain.Constants;
 using Omniwise.Domain.Entities;
 using Omniwise.Domain.Exceptions;
@@ -20,6 +22,7 @@ public class GetAssignmentByIdQueryHandler(IAssignmentsRepository assignmentsRep
     ILogger<GetAssignmentByIdQueryHandler> logger,
     IMapper mapper,
     IUserContext userContext,
+    IFileService fileService,
     IAuthorizationService authorizationService) : IRequestHandler<GetAssignmentByIdQuery, AssignmentDto>
 {
     public async Task<AssignmentDto> Handle(GetAssignmentByIdQuery request, CancellationToken cancellationToken)
@@ -48,6 +51,11 @@ public class GetAssignmentByIdQueryHandler(IAssignmentsRepository assignmentsRep
             courseId);
 
         var assignmentDto = mapper.Map<AssignmentDto>(assignment);
+        foreach (var file in assignment.Files)
+        {
+            var fileSasUrl = await fileService.GetFileSasUrl(file.BlobName);
+            assignmentDto.FileUrls.Add(fileSasUrl);
+        }
 
         return assignmentDto;
     }
