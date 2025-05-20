@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,5 +15,6 @@ public class UpdateAssignmentCommand : IRequest
     public string? Content { get; init; }
     public required DateTime Deadline { get; init; }
     public required float MaxGrade { get; init; }
+    public IEnumerable<IFormFile> Files { get; set; } = [];
     public int CourseId { get; set; }
 }

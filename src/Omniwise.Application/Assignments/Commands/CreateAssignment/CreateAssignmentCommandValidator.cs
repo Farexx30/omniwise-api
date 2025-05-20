@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Omniwise.Application.Common.Static;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,5 +21,18 @@ public class CreateAssignmentCommandValidator : AbstractValidator<CreateAssignme
 
         RuleFor(a => a.MaxGrade)
             .GreaterThan(0f);
+
+        RuleFor(a => a.Files)
+            .Custom((value, context) =>
+            {
+                var validationResult = OmniwiseFileValidation.Validate(value);
+                if (!validationResult.Succeeded)
+                {
+                    foreach (var error in validationResult.Errors)
+                    {
+                        context.AddFailure("Files", error);
+                    }
+                }
+            });
     }
 }

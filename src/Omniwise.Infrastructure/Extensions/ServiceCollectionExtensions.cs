@@ -50,6 +50,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAssignmentsRepository, AssignmentsRepository>();
         services.AddScoped<IAssignmentSubmissionsRepository, AssignmentSubmissionsRepository>();
         services.AddScoped<IAssignmentSubmissionCommentsRepository, AssignmentSubmissionCommentsRepository>();
+        services.AddScoped<IFilesRepository, FilesRepository>();
         services.AddScoped<INotificationsRepository, NotificationsRepository>();
         services.AddScoped<IQuartzSchedulerService, QuartzSchedulerService>();
 

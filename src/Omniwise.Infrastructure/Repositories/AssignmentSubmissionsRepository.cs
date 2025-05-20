@@ -48,6 +48,16 @@ internal class AssignmentSubmissionsRepository(OmniwiseDbContext dbContext) : IA
         return assignmentSubmission;
     }
 
+    public async Task<IEnumerable<int>> GetAllIdsByAssignmentIdAsync(int assignmentId)
+    {
+        var assignmentSubmissionIds = await dbContext.AssignmentSubmissions
+            .Where(asub => asub.AssignmentId == assignmentId)
+            .Select(asub => asub.Id)
+            .ToListAsync();
+
+        return assignmentSubmissionIds;
+    }
+
     public async Task<bool> IsAlreadySubmitted(int assignmentSubmissionId, string userId)
     {
         var isAlreadySubmitted = await dbContext.AssignmentSubmissions
