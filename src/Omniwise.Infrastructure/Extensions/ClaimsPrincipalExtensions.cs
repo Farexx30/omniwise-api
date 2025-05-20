@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Omniwise.Domain.Constants;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -19,5 +20,15 @@ internal static class ClaimsPrincipalExtensions
         return user?.Claims
             .Where(c => c.Type == ClaimTypes.Role)
             .Select(c => c.Value) ?? [];
+    }
+
+    public static string? GetUserFirstName(this ClaimsPrincipal? user)
+    {
+        return user?.FindFirst(c => c.Type == CustomClaimTypes.FirstName)?.Value;
+    }
+
+    public static string? GetUserLastName(this ClaimsPrincipal? user)
+    {
+        return user?.FindFirst(c => c.Type == CustomClaimTypes.LastName)?.Value;
     }
 }

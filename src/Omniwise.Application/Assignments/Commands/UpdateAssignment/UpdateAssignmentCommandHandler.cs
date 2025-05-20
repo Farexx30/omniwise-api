@@ -20,7 +20,8 @@ public class UpdateAssignmentCommandHandler(IAssignmentsRepository assignmentsRe
     ILogger<UpdateAssignmentCommandHandler> logger,
     IMapper mapper,
     IUserContext userContext,
-    IAuthorizationService authorizationService) : IRequestHandler<UpdateAssignmentCommand>
+    IAuthorizationService authorizationService,
+    IQuartzSchedulerService quartzSchedulerService) : IRequestHandler<UpdateAssignmentCommand>
 {
     public async Task Handle(UpdateAssignmentCommand request, CancellationToken cancellationToken)
     {
@@ -34,7 +35,7 @@ public class UpdateAssignmentCommandHandler(IAssignmentsRepository assignmentsRe
             throw new NotFoundException($"Course with id = {courseId} not found.");
         }
 
-        var assignment = await assignmentsRepository.GetByIdAsync(assignmentId, courseId)
+        var assignment = await assignmentsRepository.GetByIdAsync(assignmentId)
             ?? throw new NotFoundException($"{nameof(Assignment)} with id = {assignmentId} in {nameof(Course)} with id = {courseId} not found.");
 
         var authorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, assignment, Policies.MustBeEnrolledInCourse);
@@ -46,5 +47,7 @@ public class UpdateAssignmentCommandHandler(IAssignmentsRepository assignmentsRe
         mapper.Map(request, assignment);
 
         await assignmentsRepository.SaveChangesAsync();
+
+        await quartzSchedulerService.UpdateScheduledAssignmentCheckJob(assignmentId, assignment.Deadline);
     }
 }

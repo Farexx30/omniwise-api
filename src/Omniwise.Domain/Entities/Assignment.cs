@@ -19,4 +19,5 @@ public class Assignment : ICourseResource
     //References:
     public List<AssignmentSubmission> Submissions { get; set; } = [];
     public List<AssignmentFile> Files { get; set; } = [];
+    public Course Course { get; set; } = default!;
 }

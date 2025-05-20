@@ -21,7 +21,7 @@ internal class CourseConfiguration : IEntityTypeConfiguration<Course>
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(c => c.Assignments)
-            .WithOne()
+            .WithOne(a => a.Course)
             .HasForeignKey(fk => fk.CourseId)
             .OnDelete(DeleteBehavior.Cascade);
 

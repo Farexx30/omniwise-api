@@ -25,14 +25,14 @@ public class GetEnrolledCourseMembersQueryHandler(ILogger<GetEnrolledCourseMembe
         if (!isCourseExist)
         {
             logger.LogWarning("Course with id = {courseId} doesn't exist.", courseId);
-            throw new NotFoundException($"Course with id = {courseId} doesn't exist.");
+            throw new NotFoundException($"Course doesn't exist.");
         }
 
         var authorizationCourseMember = new UserCourse { CourseId = courseId };
         var authorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, authorizationCourseMember, Policies.MustBeEnrolledInCourse);
         if (!authorizationResult.Succeeded)
         {
-            throw new ForbiddenException($"You are not allowed to get enrolled course members for course with id = {courseId}.");
+            throw new ForbiddenException($"You are not allowed to get enrolled course members for the course.");
         }
 
         logger.LogInformation("Fetching all enrolled course members for course with id: {CourseId} from the repository.", request.CourseId);

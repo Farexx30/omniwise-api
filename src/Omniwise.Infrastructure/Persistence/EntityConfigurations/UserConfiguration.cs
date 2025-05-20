@@ -26,7 +26,7 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(u => u.AssignmentSubmissions)
-            .WithOne()
+            .WithOne(asub => asub.Author)
             .HasForeignKey(fk => fk.AuthorId)
             .OnDelete(DeleteBehavior.Restrict);
 

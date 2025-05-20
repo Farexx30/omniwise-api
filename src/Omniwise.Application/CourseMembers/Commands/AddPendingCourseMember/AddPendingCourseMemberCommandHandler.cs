@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Services.Notifications;
 using Omniwise.Domain.Entities;
 using Omniwise.Domain.Exceptions;
 
@@ -11,30 +12,29 @@ public class AddPendingCourseMemberCommandHandler(ILogger<AddPendingCourseMember
     IMapper mapper,
     ICoursesRepository coursesRepository,
     IUserCourseRepository userCoursesRepository,
-    IUserContext userContext) : IRequestHandler<AddPendingCourseMemberCommand>
+    IUserContext userContext,
+    INotificationService notificationService) : IRequestHandler<AddPendingCourseMemberCommand>
 {
     public async Task Handle(AddPendingCourseMemberCommand request, CancellationToken cancellationToken)
     {
-        var courseId = request.CourseId;
         var userId = userContext.GetCurrentUser().Id;
         request.UserId = userId!;
-
-        var isCourseExisting = await coursesRepository.ExistsAsync(courseId);
-        if (!isCourseExisting)
-        {
-            logger.LogWarning("Course with id = {courseId} doesn't exist.", courseId);
-            throw new NotFoundException($"{nameof(Course)} with id = {courseId} doesn't exist.");
-        }
+         
+        var course = await coursesRepository.GetCourseByIdAsync(request.CourseId) 
+            ?? throw new NotFoundException($"Course not found.");
 
         var courseMember = mapper.Map<UserCourse>(request);
 
-        var isCourseMemberExisting = await userCoursesRepository.ExistsAsync(courseId, userId!);
+        var isCourseMemberExisting = await userCoursesRepository.ExistsAsync(course.Id, userId!);
         if (isCourseMemberExisting)
         {
-            logger.LogWarning("UserCourse relation for user {userId} and course {courseId} already exists.", userId, courseId);
-            throw new ForbiddenException($"User with id = {userId} has already sent an enroll request to course with id = {courseId}.");
+            logger.LogWarning("UserCourse relation already exists.");
+            throw new ForbiddenException($"User has already sent an enroll request to the course .");
         }
 
         await userCoursesRepository.AddPendingCourseMemberAsync(courseMember);
+
+        var notificationContent = $"There is a new enrollment request for the course {course.Name}";
+        await notificationService.NotifyUserAsync(notificationContent, course.OwnerId);
     }
 }

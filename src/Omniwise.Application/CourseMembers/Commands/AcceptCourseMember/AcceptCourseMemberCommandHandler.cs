@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Services.Notifications;
 using Omniwise.Domain.Constants;
 using Omniwise.Domain.Entities;
 using Omniwise.Domain.Exceptions;
@@ -12,35 +13,34 @@ public class AcceptCourseMemberCommandHandler(ILogger<AcceptCourseMemberCommandH
     ICoursesRepository coursesRepository,
     IUserCourseRepository userCoursesRepository,
     IUserContext userContext,
-    IAuthorizationService authorizationService) : IRequestHandler<AcceptCourseMemberCommand>
+    IAuthorizationService authorizationService,
+    INotificationService notificationService) : IRequestHandler<AcceptCourseMemberCommand>
 {
     public async Task Handle(AcceptCourseMemberCommand request, CancellationToken cancellationToken)
     {
         var courseId = request.CourseId;
 
-        var isCourseExisting = await coursesRepository.ExistsAsync(courseId);
-        if (!isCourseExisting)
-        {
-            logger.LogWarning("Course with id = {courseId} doesn't exist.", courseId);
-            throw new NotFoundException($"{nameof(Course)} with id = {courseId} doesn't exist.");
-        }
+        var course = await coursesRepository.GetCourseByIdAsync(courseId) ??
+            throw new NotFoundException($"Course not found.");
 
         var authorizationCourseMember = new UserCourse { CourseId = courseId };
         var authorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, authorizationCourseMember, Policies.MustBeEnrolledInCourse);
         if (!authorizationResult.Succeeded)
         {
-            throw new ForbiddenException($"You are not allowed to accept course member for course with id = {courseId}.");
+            throw new ForbiddenException($"You are not allowed to accept course member for course.");
         }
 
         var pendingCourseMember = await userCoursesRepository.GetPendingCourseMemberAsync(courseId, request.UserId)
-            ?? throw new NotFoundException($"Pending course member with id = {request.UserId} not found.");
+            ?? throw new NotFoundException($"Pending course member not found.");
 
-        logger.LogInformation("Accepting course member with id = {userId} for course with id = {courseId}.", request.UserId, courseId);
+        logger.LogInformation("Accepting course member for course {courseName}.", course.Name);
 
         pendingCourseMember.IsAccepted = true;
         pendingCourseMember.JoinDate = DateOnly.FromDateTime(DateTime.UtcNow);
 
         await userCoursesRepository.SaveChangesAsync();
 
+        var notificationContent = $"You have been accepted to course {course.Name}."; 
+        await notificationService.NotifyUserAsync(notificationContent, request.UserId);
     }
 }

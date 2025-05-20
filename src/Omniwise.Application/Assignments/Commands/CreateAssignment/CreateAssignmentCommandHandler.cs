@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Omniwise.Application.Assignments.Queries.GetAssignmentById;
 using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Services.Notifications;
 using Omniwise.Domain.Constants;
 using Omniwise.Domain.Entities;
 using Omniwise.Domain.Exceptions;
@@ -17,21 +18,19 @@ namespace Omniwise.Application.Assignments.Commands.CreateAssignment;
 
 public class CreateAssignmentCommandHandler(IAssignmentsRepository assignmentsRepository,
     ICoursesRepository coursesRepository,
-    ILogger<CreateAssignmentCommandHandler> logger,
+    IUserCourseRepository userCourseRepository,
     IMapper mapper,
     IUserContext userContext,
-    IAuthorizationService authorizationService) : IRequestHandler<CreateAssignmentCommand, int>
+    IAuthorizationService authorizationService,
+    INotificationService notificationService,
+    IQuartzSchedulerService quartzSchedulerService) : IRequestHandler<CreateAssignmentCommand, int>
 {
     public async Task<int> Handle(CreateAssignmentCommand request, CancellationToken cancellationToken)
     {
         var courseId = request.CourseId;
 
-        var isCourseExist = await coursesRepository.ExistsAsync(courseId);
-        if (!isCourseExist)
-        {
-            logger.LogWarning("Course with id = {courseId} doesn't exist.", courseId);
-            throw new NotFoundException($"{nameof(Course)} with id = {courseId} doesn't exist.");
-        }
+        var course = await coursesRepository.GetCourseByIdAsync(courseId)
+            ?? throw new NotFoundException($"Course not found.");
 
         var assignment = mapper.Map<Assignment>(request);
 
@@ -42,6 +41,18 @@ public class CreateAssignmentCommandHandler(IAssignmentsRepository assignmentsRe
         }
 
         var assignmentId = await assignmentsRepository.CreateAsync(assignment);
+
+        var courseMembers = await userCourseRepository.GetEnrolledCourseMembersAsync(courseId);
+        var studentIds = courseMembers.Select(member => member.UserId).ToList();
+        var teacherIds = await userCourseRepository.GetTeacherIdsAsync(courseId);
+        studentIds.RemoveAll(id => teacherIds.Contains(id));
+
+        var notificationContent = $"New assignment added in course {course.Name}.";
+
+
+        await notificationService.NotifyUsersAsync(notificationContent, studentIds);
+
+        await quartzSchedulerService.ScheduleAssignmentCheckJob(assignmentId, assignment.Deadline);
 
         return assignmentId;
     }

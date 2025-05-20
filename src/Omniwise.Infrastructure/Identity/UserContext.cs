@@ -27,24 +27,29 @@ internal class UserContext(IHttpContextAccessor httpContextAccessor) : IUserCont
         {
             return CreateCurrentUser(id: null, 
                 roles: [], 
-                isAuthenticated: false);
+                firstName: null,
+                lastName: null);
         }
 
         var userId = user.GetUserId();
         var userRoles = user.GetUserRoles();
+        var userFirstName = user.GetUserFirstName();
+        var userLastName = user.GetUserLastName();
 
         return CreateCurrentUser(id: userId,
                 roles: userRoles,
-                isAuthenticated: true);
+                firstName: userFirstName,
+                lastName: userLastName);
     }
 
-    private static CurrentUser CreateCurrentUser(string? id, IEnumerable<string> roles, bool isAuthenticated)
+    private static CurrentUser CreateCurrentUser(string? id, IEnumerable<string> roles, string? firstName, string? lastName)
     {
         return new CurrentUser
         {
             Id = id,
             Roles = roles,
-            IsAuthenticated = isAuthenticated
+            FirstName = firstName,
+            LastName = lastName
         };
     }
 }

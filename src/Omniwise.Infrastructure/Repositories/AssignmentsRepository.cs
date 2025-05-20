@@ -26,11 +26,10 @@ internal class AssignmentsRepository(OmniwiseDbContext dbContext) : IAssignments
         await dbContext.SaveChangesAsync();
     }
 
-    public async Task<Assignment?> GetByIdAsync(int assignmentId, int courseId)
+    public async Task<Assignment?> GetByIdAsync(int assignmentId)
     {
         var assignment = await dbContext.Assignments
-            .FirstOrDefaultAsync(a => a.Id == assignmentId
-                                && a.CourseId == courseId);
+            .FirstOrDefaultAsync(a => a.Id == assignmentId);
 
         return assignment;
     }
@@ -60,6 +59,16 @@ internal class AssignmentsRepository(OmniwiseDbContext dbContext) : IAssignments
             .AnyAsync(a => a.Id == assignmentId);
 
         return isExist;
+    }
+
+
+    public async Task<List<string>> GetAssigmentSubmissionAuthorIds(int assignmentId)
+    {
+        var authorIds = await dbContext.AssignmentSubmissions
+            .Where(asub => asub.AssignmentId == assignmentId)
+            .Select(asub => asub.AuthorId)
+            .ToListAsync();
+        return authorIds;
     }
 
     public Task SaveChangesAsync()

@@ -79,7 +79,29 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
 
         return enrolledCourseMembers;
     }
+    public async Task<IEnumerable<EnrolledCourseMemberWithRoleDto>> GetEnrolledCourseMembersWithRolesAsync(int courseId)
+    {
+        var enrolledCourseMembers = await dbContext.UserCourses
+            .Include(uc => uc.User)
+            .Where(uc => uc.CourseId == courseId && uc.IsAccepted == true)
+            .Join(dbContext.UserRoles,
+                  member => member.UserId,
+                  userRole => userRole.UserId,
+                  (member, userRole) => new { Member = member, UserRole = userRole })
+            .Join(dbContext.Roles,
+                  firstJoinResult => firstJoinResult.UserRole.RoleId,
+                  role => role.Id,
+                  (firstJoinResult, role) => new EnrolledCourseMemberWithRoleDto
+                  {
+                      UserId = firstJoinResult.Member.UserId,
+                      FirstName = firstJoinResult.Member.User.FirstName,
+                      LastName = firstJoinResult.Member.User.LastName,
+                      RoleName = role.Name!
+                  })
+            .ToListAsync();
 
+        return enrolledCourseMembers;
+    }
     public async Task<UserCourse?> GetPendingCourseMemberAsync(int courseId, string userId)
     {
         var pendingCourseMember = await dbContext.UserCourses
@@ -101,12 +123,12 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
     public Task SaveChangesAsync()
         => dbContext.SaveChangesAsync();
 
-    public async Task<UserCourse?> GetEnrolledCourseMemberAsync(int courseId, string userId)
+    public async Task<UserCourse?> GetCourseMemberAsync(int courseId, string userId)
     {
-        var enrolledCourseMember = await dbContext.UserCourses
-            .FirstOrDefaultAsync(uc => uc.CourseId == courseId && uc.UserId == userId && uc.IsAccepted == true);
+        var courseMember = await dbContext.UserCourses
+            .FirstOrDefaultAsync(uc => uc.CourseId == courseId && uc.UserId == userId);
 
-        return enrolledCourseMember;
+        return courseMember;
     }
 
     public async Task DeleteAsync(UserCourse courseMember)
@@ -115,4 +137,23 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
         await dbContext.SaveChangesAsync();
     }
 
+    public async Task<List<string>> GetTeacherIdsAsync(int courseId)
+    {
+        var result = await dbContext.UserCourses
+            .Include(uc => uc.User)
+            .Where(uc => uc.CourseId == courseId && uc.IsAccepted == true)
+            .Join(dbContext.UserRoles,
+                  member => member.UserId,
+                  userRole => userRole.UserId,
+                  (member, userRole) => new { Member = member, UserRole = userRole })
+            .Join(dbContext.Roles,
+                  firstJoinResult => firstJoinResult.UserRole.RoleId,
+                  role => role.Id,
+                  (firstJoinResult, role) => new { firstJoinResult.Member.UserId, Role = role })
+            .Where(result => result.Role.Name == Roles.Teacher)
+            .Select(result => result.UserId)
+            .ToListAsync();
+
+        return result;
+    }
 }

@@ -19,7 +19,8 @@ public class DeleteAssignmentCommandHandler(IAssignmentsRepository assignmentsRe
     ICoursesRepository coursesRepository,
     ILogger<UpdateAssignmentCommandHandler> logger,
     IUserContext userContext,
-    IAuthorizationService authorizationService) : IRequestHandler<DeleteAssignmentCommand>
+    IAuthorizationService authorizationService,
+    IQuartzSchedulerService quartzSchedulerService) : IRequestHandler<DeleteAssignmentCommand>
 {
     public async Task Handle(DeleteAssignmentCommand request, CancellationToken cancellationToken)
     {
@@ -33,7 +34,7 @@ public class DeleteAssignmentCommandHandler(IAssignmentsRepository assignmentsRe
             throw new NotFoundException($"{nameof(Course)} with id = {courseId} doesn't exist.");
         }
 
-        var assignment = await assignmentsRepository.GetByIdAsync(assignmentId, courseId)
+        var assignment = await assignmentsRepository.GetByIdAsync(assignmentId)
             ?? throw new NotFoundException($"{nameof(Assignment)} with id = {assignmentId} in {nameof(Course)} with id = {courseId} not found.");
 
         var authorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, assignment, Policies.MustBeEnrolledInCourse);
@@ -47,5 +48,6 @@ public class DeleteAssignmentCommandHandler(IAssignmentsRepository assignmentsRe
         }
 
         await assignmentsRepository.DeleteAsync(assignment);
+        await quartzSchedulerService.DeleteScheduledAssignmentCheckJob(assignmentId);
     }
 }

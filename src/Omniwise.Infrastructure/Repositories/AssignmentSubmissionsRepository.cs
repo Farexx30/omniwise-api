@@ -1,5 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper.Execution;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Omniwise.Application.AssignmentSubmissionComments.Dtos;
+using Omniwise.Application.AssignmentSubmissions.Dtos;
 using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.CourseMembers.Dtos;
+using Omniwise.Domain.Constants;
 using Omniwise.Domain.Entities;
 using Omniwise.Infrastructure.Persistence;
 using System;
@@ -61,4 +67,20 @@ internal class AssignmentSubmissionsRepository(OmniwiseDbContext dbContext) : IA
 
     public Task SaveChangesAsync()
         => dbContext.SaveChangesAsync();
+
+    public async Task<AssignmentSubmissionNotificationDetailsDto?> GetAssignmentAndCourseNames(int assignmentSubmissionId)
+    {
+        var result = await dbContext.AssignmentSubmissions
+            .Include(asub => asub.Assignment)
+                .ThenInclude(a => a.Course)
+            .Where(asub => asub.Id == assignmentSubmissionId)
+            .Select(asub => new AssignmentSubmissionNotificationDetailsDto
+            { 
+                AssignmentName = asub.Assignment.Name, 
+                CourseName = asub.Assignment.Course.Name 
+            })
+            .FirstOrDefaultAsync();
+
+        return result;
+    }
 }

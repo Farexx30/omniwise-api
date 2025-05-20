@@ -9,11 +9,14 @@ using Omniwise.Domain.Entities;
 using Omniwise.Infrastructure.Authorization.Requirements.MustBeEnrolledInCourse;
 using Omniwise.Infrastructure.Authorization.Requirements.SameOwner;
 using Omniwise.Infrastructure.Identity;
+using Omniwise.Infrastructure.Jobs;
 using Omniwise.Infrastructure.Persistence;
 using Omniwise.Infrastructure.Persistence.MigrationAppliers;
 using Omniwise.Infrastructure.Persistence.Seeders;
 using Omniwise.Infrastructure.Repositories;
+using Omniwise.Infrastructure.Services;
 using Omniwise.Infrastructure.Storage;
+using Quartz;
 
 namespace Omniwise.Infrastructure.Extensions;
 
@@ -29,6 +32,7 @@ public static class ServiceCollectionExtensions
 
         services.AddIdentityApiEndpoints<User>()
             .AddRoles<IdentityRole>()
+            .AddClaimsPrincipalFactory<CustomUserClaimsPrincipalFactory>()
             .AddEntityFrameworkStores<OmniwiseDbContext>();
 
         services.AddScoped<IMigrationApplier, MigrationApplier>();
@@ -46,6 +50,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAssignmentsRepository, AssignmentsRepository>();
         services.AddScoped<IAssignmentSubmissionsRepository, AssignmentSubmissionsRepository>();
         services.AddScoped<IAssignmentSubmissionCommentsRepository, AssignmentSubmissionCommentsRepository>();
+        services.AddScoped<INotificationsRepository, NotificationsRepository>();
+        services.AddScoped<IQuartzSchedulerService, QuartzSchedulerService>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
@@ -64,5 +70,25 @@ public static class ServiceCollectionExtensions
 
         services.Configure<BlobStorageSettings>(configuration.GetSection("BlobStorage"));
         services.AddScoped<IBlobStorageService, BlobStorageService>();
+
+        services.AddQuartz(q =>
+        {
+            q.AddJob<CheckOverdueAssignmentJob>(opts => 
+                opts.WithIdentity(CheckOverdueAssignmentJob.Name)
+                .StoreDurably());
+
+            q.UsePersistentStore(p =>
+            {
+                p.UseSqlServer(cfg =>
+                {
+                    cfg.ConnectionString = connectionString!;
+                });
+            });
+
+            q.SetProperty("quartz.serializer.type", "json");
+        });
+
+        services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
+        services.AddSingleton<QuartzSchedulerService>();
     }
 }

@@ -26,16 +26,16 @@ public class GetCourseMemberByIdQueryHandler(ILogger<GetCourseMemberByIdQueryHan
         if (!isCourseExist.Result)
         {
             logger.LogWarning("Course with id = {courseId} doesn't exist.", courseId);
-            throw new NotFoundException($"Course with id = {courseId} doesn't exist.");
+            throw new NotFoundException($"Course doesn't exist.");
         }
 
         var courseMemberDto = await userCourseRepository.GetByIdAsync(memberId, courseId, currentUser)
-            ?? throw new NotFoundException($"Course member with id = {memberId} for course with id = {courseId} doesn't exist.");
+            ?? throw new NotFoundException($"Course member for course doesn't exist.");
 
         var authorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, courseMemberDto, Policies.MustBeEnrolledInCourse);
         if (!authorizationResult.Succeeded)
         {
-            throw new ForbiddenException($"You are not allowed to get course member with id = {memberId} in course with id = {courseId}.");
+            throw new ForbiddenException($"You are not allowed to get course member.");
         }
 
         logger.LogInformation("Getting course member with id = {memberId} for course with id = {courseId}",

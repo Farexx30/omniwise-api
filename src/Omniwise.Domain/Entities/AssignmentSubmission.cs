@@ -18,4 +18,5 @@ public class AssignmentSubmission
     public Assignment Assignment { get; set; } = default!;
     public List<AssignmentSubmissionComment> Comments { get; set; } = [];
     public List<AssignmentSubmissionFile> Files { get; set; } = [];
+    public User Author { get; set; } = default!;
 }
