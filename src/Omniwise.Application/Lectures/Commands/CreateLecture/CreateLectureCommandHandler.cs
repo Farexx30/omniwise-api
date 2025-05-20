@@ -44,10 +44,12 @@ public class CreateLectureCommandHandler(ILogger<CreateLectureCommandHandler> lo
         
 
         var courseMembers = await userCourseRepository.GetEnrolledCourseMembersAsync(courseId);
-        var userIds = courseMembers.Select(member => member.UserId).ToList();
+        var studentIds = courseMembers.Select(member => member.UserId).ToList();
+        var teacherIds = await userCourseRepository.GetTeacherIdsAsync(courseId);
+        studentIds.RemoveAll(id => teacherIds.Contains(id));
 
         var notificationContent = $"New lecture added in course {course.Name}.";
-        await notificationService.NotifyUsersAsync(notificationContent, userIds);
+        await notificationService.NotifyUsersAsync(notificationContent, studentIds);
 
 
 

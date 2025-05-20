@@ -43,10 +43,14 @@ public class CreateAssignmentCommandHandler(IAssignmentsRepository assignmentsRe
         var assignmentId = await assignmentsRepository.CreateAsync(assignment);
 
         var courseMembers = await userCourseRepository.GetEnrolledCourseMembersAsync(courseId);
-        var userIds = courseMembers.Select(member => member.UserId).ToList();
+        var studentIds = courseMembers.Select(member => member.UserId).ToList();
+        var teacherIds = await userCourseRepository.GetTeacherIdsAsync(courseId);
+        studentIds.RemoveAll(id => teacherIds.Contains(id));
 
         var notificationContent = $"New assignment added in course {course.Name}.";
-        await notificationService.NotifyUsersAsync(notificationContent, userIds);
+
+
+        await notificationService.NotifyUsersAsync(notificationContent, studentIds);
 
         await quartzSchedulerService.ScheduleAssignmentCheckJob(assignmentId, assignment.Deadline);
 
