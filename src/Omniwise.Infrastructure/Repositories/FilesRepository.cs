@@ -16,7 +16,7 @@ internal class FilesRepository(OmniwiseDbContext dbContext) : IFilesRepository
 {
     //This method deletes orphaned records from File table.
     //It is important when we delete higher in hierarchy entities and cascade delete those who contains files
-    //because in such case since we use TPT mapping strategy for any File type, the "File" base table
+    //because in such case since we use TPT mapping strategy, for any File type, the File base table
     //is not being affected by such action which would result in orphaned records in this table.
     public async Task DeleteOrphansByBlobNamesAsync(IEnumerable<string> blobNames)
     {

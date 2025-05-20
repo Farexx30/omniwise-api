@@ -11,7 +11,11 @@ public class LecturesMappingProfile : Profile
     {
         CreateMap<Lecture, LectureDto>();
         CreateMap<Lecture, LectureToGetAllDto>();
-        CreateMap<CreateLectureCommand, Lecture>();
-        CreateMap<UpdateLectureCommand, Lecture>();
+
+        CreateMap<CreateLectureCommand, Lecture>()
+            .ForMember(dest => dest.Files, opt => opt.Ignore());
+
+        CreateMap<UpdateLectureCommand, Lecture>()
+            .ForMember(dest => dest.Files, opt => opt.Ignore());
     }
 }

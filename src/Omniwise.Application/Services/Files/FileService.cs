@@ -118,6 +118,7 @@ internal class FileService(ILogger<FileService> logger,
     {
         return fileType switch
         {
+            var type when type == typeof(LectureFile) => FileFolders.Lectures,
             var type when type == typeof(AssignmentFile) => FileFolders.Assignments,
             var type when type == typeof(AssignmentSubmissionFile) => FileFolders.AssignmentSubmissions,
             _ => throw new Exception("Unknown file type.")

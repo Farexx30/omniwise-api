@@ -18,7 +18,8 @@ public class LecturesController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
     [Authorize(Roles = Roles.Teacher)]
-    public async Task<IActionResult> CreateLecture([FromRoute] int courseId, [FromBody] CreateLectureCommand command)
+    [RequestSizeLimit(50_000_000)]
+    public async Task<IActionResult> CreateLecture([FromForm] CreateLectureCommand command, [FromRoute] int courseId)
     {
         command.CourseId = courseId;
         int lectureId = await mediator.Send(command);
@@ -27,7 +28,8 @@ public class LecturesController(IMediator mediator) : ControllerBase
 
     [HttpPatch("{lectureId}")]
     [Authorize(Roles = Roles.Teacher)]
-    public async Task<IActionResult> UpdateLecture([FromRoute] int courseId, [FromRoute] int lectureId, [FromBody] UpdateLectureCommand command)
+    [RequestSizeLimit(50_000_000)]
+    public async Task<IActionResult> UpdateLecture([FromForm] UpdateLectureCommand command, [FromRoute] int courseId, [FromRoute] int lectureId)
     {
         command.CourseId = courseId;
         command.Id = lectureId;

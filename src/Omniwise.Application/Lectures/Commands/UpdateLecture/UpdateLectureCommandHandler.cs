@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Services.Files;
 using Omniwise.Domain.Constants;
 using Omniwise.Domain.Exceptions;
 
@@ -13,6 +14,8 @@ public class UpdateLectureCommandHandler(ILogger<UpdateLectureCommandHandler> lo
     ICoursesRepository coursesRepository,
     ILecturesRepository lecturesRepository,
     IUserContext userContext,
+    IUnitOfWork unitOfWork,
+    IFileService fileService,
     IAuthorizationService authorizationService) : IRequestHandler<UpdateLectureCommand>
 {
     public async Task Handle(UpdateLectureCommand request, CancellationToken cancellationToken)
@@ -38,8 +41,16 @@ public class UpdateLectureCommandHandler(ILogger<UpdateLectureCommandHandler> lo
 
         logger.LogInformation("Lecture with id = {id} is updating.", request.Id);
 
-        mapper.Map(request, lecture);
-        await lecturesRepository.SaveChangesAsync();
+        var files = request.Files;
+
+        await unitOfWork.ExecuteTransactionalAsync(async () =>
+        {
+            mapper.Map(request, lecture);
+
+            await fileService.CompareAndUpdateAsync(files, lecture.Files, lectureId);
+
+            await lecturesRepository.SaveChangesAsync();
+        });
     }
 }
     
