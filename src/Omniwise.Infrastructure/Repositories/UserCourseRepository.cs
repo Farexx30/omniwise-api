@@ -137,4 +137,23 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
         await dbContext.SaveChangesAsync();
     }
 
+    public async Task<List<string>> GetTeacherIdsAsync(int courseId)
+    {
+        var result = await dbContext.UserCourses
+            .Include(uc => uc.User)
+            .Where(uc => uc.CourseId == courseId && uc.IsAccepted == true)
+            .Join(dbContext.UserRoles,
+                  member => member.UserId,
+                  userRole => userRole.UserId,
+                  (member, userRole) => new { Member = member, UserRole = userRole })
+            .Join(dbContext.Roles,
+                  firstJoinResult => firstJoinResult.UserRole.RoleId,
+                  role => role.Id,
+                  (firstJoinResult, role) => new { firstJoinResult.Member.UserId, Role = role })
+            .Where(result => result.Role.Name == Roles.Teacher)
+            .Select(result => result.UserId)
+            .ToListAsync();
+
+        return result;
+    }
 }

@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Omniwise.Application.AssignmentSubmissionComments.Dtos;
 using Omniwise.Application.Common.Interfaces;
+using Omniwise.Domain.Constants;
 using Omniwise.Domain.Entities;
 using Omniwise.Infrastructure.Persistence;
 using System;
@@ -36,4 +38,30 @@ internal class AssignmentSubmissionCommentsRepository(OmniwiseDbContext dbContex
 
     public Task SaveChangesAsync()
         => dbContext.SaveChangesAsync();
+
+    public async Task<AssignmentSubmissionCommentNotificationDto?> GetDetailsToCommentNotification(int assignmentSubmissionId)
+    {
+      var result = await dbContext.AssignmentSubmissions
+                .Include(asub => asub.Assignment)
+                    .ThenInclude(a => a.Course)
+                        .ThenInclude(c => c.Members)
+            .Where(asub => asub.Id == assignmentSubmissionId)
+            .Select(asub => new AssignmentSubmissionCommentNotificationDto
+            {
+                CourseName = asub.Assignment.Course.Name,
+                CourseId = asub.Assignment.Course.Id,
+                AssignmentName = asub.Assignment.Name,
+                AssignmentSubmissionAuthorFirstName = asub.Assignment.Course.Members
+                    .Where(member => member.Id == asub.AuthorId)
+                    .Select(member => member.FirstName)
+                    .First(),
+                AssignmentSubmissionAuthorLastName = asub.Assignment.Course.Members
+                    .Where(member => member.Id == asub.AuthorId)
+                    .Select(member => member.LastName)
+                    .First(),
+            })
+            .FirstOrDefaultAsync();
+        
+        return result;
+    }
 }

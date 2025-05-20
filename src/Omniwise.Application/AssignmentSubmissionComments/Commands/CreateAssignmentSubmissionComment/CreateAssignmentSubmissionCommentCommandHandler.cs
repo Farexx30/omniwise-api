@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Omniwise.Application.AssignmentSubmissions.Commands.DeleteAssignmentSubmission;
 using Omniwise.Application.Common.Interfaces;
 using Omniwise.Application.Services.Files;
+using Omniwise.Application.Services.Notifications;
 using Omniwise.Domain.Constants;
 using Omniwise.Domain.Entities;
 using Omniwise.Domain.Exceptions;
@@ -18,10 +19,12 @@ namespace Omniwise.Application.AssignmentSubmissionComments.Commands.CreateAssig
 
 public class CreateAssignmentSubmissionCommentCommandHandler(IAssignmentSubmissionCommentsRepository assignmentSubmissionCommentsRepository,
     IAssignmentSubmissionsRepository assignmentSubmissionsRepository,
+    IUserCourseRepository userCourseRepository,
     ILogger<CreateAssignmentSubmissionCommentCommandHandler> logger,
     IMapper mapper,
     IUserContext userContext,
-    IAuthorizationService authorizationService) : IRequestHandler<CreateAssignmentSubmissionCommentCommand, int>
+    IAuthorizationService authorizationService,
+    INotificationService notificationService) : IRequestHandler<CreateAssignmentSubmissionCommentCommand, int>
 {
     public async Task<int> Handle(CreateAssignmentSubmissionCommentCommand request, CancellationToken cancellationToken)
     {
@@ -64,6 +67,25 @@ public class CreateAssignmentSubmissionCommentCommandHandler(IAssignmentSubmissi
         }
 
         var assignmentSubmissionCommentId = await assignmentSubmissionCommentsRepository.CreateAsync(assignmentSubmissionComment);
+
+        var notificationDetails = await assignmentSubmissionCommentsRepository.GetDetailsToCommentNotification(assignmentSubmissionId);
+
+        if (notificationDetails is not null)
+        {
+            notificationDetails.CommentAuthorFirstName = currentUser.FirstName!;
+            notificationDetails.CommentAuthorLastName = currentUser.LastName!;
+
+            string authorSubmissionName = notificationDetails.AssignmentSubmissionAuthorFirstName + " " + notificationDetails.AssignmentSubmissionAuthorLastName;
+            string authorCommentName = notificationDetails.CommentAuthorFirstName + " " + notificationDetails.CommentAuthorLastName;
+            var notificationContent = $"{authorCommentName} posted a new comment on {authorSubmissionName}'s assignment submission for {notificationDetails.AssignmentName} in {notificationDetails.CourseName}.{Environment.NewLine}Comment content:{Environment.NewLine}{assignmentSubmissionComment.Content}";
+        
+            var notificationReceivers = await userCourseRepository.GetTeacherIdsAsync(notificationDetails.CourseId);
+            notificationReceivers.Add(assignmentSubmission.AuthorId);
+            notificationReceivers.Remove(assignmentSubmissionComment.AuthorId);
+
+            await notificationService.NotifyUsersAsync(notificationContent, notificationReceivers);
+        }
+
 
         return assignmentSubmissionCommentId;
     }

@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper.Execution;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Omniwise.Application.AssignmentSubmissionComments.Dtos;
 using Omniwise.Application.AssignmentSubmissions.Dtos;
 using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.CourseMembers.Dtos;
 using Omniwise.Domain.Constants;
 using Omniwise.Domain.Entities;
 using Omniwise.Infrastructure.Persistence;
@@ -69,7 +72,7 @@ internal class AssignmentSubmissionsRepository(OmniwiseDbContext dbContext) : IA
     {
         var result = await dbContext.AssignmentSubmissions
             .Include(asub => asub.Assignment)
-            .ThenInclude(a => a.Course)
+                .ThenInclude(a => a.Course)
             .Where(asub => asub.Id == assignmentSubmissionId)
             .Select(asub => new AssignmentSubmissionNotificationDetailsDto
             { 

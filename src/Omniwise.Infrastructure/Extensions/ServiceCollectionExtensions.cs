@@ -32,6 +32,7 @@ public static class ServiceCollectionExtensions
 
         services.AddIdentityApiEndpoints<User>()
             .AddRoles<IdentityRole>()
+            .AddClaimsPrincipalFactory<CustomUserClaimsPrincipalFactory>()
             .AddEntityFrameworkStores<OmniwiseDbContext>();
 
         services.AddScoped<IMigrationApplier, MigrationApplier>();

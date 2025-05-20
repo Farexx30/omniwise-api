@@ -16,4 +16,5 @@ public class AssignmentSubmissionComment
 
     //References:
     public User Author { get; set; } = default!;
+    public AssignmentSubmission AssignmentSubmission { get; set; } = default!;
 }

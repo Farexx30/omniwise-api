@@ -11,7 +11,8 @@ public record CurrentUser
 {
     public string? Id { get; init; }
     public IEnumerable<string> Roles { get; init; } = [];
-    public required bool IsAuthenticated { get; init; }
+    public string? FirstName { get; init; }
+    public string? LastName { get; init; }
 
     public bool IsInRole(string role)
         => Roles.Contains(role, StringComparer.OrdinalIgnoreCase);

@@ -17,4 +17,5 @@ public interface IUserCourseRepository
     Task<UserCourse?> GetCourseMemberAsync(int courseId, string userId);
     Task DeleteAsync(UserCourse courseMember);
     Task SaveChangesAsync();
+    Task<List<string>> GetTeacherIdsAsync(int courseId);
 }

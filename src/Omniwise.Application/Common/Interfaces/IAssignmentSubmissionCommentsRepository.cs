@@ -1,4 +1,5 @@
-﻿using Omniwise.Domain.Entities;
+﻿using Omniwise.Application.AssignmentSubmissionComments.Dtos;
+using Omniwise.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,4 +14,5 @@ public interface IAssignmentSubmissionCommentsRepository
     Task<AssignmentSubmissionComment?> GetByIdAsync(int assignmentSubmissionCommentId);
     Task DeleteAsync(AssignmentSubmissionComment comment);
     Task SaveChangesAsync();
+    Task<AssignmentSubmissionCommentNotificationDto?> GetDetailsToCommentNotification(int assignmentSubmissionId);
 }

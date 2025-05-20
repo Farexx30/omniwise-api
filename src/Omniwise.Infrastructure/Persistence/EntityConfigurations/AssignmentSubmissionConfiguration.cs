@@ -16,7 +16,7 @@ internal class AssignmentSubmissionConfiguration : IEntityTypeConfiguration<Assi
         //Relations:
         //One-to-many:
         builder.HasMany(asub => asub.Comments)
-            .WithOne()
+            .WithOne(asubc => asubc.AssignmentSubmission)
             .HasForeignKey(fk => fk.AssignmentSubmissionId)
             .OnDelete(DeleteBehavior.Cascade);
 
