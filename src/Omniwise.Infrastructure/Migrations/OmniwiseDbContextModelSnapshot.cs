@@ -548,41 +548,51 @@ namespace Omniwise.Infrastructure.Migrations
 
             modelBuilder.Entity("Omniwise.Domain.Entities.Assignment", b =>
                 {
-                    b.HasOne("Omniwise.Domain.Entities.Course", null)
+                    b.HasOne("Omniwise.Domain.Entities.Course", "Course")
                         .WithMany("Assignments")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Course");
                 });
 
             modelBuilder.Entity("Omniwise.Domain.Entities.AssignmentSubmission", b =>
                 {
-                    b.HasOne("Omniwise.Domain.Entities.Assignment", null)
+                    b.HasOne("Omniwise.Domain.Entities.Assignment", "Assignment")
                         .WithMany("Submissions")
                         .HasForeignKey("AssignmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Omniwise.Domain.Entities.User", null)
+                    b.HasOne("Omniwise.Domain.Entities.User", "Author")
                         .WithMany("AssignmentSubmissions")
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Assignment");
+
+                    b.Navigation("Author");
                 });
 
             modelBuilder.Entity("Omniwise.Domain.Entities.AssignmentSubmissionComment", b =>
                 {
-                    b.HasOne("Omniwise.Domain.Entities.AssignmentSubmission", null)
+                    b.HasOne("Omniwise.Domain.Entities.AssignmentSubmission", "AssignmentSubmission")
                         .WithMany("Comments")
                         .HasForeignKey("AssignmentSubmissionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Omniwise.Domain.Entities.User", null)
+                    b.HasOne("Omniwise.Domain.Entities.User", "Author")
                         .WithMany("AssignmentSubmissionComments")
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("AssignmentSubmission");
+
+                    b.Navigation("Author");
                 });
 
             modelBuilder.Entity("Omniwise.Domain.Entities.Course", b =>
@@ -620,11 +630,13 @@ namespace Omniwise.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Omniwise.Domain.Entities.User", null)
-                        .WithMany()
+                    b.HasOne("Omniwise.Domain.Entities.User", "User")
+                        .WithMany("UserCourses")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Omniwise.Domain.Entities.AssignmentFile", b =>
@@ -707,6 +719,8 @@ namespace Omniwise.Infrastructure.Migrations
                     b.Navigation("Notifications");
 
                     b.Navigation("OwnedCourses");
+
+                    b.Navigation("UserCourses");
                 });
 #pragma warning restore 612, 618
         }
