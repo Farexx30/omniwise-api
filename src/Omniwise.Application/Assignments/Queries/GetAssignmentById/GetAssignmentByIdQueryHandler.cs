@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Omniwise.Application.Assignments.Dtos;
 using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Common.Types;
 using Omniwise.Application.Lectures.Dtos;
 using Omniwise.Application.Services.Files;
 using Omniwise.Domain.Constants;
