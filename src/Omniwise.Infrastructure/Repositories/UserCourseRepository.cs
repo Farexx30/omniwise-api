@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using Omniwise.Application.Assignments.Dtos;
 using Omniwise.Application.Common.Interfaces;
 using Omniwise.Application.Common.Types;
@@ -25,47 +27,64 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
 
     public async Task<CourseMemberDetailsDto?> GetByIdAsync(string memberId, int courseId, CurrentUser currentUser)
     {
-        var currentUserId = currentUser.Id!;
+        var currentUserId = currentUser.Id;
         var currentUserRoleName = currentUser.Roles.First();
 
-        var result = await dbContext.Users
-             .Where(u => u.Id == memberId)
-             .Include(member => member.UserCourses)
-             .Include(member => member.AssignmentSubmissions)
-                    .ThenInclude(a => a.Assignment)
-            .Join(dbContext.UserRoles,
-                  member => member.Id,
-                  userRole => userRole.UserId,
-                  (member, userRole) => new { Member = member, UserRole = userRole })
-            .Join(dbContext.Roles,
-                  firstJoinResult => firstJoinResult.UserRole.RoleId,
-                  role => role.Id,
-                  (firstJoinResult, role) => new { firstJoinResult.Member, Role = role })
-            .Select(result => new CourseMemberDetailsDto
-            {
-                UserId = result.Member.Id,
-                JoinDate = result.Member.UserCourses
-                    .Where(uc => uc.CourseId == courseId)
-                    .Select(uc => uc.JoinDate)
-                    .First(),
-                FirstName = result.Member.FirstName,
-                LastName = result.Member.LastName,
-                Email = result.Member.Email!,
-                RoleName = result.Role.Name!,
-                AssignmentSubmissions = currentUserRoleName.Equals(Roles.Teacher, StringComparison.CurrentCultureIgnoreCase)
-                                        || currentUserId.Equals(memberId, StringComparison.CurrentCultureIgnoreCase)
-                ? result.Member.AssignmentSubmissions.Select(asub => new AssignmentMemberSubmissionDto
+        FormattableString query = $@"
+            SELECT uc.UserId, uc.JoinDate, u.FirstName, u.LastName, u.Email, r.Name RoleName,
+                   ad.AssignmentSubmissionId, ad.AssignmentName, ad.AssignmentDeadline, ad.AssignmentSubmissionGrade, 
+                   uc.CourseId
+            FROM UserCourses uc
+            INNER JOIN AspNetUsers u ON uc.UserId = u.Id
+            INNER JOIN AspNetUserRoles ur ON u.Id = ur.UserId
+            INNER JOIN AspNetRoles r ON ur.RoleId = r.Id
+            LEFT JOIN (
+                SELECT asub.AuthorId, asub.Id AssignmentSubmissionId, a.Name AssignmentName, a.Deadline AssignmentDeadline, asub.Grade AssignmentSubmissionGrade
+                FROM Assignments a
+                INNER JOIN AssignmentSubmissions asub ON a.Id = asub.AssignmentId
+                WHERE a.CourseId = {courseId}
+            ) AS ad
+            ON ad.AuthorId = {memberId}
+            WHERE uc.UserId = {memberId} AND uc.CourseId = {courseId}";
+
+        var flatResult = await dbContext.Database
+            .SqlQuery<FlatCourseMemberDetailsDto>(query)
+            .ToListAsync();
+
+        var result = flatResult.GroupBy(flatResult => new
+        {
+            flatResult.UserId,
+            flatResult.JoinDate,
+            flatResult.FirstName,
+            flatResult.LastName,
+            flatResult.Email,
+            flatResult.RoleName,
+            flatResult.CourseId
+        })
+        .Select(groupResult => new CourseMemberDetailsDto
+        {
+            UserId = groupResult.Key.UserId,
+            JoinDate = groupResult.Key.JoinDate,
+            FirstName = groupResult.Key.FirstName,
+            LastName = groupResult.Key.LastName,
+            Email = groupResult.Key.Email,
+            RoleName = groupResult.Key.RoleName,
+            AssignmentSubmissions = (currentUserRoleName.Equals(Roles.Teacher, StringComparison.CurrentCultureIgnoreCase)
+                                    || groupResult.Key.UserId.Equals(currentUserId))
+                                    && !groupResult.Key.RoleName.Equals(Roles.Teacher, StringComparison.CurrentCultureIgnoreCase)
+                ? [.. groupResult
+                .Where(x => x.AssignmentSubmissionId != null)
+                .Select(x => new AssignmentMemberSubmissionDto
                 {
-                    Id = asub.Id,
-                    Name = asub.Assignment.Name,
-                    Deadline = asub.Assignment.Deadline,
-                    Grade = asub.Grade,
-                })
-                .ToList()
+                    Id = x.AssignmentSubmissionId!.Value,
+                    Name = x.AssignmentName!,
+                    Deadline = x.AssignmentDeadline!.Value,
+                    Grade = x.AssignmentSubmissionGrade
+                })]
                 : default,
-                CourseId = courseId
-            })
-            .FirstOrDefaultAsync();
+            CourseId = groupResult.Key.CourseId
+        })
+        .FirstOrDefault();
 
         return result;
     }

@@ -2,63 +2,68 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Omniwise.Application.Assignments.Dtos;
+using Omniwise.Application.Assignments.Queries.GetAllCourseAssignments;
 using Omniwise.Application.Lectures.Commands.CreateLecture;
 using Omniwise.Application.Lectures.Commands.DeleteLecture;
 using Omniwise.Application.Lectures.Commands.UpdateLecture;
 using Omniwise.Application.Lectures.Queries.GetLectureById;
-using Omniwise.Application.Lectures.Queries.GetLectures;
+using Omniwise.Application.Lectures.Queries.GetAllCourseLectures;
 using Omniwise.Domain.Constants;
 
 namespace Omniwise.API.Controllers;
 
 [ApiController]
-[Route("api/courses/{courseId}/lectures")]
+[Route("api")]
 [Authorize(Roles = $"{Roles.Teacher},{Roles.Student}")]
 public class LecturesController(IMediator mediator) : ControllerBase
 {
-    [HttpPost]
+    [HttpPost("courses/{courseId}/lectures")]
     [Authorize(Roles = Roles.Teacher)]
     [RequestSizeLimit(50_000_000)]
     public async Task<IActionResult> CreateLecture([FromForm] CreateLectureCommand command, [FromRoute] int courseId)
     {
         command.CourseId = courseId;
         int lectureId = await mediator.Send(command);
-        return CreatedAtAction(nameof(GetLectureById), new { courseId, lectureId }, null);
+
+        return CreatedAtAction(nameof(GetLectureById), new { lectureId }, null);
     }
 
-    [HttpPatch("{lectureId}")]
+    [HttpPatch("lectures/{lectureId}")]
     [Authorize(Roles = Roles.Teacher)]
     [RequestSizeLimit(50_000_000)]
-    public async Task<IActionResult> UpdateLecture([FromForm] UpdateLectureCommand command, [FromRoute] int courseId, [FromRoute] int lectureId)
+    public async Task<IActionResult> UpdateLecture([FromForm] UpdateLectureCommand command, [FromRoute] int lectureId)
     {
-        command.CourseId = courseId;
         command.Id = lectureId;
         await mediator.Send(command);
+
         return NoContent();
     }
 
-    [HttpDelete("{lectureId}")]
+    [HttpDelete("lectures/{lectureId}")]
     [Authorize(Roles = Roles.Teacher)]
-    public async Task<IActionResult> DeleteLecture([FromRoute] int courseId, [FromRoute] int lectureId)
+    public async Task<IActionResult> DeleteLecture([FromRoute] int lectureId)
     {
-        var command = new DeleteLectureCommand { CourseId = courseId, Id = lectureId };
+        var command = new DeleteLectureCommand { LectureId = lectureId };
         await mediator.Send(command);
+
         return NoContent();
     }
 
-
-    [HttpGet("{lectureId}")]
-    public async Task<ActionResult<AssignmentDto>> GetLectureById([FromRoute] int courseId, [FromRoute] int lectureId)
+    [HttpGet("lectures/{lectureId}")]
+    public async Task<ActionResult<AssignmentDto>> GetLectureById([FromRoute] int lectureId)
     {
-        var lecture = await mediator.Send(new GetLectureByIdQuery(courseId, lectureId)); ;
+        var query = new GetLectureByIdQuery { LectureId = lectureId };
+        var lecture = await mediator.Send(query);
 
         return Ok(lecture);
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetLectures([FromRoute] int courseId)
+    [HttpGet("courses/{courseId}/lectures")]
+    public async Task<IActionResult> GetAllCourseLectures([FromRoute] int courseId)
     {
-        var lectures = await mediator.Send(new GetLecturesQuery(courseId));
+        var query = new GetAllCourseLecturesQuery { CourseId = courseId };
+        var lectures = await mediator.Send(query);
+
         return Ok(lectures);
     }
 }

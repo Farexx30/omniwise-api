@@ -26,16 +26,20 @@ public class CreateLectureCommandHandler(ILogger<CreateLectureCommandHandler> lo
     {
         var currentUser = userContext.GetCurrentUser();
         var courseId = request.CourseId;
-        
-        var course = await coursesRepository.GetCourseByIdAsync(courseId) 
-            ?? throw new NotFoundException($"Course not found.");
+
+        var course = await coursesRepository.GetCourseByIdAsync(courseId)
+            ?? throw new NotFoundException($"Course with id = {courseId} not found.");
 
         var lecture = mapper.Map<Lecture>(request);
 
         var authorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, lecture, Policies.MustBeEnrolledInCourse);
         if (!authorizationResult.Succeeded)
         {
-            throw new ForbiddenException($"You are not allowed to create Lecture in course with id {courseId}.");
+            logger.LogWarning("User with id = {userId} is not allowed to create lecture in course with id = {courseId}.",
+                currentUser.Id,
+                courseId);
+
+            throw new ForbiddenException($"You are not allowed to create lecture in course with id = {courseId}.");
         }
 
         logger.LogInformation("Creating a new lecture {@request} by teacher with id: {currentUserId}",

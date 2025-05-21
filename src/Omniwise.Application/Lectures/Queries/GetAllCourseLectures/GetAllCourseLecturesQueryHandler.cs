@@ -8,16 +8,16 @@ using Omniwise.Domain.Constants;
 using Omniwise.Domain.Entities;
 using Omniwise.Domain.Exceptions;
 
-namespace Omniwise.Application.Lectures.Queries.GetLectures;
+namespace Omniwise.Application.Lectures.Queries.GetAllCourseLectures;
 
-public class GetLecturesQueryHandler(ILogger<GetLecturesQueryHandler> logger,
+public class GetAllCourseLecturesQueryHandler(ILogger<GetAllCourseLecturesQueryHandler> logger,
     IMapper mapper,
     ICoursesRepository coursesRepository,
     ILecturesRepository lecturesRepository,
     IUserContext userContext,
-    IAuthorizationService authorizationService) : IRequestHandler<GetLecturesQuery, IEnumerable<LectureToGetAllDto>>
+    IAuthorizationService authorizationService) : IRequestHandler<GetAllCourseLecturesQuery, IEnumerable<LectureToGetAllDto>>
 {
-    public async Task<IEnumerable<LectureToGetAllDto>> Handle(GetLecturesQuery request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<LectureToGetAllDto>> Handle(GetAllCourseLecturesQuery request, CancellationToken cancellationToken)
     {
         var courseId = request.CourseId;
 
@@ -39,7 +39,6 @@ public class GetLecturesQueryHandler(ILogger<GetLecturesQueryHandler> logger,
 
         var lectures = await lecturesRepository.GetAllLecturesAsync(courseId);
         var lecturesDtos = mapper.Map<IEnumerable<LectureToGetAllDto>>(lectures);
-
 
         return lecturesDtos;
     }

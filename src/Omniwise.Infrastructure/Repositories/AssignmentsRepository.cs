@@ -79,6 +79,7 @@ internal class AssignmentsRepository(OmniwiseDbContext dbContext) : IAssignments
             .Where(asub => asub.AssignmentId == assignmentId)
             .Select(asub => asub.AuthorId)
             .ToListAsync();
+
         return authorIds;
     }
 

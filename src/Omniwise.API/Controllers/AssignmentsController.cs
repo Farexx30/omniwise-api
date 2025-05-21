@@ -12,11 +12,11 @@ using Omniwise.Domain.Constants;
 namespace Omniwise.API.Controllers;
 
 [ApiController]
-[Route("api/courses/{courseId}/assignments")]
+[Route("api")]
 [Authorize(Roles = $"{Roles.Teacher},{Roles.Student}")]
 public class AssignmentsController(IMediator mediator) : ControllerBase
 {
-    [HttpPost]
+    [HttpPost("courses/{courseId}/assignments")]
     [Authorize(Roles = Roles.Teacher)]
     [RequestSizeLimit(50_000_000)]
     public async Task<IActionResult> CreateAssignment([FromForm] CreateAssignmentCommand command, [FromRoute] int courseId)
@@ -24,49 +24,40 @@ public class AssignmentsController(IMediator mediator) : ControllerBase
         command.CourseId = courseId;
         var assignmentId = await mediator.Send(command);
 
-        return CreatedAtAction(nameof(GetAssignmentById), new { assignmentId, courseId }, null);
+        return CreatedAtAction(nameof(GetAssignmentById), new { assignmentId }, null);
     }
 
-    [HttpPatch("{assignmentId}")]
+    [HttpPatch("assignments/{assignmentId}")]
     [Authorize(Roles = Roles.Teacher)]
     [RequestSizeLimit(50_000_000)]
-    public async Task<IActionResult> UpdateAssignment([FromForm] UpdateAssignmentCommand command, [FromRoute] int assignmentId, [FromRoute] int courseId)
+    public async Task<IActionResult> UpdateAssignment([FromForm] UpdateAssignmentCommand command, [FromRoute] int assignmentId)
     {
         command.AssignmentId = assignmentId;
-        command.CourseId = courseId;
         await mediator.Send(command);
 
         return NoContent();
     }
 
-    [HttpDelete("{assignmentId}")]
+    [HttpDelete("assignments/{assignmentId}")]
     [Authorize(Roles = Roles.Teacher)]
-    public async Task<IActionResult> DeleteAssignment([FromRoute] int assignmentId, [FromRoute] int courseId)
+    public async Task<IActionResult> DeleteAssignment([FromRoute] int assignmentId)
     {
-        var command = new DeleteAssignmentCommand 
-        { 
-            AssignmentId = assignmentId,
-            CourseId = courseId 
-        };
+        var command = new DeleteAssignmentCommand { AssignmentId = assignmentId };
         await mediator.Send(command);
 
         return NoContent();
     }
 
-    [HttpGet("{assignmentId}")]
-    public async Task<ActionResult<AssignmentDto>> GetAssignmentById([FromRoute] int assignmentId, [FromRoute] int courseId)
+    [HttpGet("assignments/{assignmentId}")]
+    public async Task<ActionResult<AssignmentDto>> GetAssignmentById([FromRoute] int assignmentId)
     {
-        var query = new GetAssignmentByIdQuery 
-        { 
-            AssignmentId = assignmentId,
-            CourseId = courseId
-        };
+        var query = new GetAssignmentByIdQuery { AssignmentId = assignmentId };
         var assignment = await mediator.Send(query);
 
         return Ok(assignment);
     }
 
-    [HttpGet]
+    [HttpGet("courses/{courseId}/assignments")]
     public async Task<ActionResult<IEnumerable<BasicAssignmentDto>>> GetAllCourseAssignments([FromRoute] int courseId)
     {
         var query = new GetAllCourseAssignmentsQuery { CourseId = courseId };

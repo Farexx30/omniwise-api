@@ -4,6 +4,5 @@ namespace Omniwise.Application.Lectures.Commands.DeleteLecture;
 
 public class DeleteLectureCommand : IRequest
 {
-    public int CourseId { get; set; }
-    public required int Id { get; init; }
+    public required int LectureId { get; init; }
 }
