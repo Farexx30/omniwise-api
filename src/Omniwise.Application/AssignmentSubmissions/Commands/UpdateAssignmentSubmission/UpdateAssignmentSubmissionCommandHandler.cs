@@ -53,6 +53,8 @@ class UpdateAssignmentSubmissionCommandHandler(IAssignmentSubmissionsRepository 
         {
             await fileService.CompareAndUpdateAsync(newFiles, currentFiles, assignmentSubmissionId); //This will internally modify the currentFiles List as follow with comparing and updating logic.
 
+            assignmentSubmission.LatestSubmissionDate = DateTime.UtcNow;
+
             await assignmentSubmissionsRepository.SaveChangesAsync();
         });
     }

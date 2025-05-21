@@ -27,7 +27,7 @@ public class UpdateAssignmentCommandHandler(IAssignmentsRepository assignmentsRe
     IQuartzSchedulerService quartzSchedulerService) : IRequestHandler<UpdateAssignmentCommand>
 {
     public async Task Handle(UpdateAssignmentCommand request, CancellationToken cancellationToken)
-    {
+    {;
         var assignmentId = request.AssignmentId;
         var courseId = request.CourseId;
 
