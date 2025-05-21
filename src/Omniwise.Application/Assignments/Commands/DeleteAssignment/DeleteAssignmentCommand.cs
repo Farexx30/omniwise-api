@@ -10,5 +10,4 @@ namespace Omniwise.Application.Assignments.Commands.DeleteAssignment;
 public class DeleteAssignmentCommand : IRequest
 {
     public required int AssignmentId { get; init; }
-    public required int CourseId { get; init; }
 }

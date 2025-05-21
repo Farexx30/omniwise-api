@@ -19,7 +19,6 @@ using System.Threading.Tasks;
 namespace Omniwise.Application.Assignments.Queries.GetAssignmentById;
 
 public class GetAssignmentByIdQueryHandler(IAssignmentsRepository assignmentsRepository,
-    ICoursesRepository coursesRepository,
     ILogger<GetAssignmentByIdQueryHandler> logger,
     IMapper mapper,
     IUserContext userContext,
@@ -28,28 +27,23 @@ public class GetAssignmentByIdQueryHandler(IAssignmentsRepository assignmentsRep
 {
     public async Task<AssignmentDto> Handle(GetAssignmentByIdQuery request, CancellationToken cancellationToken)
     {
+        var currentUser = userContext.GetCurrentUser();
         var assignmentId = request.AssignmentId;
-        var courseId = request.CourseId;
-
-        var isCourseExist = await coursesRepository.ExistsAsync(courseId);
-        if (!isCourseExist)
-        {
-            logger.LogWarning("Course with id = {courseId} doesn't exist.", courseId);
-            throw new NotFoundException($"{nameof(Course)} with id = {courseId} doesn't exist.");
-        }
 
         var assignment = await assignmentsRepository.GetByIdAsync(assignmentId)
-            ?? throw new NotFoundException($"{nameof(Assignment)} with id = {assignmentId} for {nameof(Course)} with id = {courseId} doesn't exist.");
+            ?? throw new NotFoundException($"{nameof(Assignment)} with id = {assignmentId} not found.");
 
         var authorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, assignment, Policies.MustBeEnrolledInCourse);
         if (!authorizationResult.Succeeded)
         {
-            throw new ForbiddenException($"You are not allowed to get {nameof(Assignment)} with id = {assignmentId} in {nameof(Course)} with id = {courseId}.");
+            logger.LogWarning("User with id = {userId} is not allowed to get assignment with id = {assignmentId}.",
+                currentUser.Id,
+                assignmentId);
+
+            throw new ForbiddenException($"You are not allowed to get {nameof(Assignment)} with id = {assignmentId}.");
         }
 
-        logger.LogInformation("Getting assignment with id = {assignmentId} for course with id = {courseId}",
-            assignmentId,
-            courseId);
+        logger.LogInformation("Getting assignment with id = {assignmentId}.", assignmentId);
 
         var assignmentDto = mapper.Map<AssignmentDto>(assignment);
         foreach (var file in assignment.Files)

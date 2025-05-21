@@ -11,5 +11,4 @@ namespace Omniwise.Application.Assignments.Queries.GetAssignmentById;
 public class GetAssignmentByIdQuery : IRequest<AssignmentDto>
 {
     public required int AssignmentId { get; init; }
-    public required int CourseId { get; init; }
 }
