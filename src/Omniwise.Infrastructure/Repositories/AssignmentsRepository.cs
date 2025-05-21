@@ -29,9 +29,20 @@ internal class AssignmentsRepository(OmniwiseDbContext dbContext) : IAssignments
     public async Task<Assignment?> GetByIdAsync(int assignmentId)
     {
         var assignment = await dbContext.Assignments
+            .Include(a => a.Files)
             .FirstOrDefaultAsync(a => a.Id == assignmentId);
 
         return assignment;
+    }
+
+    public async Task<IEnumerable<int>> GetAllIdsByCourseIdAsync(int courseId)
+    {
+        var assignmentIds = await dbContext.Assignments
+            .Where(a => a.CourseId == courseId)
+            .Select(a => a.Id)
+            .ToListAsync();
+
+        return assignmentIds;
     }
 
     public async Task<IEnumerable<Assignment>> GetAllCourseAssignmentsAsync(int courseId)

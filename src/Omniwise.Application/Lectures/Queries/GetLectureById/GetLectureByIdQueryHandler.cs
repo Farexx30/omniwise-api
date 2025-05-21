@@ -2,9 +2,12 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
+using Omniwise.Application.AssignmentSubmissions.Dtos;
 using Omniwise.Application.Common.Interfaces;
 using Omniwise.Application.Lectures.Dtos;
+using Omniwise.Application.Services.Files;
 using Omniwise.Domain.Constants;
+using Omniwise.Domain.Entities;
 using Omniwise.Domain.Exceptions;
 
 namespace Omniwise.Application.Lectures.Queries.GetLectureById;
@@ -14,6 +17,7 @@ public class GetLectureByIdQueryHandler(ILogger<GetLectureByIdQueryHandler> logg
     ICoursesRepository coursesRepository,
     ILecturesRepository lecturesRepository,
     IUserContext userContext,
+    IFileService fileService,
     IAuthorizationService authorizationService) : IRequestHandler<GetLectureByIdQuery, LectureDto>
 {
     public async Task<LectureDto> Handle(GetLectureByIdQuery request, CancellationToken cancellationToken)
@@ -38,10 +42,16 @@ public class GetLectureByIdQueryHandler(ILogger<GetLectureByIdQueryHandler> logg
         }
 
         logger.LogInformation("Getting lecture with id = {lectureId} for course with id = {courseId}",
-            lectureId,
-            courseId);
+        lectureId,
+        courseId);
 
         var lectureDto = mapper.Map<LectureDto>(lecture);
+        foreach (var file in lecture.Files)
+        {
+            var fileSasUrl = await fileService.GetFileSasUrl(file.BlobName);
+            lectureDto.FileUrls.Add(fileSasUrl);
+        }
+
         return lectureDto;
     }
 }

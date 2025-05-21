@@ -19,6 +19,12 @@ internal class FileConfiguration : IEntityTypeConfiguration<File>
 
         builder.UseTptMappingStrategy();
 
+        //Additional indexes:
+        builder.HasIndex(f => f.BlobName)
+            .IsClustered(false)
+            .IsUnique()
+            .HasDatabaseName("IX_Files_BlobName");
+
         //Properties:
         builder.Property(f => f.OriginalName)
             .HasMaxLength(256);

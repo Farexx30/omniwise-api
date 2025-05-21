@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Omniwise.Application.Assignments.Commands.CreateAssignment;
 using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Services.Files;
 using Omniwise.Domain.Constants;
 using Omniwise.Domain.Entities;
 using Omniwise.Domain.Exceptions;
@@ -20,6 +21,8 @@ public class UpdateAssignmentCommandHandler(IAssignmentsRepository assignmentsRe
     ILogger<UpdateAssignmentCommandHandler> logger,
     IMapper mapper,
     IUserContext userContext,
+    IUnitOfWork unitOfWork,
+    IFileService fileService,
     IAuthorizationService authorizationService,
     IQuartzSchedulerService quartzSchedulerService) : IRequestHandler<UpdateAssignmentCommand>
 {
@@ -44,9 +47,16 @@ public class UpdateAssignmentCommandHandler(IAssignmentsRepository assignmentsRe
             throw new ForbiddenException($"You are not allowed to update {nameof(Assignment)} with id = {assignmentId} in {nameof(Course)} with id = {courseId}.");
         }
 
-        mapper.Map(request, assignment);
+        var files = request.Files;
 
-        await assignmentsRepository.SaveChangesAsync();
+        await unitOfWork.ExecuteTransactionalAsync(async () =>
+        {
+            mapper.Map(request, assignment);
+
+            await fileService.CompareAndUpdateAsync(files, assignment.Files, assignmentId);
+
+            await assignmentsRepository.SaveChangesAsync();
+        });
 
         await quartzSchedulerService.UpdateScheduledAssignmentCheckJob(assignmentId, assignment.Deadline);
     }

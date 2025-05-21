@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Services.Files;
 using Omniwise.Domain.Constants;
 using Omniwise.Domain.Exceptions;
 
@@ -11,6 +12,8 @@ public class DeleteLectureCommandHandler(ILogger<DeleteLectureCommandHandler> lo
     ICoursesRepository coursesRepository,
     ILecturesRepository lecturesRepository,
     IUserContext userContext,
+    IUnitOfWork unitOfWork,
+    IFileService fileService,
     IAuthorizationService authorizationService) : IRequestHandler<DeleteLectureCommand>
 {
     public async Task Handle(DeleteLectureCommand request, CancellationToken cancellationToken)
@@ -36,6 +39,15 @@ public class DeleteLectureCommandHandler(ILogger<DeleteLectureCommandHandler> lo
 
         logger.LogInformation("Lecture with id = {id} is deleting.", request.Id);
 
-        await lecturesRepository.DeleteAsync(lecture);
+        var fileNamesToDelete = lecture.Files
+            .Select(f => f.BlobName)
+            .ToList();
+
+        await unitOfWork.ExecuteTransactionalAsync(async () =>
+        {
+            await fileService.DeleteAllAsync(fileNamesToDelete);
+
+            await lecturesRepository.DeleteAsync(lecture);
+        });
     }
 }

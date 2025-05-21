@@ -12,13 +12,13 @@ namespace Omniwise.Application.Common.Static;
 
 public static class OmniwiseFileValidation
 {
-    public static OmniwiseValidationResult Validate(List<IFormFile> files)
+    public static OmniwiseValidationResult Validate(IEnumerable<IFormFile> files)
     {
         var errors = new List<string>();
         bool isSuccess = true;
 
         //Check if user sent at least one file:
-        if (files.Count == 0)
+        if (!files.Any())
         {
             errors.Add("At least one file is required.");
             isSuccess = false;

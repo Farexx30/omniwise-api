@@ -18,7 +18,8 @@ public class AssignmentsController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
     [Authorize(Roles = Roles.Teacher)]
-    public async Task<IActionResult> CreateAssignment([FromBody] CreateAssignmentCommand command, [FromRoute] int courseId)
+    [RequestSizeLimit(50_000_000)]
+    public async Task<IActionResult> CreateAssignment([FromForm] CreateAssignmentCommand command, [FromRoute] int courseId)
     {
         command.CourseId = courseId;
         var assignmentId = await mediator.Send(command);
@@ -28,7 +29,8 @@ public class AssignmentsController(IMediator mediator) : ControllerBase
 
     [HttpPatch("{assignmentId}")]
     [Authorize(Roles = Roles.Teacher)]
-    public async Task<IActionResult> UpdateAssignment([FromBody] UpdateAssignmentCommand command, [FromRoute] int assignmentId, [FromRoute] int courseId)
+    [RequestSizeLimit(50_000_000)]
+    public async Task<IActionResult> UpdateAssignment([FromForm] UpdateAssignmentCommand command, [FromRoute] int assignmentId, [FromRoute] int courseId)
     {
         command.AssignmentId = assignmentId;
         command.CourseId = courseId;

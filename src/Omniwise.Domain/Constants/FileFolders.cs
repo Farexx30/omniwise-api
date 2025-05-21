@@ -8,5 +8,8 @@ namespace Omniwise.Domain.Constants;
 
 public static class FileFolders
 {
+    public const string CourseImages = "course-images";
+    public const string Lectures = "lectures";
+    public const string Assignments = "assignments";
     public const string AssignmentSubmissions = "assignment-submissions";
 }

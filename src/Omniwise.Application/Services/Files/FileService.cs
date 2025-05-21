@@ -21,7 +21,7 @@ namespace Omniwise.Application.Services.Files;
 internal class FileService(ILogger<FileService> logger,
         IBlobStorageService blobStorageService) : IFileService
 {
-    public async Task<List<TFile>> UploadAllAsync<TFile>(List<IFormFile> files, int parentId)
+    public async Task<List<TFile>> UploadAllAsync<TFile>(IEnumerable<IFormFile> files, int parentId)
         where TFile : File, new()
     {
         var folderName = GetFolderName(typeof(TFile));
@@ -49,7 +49,7 @@ internal class FileService(ILogger<FileService> logger,
         return uploadedFiles;
     }
 
-    public async Task CompareAndUpdateAsync<TFile>(List<IFormFile> newFiles, List<TFile> currentFiles, int parentId)
+    public async Task CompareAndUpdateAsync<TFile>(IEnumerable<IFormFile> newFiles, List<TFile> currentFiles, int parentId)
         where TFile : File, new()
     {
         var folderName = GetFolderName(typeof(TFile));
@@ -118,6 +118,8 @@ internal class FileService(ILogger<FileService> logger,
     {
         return fileType switch
         {
+            var type when type == typeof(LectureFile) => FileFolders.Lectures,
+            var type when type == typeof(AssignmentFile) => FileFolders.Assignments,
             var type when type == typeof(AssignmentSubmissionFile) => FileFolders.AssignmentSubmissions,
             _ => throw new Exception("Unknown file type.")
         };

@@ -14,11 +14,12 @@ public class AssignmentsMappingProfile : Profile
 {
     public AssignmentsMappingProfile()
     {
-        CreateMap<CreateAssignmentCommand, Assignment>();
+        CreateMap<CreateAssignmentCommand, Assignment>()
+            .ForMember(dest => dest.Files, opt => opt.Ignore());
 
         CreateMap<UpdateAssignmentCommand, Assignment>()
-            .ForMember(d => d.Id, opt =>
-                opt.MapFrom(src => src.AssignmentId));
+            .ForMember(dest => dest.Files, opt => opt.Ignore())
+            .ForMember(d => d.Id, opt => opt.MapFrom(src => src.AssignmentId));
 
         CreateMap<Assignment, AssignmentDto>();
         CreateMap<Assignment, BasicAssignmentDto>();

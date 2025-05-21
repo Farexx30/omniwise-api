@@ -32,6 +32,13 @@ internal class AssignmentSubmissionsRepository(OmniwiseDbContext dbContext) : IA
         await dbContext.SaveChangesAsync();
     }
 
+    public async Task DeleteByAuthorIdAsync(string authorId)
+    {
+        await dbContext.AssignmentSubmissions
+            .Where(asub => asub.AuthorId == authorId)
+            .ExecuteDeleteAsync();
+    }
+
     public async Task<AssignmentSubmission?> GetByIdAsync(int assignmentSubmissionId)
     {
         var assignmentSubmission = await dbContext.AssignmentSubmissions
@@ -46,6 +53,35 @@ internal class AssignmentSubmissionsRepository(OmniwiseDbContext dbContext) : IA
         }
 
         return assignmentSubmission;
+    }
+
+    public async Task<IEnumerable<int>> GetAllIdsByAssignmentIdAsync(int assignmentId)
+    {
+        var assignmentSubmissionIds = await dbContext.AssignmentSubmissions
+            .Where(asub => asub.AssignmentId == assignmentId)
+            .Select(asub => asub.Id)
+            .ToListAsync();
+
+        return assignmentSubmissionIds;
+    }
+
+    public async Task<IEnumerable<int>> GetAllIdsByAssignmentIdsAsync(IEnumerable<int> assignmentIds)
+    {
+        var assignmentSubmissionIds = await dbContext.AssignmentSubmissions
+            .Where(asub => assignmentIds.Contains(asub.AssignmentId))
+            .Select(asub => asub.Id)
+            .ToListAsync();
+
+        return assignmentSubmissionIds;
+    }
+    public async Task<IEnumerable<int>> GetAllIdsByAuthorIdAsync(string authorId)
+    {
+        var assignmentSubmissionIds = await dbContext.AssignmentSubmissions
+            .Where(asub => asub.AuthorId == authorId)
+            .Select(asub => asub.Id)
+            .ToListAsync();
+
+        return assignmentSubmissionIds;
     }
 
     public async Task<bool> IsAlreadySubmitted(int assignmentSubmissionId, string userId)

@@ -46,7 +46,7 @@ internal class CourseConfiguration : IEntityTypeConfiguration<Course>
         builder.Property(c => c.Name)
             .HasMaxLength(256);
 
-        builder.Property(c => c.ImgUrl)
-            .HasMaxLength(2048);
+        builder.Property(c => c.ImgBlobName)
+            .HasMaxLength(1024);
     }
 }

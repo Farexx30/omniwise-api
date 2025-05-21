@@ -19,7 +19,7 @@ public class CoursesController(IMediator mediator) : ControllerBase
 {
     [HttpPost]
     [Authorize(Roles = Roles.Teacher)]
-    public async Task<IActionResult> CreateCourse([FromBody] CreateCourseCommand command)
+    public async Task<IActionResult> CreateCourse([FromForm] CreateCourseCommand command)
     {
         int courseId = await mediator.Send(command);
 
@@ -28,7 +28,7 @@ public class CoursesController(IMediator mediator) : ControllerBase
 
     [HttpPatch("{courseId}")]
     [Authorize(Roles = Roles.Teacher)]
-    public async Task<IActionResult> UpdateCourse([FromRoute] int courseId, [FromBody] UpdateCourseCommand command)
+    public async Task<IActionResult> UpdateCourse([FromForm] UpdateCourseCommand command, [FromRoute] int courseId)
     {
         command.Id = courseId;
         await mediator.Send(command);

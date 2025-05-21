@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,5 @@ public class UpdateCourseCommand : IRequest
 {
     public int Id { get; set; }
     public required string Name { get; init; }
-    public string? ImgUrl { get; init; }
+    public IFormFile? Img { get; init; }
 }

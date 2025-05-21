@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Services.Files;
 using Omniwise.Application.Services.Notifications;
 using Omniwise.Domain.Constants;
 using Omniwise.Domain.Entities;
@@ -16,6 +17,8 @@ public class CreateLectureCommandHandler(ILogger<CreateLectureCommandHandler> lo
     ILecturesRepository lecturesRepository,
     IUserCourseRepository userCourseRepository,
     IUserContext userContext,
+    IUnitOfWork unitOfWork,
+    IFileService fileService,
     IAuthorizationService authorizationService,
     INotificationService notificationService): IRequestHandler<CreateLectureCommand, int>
 {
@@ -39,19 +42,25 @@ public class CreateLectureCommandHandler(ILogger<CreateLectureCommandHandler> lo
             request,
             currentUser.Id);
 
-        var lectureId = await lecturesRepository.CreateAsync(lecture);
+        var files = request.Files;
 
-        
+        int lectureId = 0;
+        await unitOfWork.ExecuteTransactionalAsync(async () =>
+        {
+            lectureId = await lecturesRepository.CreateAsync(lecture);
 
+            var lectureFiles = await fileService.UploadAllAsync<LectureFile>(files, lectureId);
+            lecture.Files.AddRange(lectureFiles);
+            await lecturesRepository.SaveChangesAsync();
+        });
+     
         var courseMembers = await userCourseRepository.GetEnrolledCourseMembersAsync(courseId);
         var studentIds = courseMembers.Select(member => member.UserId).ToList();
         var teacherIds = await userCourseRepository.GetTeacherIdsAsync(courseId);
-        studentIds.RemoveAll(id => teacherIds.Contains(id));
+        studentIds.RemoveAll(teacherIds.Contains);
 
         var notificationContent = $"New lecture added in course {course.Name}.";
         await notificationService.NotifyUsersAsync(notificationContent, studentIds);
-
-
 
         return lectureId;
     }

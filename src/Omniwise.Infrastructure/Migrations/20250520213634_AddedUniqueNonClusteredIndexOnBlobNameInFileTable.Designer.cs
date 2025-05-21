@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Omniwise.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using Omniwise.Infrastructure.Persistence;
 namespace Omniwise.Infrastructure.Migrations
 {
     [DbContext(typeof(OmniwiseDbContext))]
-    partial class OmniwiseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250520213634_AddedUniqueNonClusteredIndexOnBlobNameInFileTable")]
+    partial class AddedUniqueNonClusteredIndexOnBlobNameInFileTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -257,9 +260,9 @@ namespace Omniwise.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ImgBlobName")
-                        .HasMaxLength(1024)
-                        .HasColumnType("nvarchar(1024)");
+                    b.Property<string>("ImgUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
 
                     b.Property<string>("Name")
                         .IsRequired()

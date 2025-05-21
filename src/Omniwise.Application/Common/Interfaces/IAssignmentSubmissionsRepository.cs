@@ -13,7 +13,11 @@ public interface IAssignmentSubmissionsRepository
 {
     Task<int> CreateAsync(AssignmentSubmission assignmentSubmission);
     Task DeleteAsync(AssignmentSubmission assignmentSubmission);
+    Task DeleteByAuthorIdAsync(string authorId);
     Task<AssignmentSubmission?> GetByIdAsync(int assignmentSubmissionId);
+    Task<IEnumerable<int>> GetAllIdsByAssignmentIdAsync(int assignmentId);
+    Task<IEnumerable<int>> GetAllIdsByAssignmentIdsAsync(IEnumerable<int> assignmentIds);
+    Task<IEnumerable<int>> GetAllIdsByAuthorIdAsync(string authorId);
     Task<bool> IsAlreadySubmitted(int assignmentSubmissionId, string userId);
     Task<bool> ExistsAsync(int assignmentSubmissionId);
     Task SaveChangesAsync();

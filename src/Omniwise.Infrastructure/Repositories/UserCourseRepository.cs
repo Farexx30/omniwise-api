@@ -11,7 +11,7 @@ namespace Omniwise.Infrastructure.Repositories;
 
 internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRepository
 {
-    public async Task AddPendingCourseMemberAsync(UserCourse courseMember)
+    public async Task AddCourseMemberAsync(UserCourse courseMember)
     {
         dbContext.UserCourses.Add(courseMember);
         await dbContext.SaveChangesAsync();
@@ -123,18 +123,34 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
     public Task SaveChangesAsync()
         => dbContext.SaveChangesAsync();
 
-    public async Task<UserCourse?> GetCourseMemberAsync(int courseId, string userId)
+    public async Task<EnrolledCourseMemberWithRoleDto?> GetCourseMemberWithRoleNameAsync(int courseId, string userId)
     {
         var courseMember = await dbContext.UserCourses
-            .FirstOrDefaultAsync(uc => uc.CourseId == courseId && uc.UserId == userId);
+            .Join(dbContext.UserRoles,
+                  userCourse => userCourse.UserId,
+                  userRole => userRole.UserId,
+                  (userCourse, userRole) => new { UserCourse = userCourse, UserRole = userRole })
+            .Join(dbContext.Roles,
+                  firstJoinResult => firstJoinResult.UserRole.RoleId,
+                  role => role.Id,
+                  (firstJoinResult, role) => new { firstJoinResult.UserCourse, Role = role })
+            .Where(secondJoinResult => secondJoinResult.UserCourse.CourseId == courseId 
+                   && secondJoinResult.UserCourse.UserId == userId)
+            .Select(secondJoinResult => new EnrolledCourseMemberWithRoleDto
+            {
+                UserId = secondJoinResult.UserCourse.UserId,
+                RoleName = secondJoinResult.Role.Name!
+            })
+            .FirstOrDefaultAsync();
 
         return courseMember;
     }
 
-    public async Task DeleteAsync(UserCourse courseMember)
+    public async Task DeleteByUserIdAsync(string userId)
     {
-        dbContext.UserCourses.Remove(courseMember);
-        await dbContext.SaveChangesAsync();
+        await dbContext.UserCourses
+            .Where(uc => uc.UserId == userId)
+            .ExecuteDeleteAsync();
     }
 
     public async Task<List<string>> GetTeacherIdsAsync(int courseId)

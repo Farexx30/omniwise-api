@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Omniwise.Application.Assignments.Commands.UpdateAssignment;
 using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Services.Files;
 using Omniwise.Domain.Constants;
 using Omniwise.Domain.Entities;
 using Omniwise.Domain.Exceptions;
@@ -17,8 +18,12 @@ namespace Omniwise.Application.Assignments.Commands.DeleteAssignment;
 
 public class DeleteAssignmentCommandHandler(IAssignmentsRepository assignmentsRepository,
     ICoursesRepository coursesRepository,
+    IAssignmentSubmissionsRepository assignmentSubmissionsRepository,
+    IFilesRepository filesRepository,
     ILogger<UpdateAssignmentCommandHandler> logger,
     IUserContext userContext,
+    IFileService fileService,
+    IUnitOfWork unitOfWork,
     IAuthorizationService authorizationService,
     IQuartzSchedulerService quartzSchedulerService) : IRequestHandler<DeleteAssignmentCommand>
 {
@@ -46,8 +51,23 @@ public class DeleteAssignmentCommandHandler(IAssignmentsRepository assignmentsRe
 
             throw new ForbiddenException($"You are not allowed to delete {nameof(Assignment)} with id = {assignmentId} in {nameof(Course)} with id = {courseId}.");
         }
+        
+        var fileNamesToDelete = assignment.Files
+            .Select(f => f.BlobName)
+            .ToList();
 
-        await assignmentsRepository.DeleteAsync(assignment);
+        var relatedAssignmentSubmissionIds = await assignmentSubmissionsRepository.GetAllIdsByAssignmentIdAsync(assignmentId);
+        var relatedAssignmentSubmissionFileNames = await filesRepository.GetAllBlobNamesByParentIdsAsync<AssignmentSubmissionFile>(relatedAssignmentSubmissionIds);
+        fileNamesToDelete.AddRange(relatedAssignmentSubmissionFileNames);
+
+        await unitOfWork.ExecuteTransactionalAsync(async () =>
+        {
+            await fileService.DeleteAllAsync(fileNamesToDelete);
+
+            await assignmentsRepository.DeleteAsync(assignment);
+            await filesRepository.DeleteOrphansByBlobNamesAsync(relatedAssignmentSubmissionFileNames);
+        });
+
         await quartzSchedulerService.DeleteScheduledAssignmentCheckJob(assignmentId);
     }
 }
