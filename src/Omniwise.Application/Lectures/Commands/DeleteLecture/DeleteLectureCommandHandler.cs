@@ -9,7 +9,6 @@ using Omniwise.Domain.Exceptions;
 namespace Omniwise.Application.Lectures.Commands.DeleteLecture;
 
 public class DeleteLectureCommandHandler(ILogger<DeleteLectureCommandHandler> logger,
-    ICoursesRepository coursesRepository,
     ILecturesRepository lecturesRepository,
     IUserContext userContext,
     IUnitOfWork unitOfWork,
@@ -18,26 +17,23 @@ public class DeleteLectureCommandHandler(ILogger<DeleteLectureCommandHandler> lo
 {
     public async Task Handle(DeleteLectureCommand request, CancellationToken cancellationToken)
     {
-        var courseId = request.CourseId;
-        var lectureId = request.Id;
+        var currentUser = userContext.GetCurrentUser();
+        var lectureId = request.LectureId;
 
-        var isCourseExisting = await coursesRepository.ExistsAsync(courseId);
-        if (!isCourseExisting)
-        {
-            logger.LogWarning("Course with id = {courseId} doesn't exist.", courseId);
-            throw new NotFoundException($"Course with id = {courseId} not found.");
-        }
-
-        var lecture = await lecturesRepository.GetByIdAsync(request.CourseId, request.Id)
-            ?? throw new NotFoundException($"Lecture with id = {request.Id} for Course with id = {request.CourseId} not found.");
+        var lecture = await lecturesRepository.GetByIdAsync(lectureId)
+            ?? throw new NotFoundException($"Lecture with id = {lectureId} not found.");
 
         var authorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, lecture, Policies.MustBeEnrolledInCourse);
         if (!authorizationResult.Succeeded)
         {
-            throw new ForbiddenException($"You are not allowed to delete lecture with id = {request.Id}.");
+            logger.LogWarning("User with id = {userId} is not allowed to delete lecture with id = {lectureId}.",
+                currentUser.Id, 
+                lectureId);
+
+            throw new ForbiddenException($"You are not allowed to delete lecture with id = {lectureId}.");
         }
 
-        logger.LogInformation("Lecture with id = {id} is deleting.", request.Id);
+        logger.LogInformation("Lecture with id = {id} is deleting.", lectureId);
 
         var fileNamesToDelete = lecture.Files
             .Select(f => f.BlobName)

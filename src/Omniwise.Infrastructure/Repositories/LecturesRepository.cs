@@ -23,12 +23,11 @@ internal class LecturesRepository(OmniwiseDbContext dbContext) : ILecturesReposi
         await dbContext.SaveChangesAsync();
     }
 
-    public async Task<Lecture?> GetByIdAsync(int courseId, int lectureId)
+    public async Task<Lecture?> GetByIdAsync(int lectureId)
     {
         var lecture = await dbContext.Lectures
             .Include(l => l.Files)
-            .FirstOrDefaultAsync(l => l.Id == lectureId
-                                  && l.CourseId == courseId);
+            .FirstOrDefaultAsync(l => l.Id == lectureId);
 
         return lecture;
     }

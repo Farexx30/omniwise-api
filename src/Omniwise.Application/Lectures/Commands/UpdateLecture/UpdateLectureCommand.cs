@@ -9,5 +9,4 @@ public class UpdateLectureCommand : IRequest
     public string Name { get; set; } = default!;
     public string? Content { get; set; }
     public IEnumerable<IFormFile> Files { get; init; } = [];
-    public int CourseId { get; set; }
 }
