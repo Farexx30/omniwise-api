@@ -18,23 +18,52 @@ namespace Omniwise.Application.Courses.Commands.UpdateCourse;
 public class UpdateCourseCommandHandler(ICoursesRepository coursesRepository,
         ILogger<UpdateCourseCommandHandler> logger,
         IMapper mapper,
+        IUnitOfWork unitOfWork,
+        IBlobStorageService blobStorageService,
         IUserContext userContext,
         IAuthorizationService authorizationService) : IRequestHandler<UpdateCourseCommand>
 {
     public async Task Handle(UpdateCourseCommand request, CancellationToken cancellationToken)
     {
-        var course = await coursesRepository.GetCourseByIdAsync(request.Id)
-                ?? throw new NotFoundException($"Course with id = {request.Id} not found.");
+        var courseId = request.Id;
+
+        var course = await coursesRepository.GetCourseByIdAsync(courseId)
+                ?? throw new NotFoundException($"Course with id = {courseId} not found.");
 
         var authorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, course, Policies.SameOwner);
         if (!authorizationResult.Succeeded)
         {
-            throw new ForbiddenException($"You are not allowed to update course with id = {request.Id}.");
+            throw new ForbiddenException($"You are not allowed to update course with id = {courseId}.");
         }
 
-        logger.LogInformation("Course with id = {id} is updating.", request.Id);
+        logger.LogInformation("Course with id = {id} is updating.", courseId);
 
-        mapper.Map(request, course);
-        await coursesRepository.SaveChangesAsync();
+        await unitOfWork.ExecuteTransactionalAsync(async () =>
+        {
+            mapper.Map(request, course);
+
+            var currentCourseImgBlobName = course.ImgBlobName;
+            if (currentCourseImgBlobName is not null)
+            {
+                await blobStorageService.DeleteBlobAsync(currentCourseImgBlobName);
+            }
+
+            var courseImg = request.Img;
+            if (courseImg is not null)
+            {
+                var blobName = $"{FileFolders.CourseImages}/{courseId}-{courseImg.FileName}";
+
+                using var stream = courseImg.OpenReadStream();
+                await blobStorageService.UploadBlobAsync(stream, blobName);
+
+                course.ImgBlobName = blobName;
+            }
+            else
+            {
+                course.ImgBlobName = null;
+            }
+
+            await coursesRepository.SaveChangesAsync();
+        });
     }
 }

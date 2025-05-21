@@ -12,6 +12,7 @@ public interface IAssignmentsRepository
     Task<int> CreateAsync(Assignment assignment);
     Task DeleteAsync(Assignment assignment);
     Task<Assignment?> GetByIdAsync(int assignmentId);
+    Task<IEnumerable<int>> GetAllIdsByCourseIdAsync(int courseId);
     Task<IEnumerable<Assignment>> GetAllCourseAssignmentsAsync(int courseId);
     Task<float> GetMaxGradeAsync(int assignmentId);
     Task<List<string>> GetAssigmentSubmissionAuthorIds(int assignmentId);

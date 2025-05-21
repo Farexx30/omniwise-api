@@ -32,7 +32,7 @@ public class AddPendingCourseMemberCommandHandler(ILogger<AddPendingCourseMember
             throw new ForbiddenException($"User has already sent an enroll request to the course .");
         }
 
-        await userCoursesRepository.AddPendingCourseMemberAsync(courseMember);
+        await userCoursesRepository.AddCourseMemberAsync(courseMember);
 
         var notificationContent = $"There is a new enrollment request for the course {course.Name}";
         await notificationService.NotifyUserAsync(notificationContent, course.OwnerId);

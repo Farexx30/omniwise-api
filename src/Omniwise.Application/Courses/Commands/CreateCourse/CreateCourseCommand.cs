@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +11,5 @@ namespace Omniwise.Application.Courses.Commands.CreateCourse;
 public class CreateCourseCommand : IRequest<int>
 {
     public required string Name { get; init; }
-    public string? ImgUrl { get; init; }
+    public IFormFile? Img { get; init; }
 }
