@@ -27,6 +27,7 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
 
     public async Task<CourseMemberDetailsDto?> GetByIdAsync(string memberId, int courseId, CurrentUser currentUser)
     {
+        var currentUserId = currentUser.Id;
         var currentUserRoleName = currentUser.Roles.First();
 
         FormattableString query = $@"
@@ -68,7 +69,8 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
             LastName = groupResult.Key.LastName,
             Email = groupResult.Key.Email,
             RoleName = groupResult.Key.RoleName,
-            AssignmentSubmissions = currentUserRoleName.Equals(Roles.Teacher, StringComparison.CurrentCultureIgnoreCase)
+            AssignmentSubmissions = (currentUserRoleName.Equals(Roles.Teacher, StringComparison.CurrentCultureIgnoreCase)
+                                    || groupResult.Key.UserId.Equals(currentUserId))
                                     && !groupResult.Key.RoleName.Equals(Roles.Teacher, StringComparison.CurrentCultureIgnoreCase)
                 ? [.. groupResult
                 .Where(x => x.AssignmentSubmissionId != null)
