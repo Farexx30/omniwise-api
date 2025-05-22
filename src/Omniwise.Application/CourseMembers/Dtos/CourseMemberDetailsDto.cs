@@ -11,7 +11,7 @@ public class CourseMemberDetailsDto : ICourseResource
     public string LastName { get; set; } = default!;
     public string Email { get; set; } = default!;
     public string RoleName { get; set; } = default!;
-    public List<AssignmentMemberSubmissionDto>? AssignmentSubmissions { get; set; }
+    public IEnumerable<AssignmentMemberSubmissionDto>? AssignmentSubmissions { get; set; }
 
     public int CourseId { get; set; }
 }
