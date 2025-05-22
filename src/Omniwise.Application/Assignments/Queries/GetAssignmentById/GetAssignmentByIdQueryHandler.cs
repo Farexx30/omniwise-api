@@ -30,7 +30,7 @@ public class GetAssignmentByIdQueryHandler(IAssignmentsRepository assignmentsRep
         var currentUser = userContext.GetCurrentUser();
         var assignmentId = request.AssignmentId;
 
-        var assignment = await assignmentsRepository.GetByIdAsync(assignmentId)
+        var assignment = await assignmentsRepository.GetByIdAsync(assignmentId, currentUser: currentUser, includeAssignmentSubmissions: true)
             ?? throw new NotFoundException($"{nameof(Assignment)} with id = {assignmentId} not found.");
 
         var authorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, assignment, Policies.MustBeEnrolledInCourse);

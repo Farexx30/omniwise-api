@@ -1,4 +1,5 @@
-﻿using Omniwise.Domain.Entities;
+﻿using Omniwise.Application.Common.Types;
+using Omniwise.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ public interface IAssignmentsRepository
 {
     Task<int> CreateAsync(Assignment assignment);
     Task DeleteAsync(Assignment assignment);
-    Task<Assignment?> GetByIdAsync(int assignmentId);
+    Task<Assignment?> GetByIdAsync(int assignmentId, CurrentUser? currentUser = default, bool includeAssignmentSubmissions = false);
     Task<IEnumerable<int>> GetAllIdsByCourseIdAsync(int courseId);
     Task<IEnumerable<Assignment>> GetAllCourseAssignmentsAsync(int courseId);
     Task<float> GetMaxGradeAsync(int assignmentId);
