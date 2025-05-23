@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
-using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Common.Interfaces.Identity;
+using Omniwise.Application.Common.Interfaces.Repositories;
 using Omniwise.Domain.Exceptions;
 
 namespace Omniwise.Application.Notifications.Commands.DeleteNotification;

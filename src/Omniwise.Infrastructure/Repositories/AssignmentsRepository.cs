@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Common.Interfaces.Repositories;
 using Omniwise.Application.Common.Types;
 using Omniwise.Domain.Constants;
 using Omniwise.Domain.Entities;
@@ -64,6 +64,7 @@ internal class AssignmentsRepository(OmniwiseDbContext dbContext) : IAssignments
     public async Task<IEnumerable<Assignment>> GetAllCourseAssignmentsAsync(int courseId)
     {
        var assignments = await dbContext.Assignments
+            .AsNoTracking()
             .Where(c => c.CourseId == courseId)
             .ToListAsync();
 

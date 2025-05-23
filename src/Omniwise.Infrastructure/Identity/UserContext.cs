@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Common.Interfaces.Identity;
 using Omniwise.Application.Common.Types;
 using Omniwise.Infrastructure.Extensions;
 using System;

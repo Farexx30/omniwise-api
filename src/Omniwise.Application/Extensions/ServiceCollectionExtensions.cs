@@ -1,9 +1,8 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.Extensions.DependencyInjection;
-using Omniwise.Application.Services.Files;
-using Omniwise.Application.Services.Notifications;
-
+using Omniwise.Application.Common.Services.Files;
+using Omniwise.Application.Common.Services.Notifications;
 
 namespace Omniwise.Application.Extensions;
 

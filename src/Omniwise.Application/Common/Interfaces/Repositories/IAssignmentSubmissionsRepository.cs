@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Omniwise.Application.Common.Interfaces;
+namespace Omniwise.Application.Common.Interfaces.Repositories;
 
 public interface IAssignmentSubmissionsRepository
 {
@@ -20,6 +20,6 @@ public interface IAssignmentSubmissionsRepository
     Task<IEnumerable<int>> GetAllIdsByAuthorIdAsync(string authorId);
     Task<bool> IsAlreadySubmittedAsync(int assignmentSubmissionId, string userId);
     Task<bool> ExistsAsync(int assignmentSubmissionId);
-    Task SaveChangesAsync();
     Task<AssignmentSubmissionNotificationDetailsDto?> GetRelatedAssignmentAndCourseNamesAsync(int assignmentSubmissionId);
+    Task SaveChangesAsync();
 }

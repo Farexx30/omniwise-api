@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Common.Interfaces.Identity;
+using Omniwise.Application.Common.Interfaces.Repositories;
 using Omniwise.Application.Notifications.Dtos;
 
 namespace Omniwise.Application.Notifications.Queries.GetNotifications;

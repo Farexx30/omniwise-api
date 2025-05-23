@@ -3,7 +3,7 @@ using Omniwise.Application.Common.Types;
 using Omniwise.Application.CourseMembers.Dtos;
 using Omniwise.Domain.Entities;
 
-namespace Omniwise.Application.Common.Interfaces;
+namespace Omniwise.Application.Common.Interfaces.Repositories;
 
 public interface IUserCourseRepository
 {
@@ -16,6 +16,6 @@ public interface IUserCourseRepository
     Task<UserCourse?> GetPendingCourseMemberAsync(int courseId, string userId);
     Task<EnrolledCourseMemberWithRoleDto?> GetCourseMemberWithRoleNameAsync(int courseId, string userId);
     Task DeleteByUserIdAsync(string userId);
-    Task SaveChangesAsync();
     Task<List<string>> GetTeacherIdsAsync(int courseId);
+    Task SaveChangesAsync();
 }

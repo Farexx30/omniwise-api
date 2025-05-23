@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
-using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Common.Interfaces.Repositories;
 using Omniwise.Domain.Entities;
 using Omniwise.Domain.Exceptions;
 using System;

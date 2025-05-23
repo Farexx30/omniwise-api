@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using File = Omniwise.Domain.Entities.File;
 
-namespace Omniwise.Application.Services.Files;
+namespace Omniwise.Application.Common.Services.Files;
 
 public interface IFileService
 {

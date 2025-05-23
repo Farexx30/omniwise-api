@@ -1,7 +1,7 @@
 ﻿using Omniwise.Infrastructure.Persistence;
-using Omniwise.Application.Common.Interfaces;
 using Omniwise.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Omniwise.Application.Common.Interfaces.Repositories;
 
 namespace Omniwise.Infrastructure.Repositories;
 
@@ -14,8 +14,6 @@ internal class LecturesRepository(OmniwiseDbContext dbContext) : ILecturesReposi
 
         return lecture.Id;
     }
-
-    public Task SaveChangesAsync() => dbContext.SaveChangesAsync();
 
     public async Task DeleteAsync(Lecture lecture)
     {
@@ -42,12 +40,16 @@ internal class LecturesRepository(OmniwiseDbContext dbContext) : ILecturesReposi
         return lectureIds;
     }
 
-    public async Task<IEnumerable<Lecture>> GetAllLecturesAsync(int courseId)
+    public async Task<IEnumerable<Lecture>> GetAllCourseLecturesAsync(int courseId)
     {
         var lectures = await dbContext.Lectures
+            .AsNoTracking()
             .Where(l => l.CourseId == courseId)
             .ToListAsync();
 
         return lectures;
     }
+
+    public Task SaveChangesAsync()
+        => dbContext.SaveChangesAsync();
 }

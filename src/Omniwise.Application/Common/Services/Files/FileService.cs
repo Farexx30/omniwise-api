@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
 using Omniwise.Application.AssignmentSubmissions.Commands.CreateAssignmentSubmission;
-using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Common.Interfaces.Storage;
 using Omniwise.Application.Common.Static;
 using Omniwise.Application.Common.Types;
 using Omniwise.Domain.Constants;
@@ -16,7 +16,7 @@ using System.Text;
 using System.Threading.Tasks;
 using File = Omniwise.Domain.Entities.File;
 
-namespace Omniwise.Application.Services.Files;
+namespace Omniwise.Application.Common.Services.Files;
 
 internal class FileService(ILogger<FileService> logger,
         IBlobStorageService blobStorageService) : IFileService

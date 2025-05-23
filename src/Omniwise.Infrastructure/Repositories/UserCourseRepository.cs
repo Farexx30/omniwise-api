@@ -2,7 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Omniwise.Application.Assignments.Dtos;
-using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Common.Interfaces.Repositories;
 using Omniwise.Application.Common.Types;
 using Omniwise.Application.CourseMembers.Dtos;
 using Omniwise.Domain.Constants;
@@ -22,7 +22,8 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
     public async Task<bool> ExistsAsync(int courseId, string userId)
     {
         return await dbContext.UserCourses
-            .AnyAsync(uc => uc.CourseId == courseId && uc.UserId == userId);
+            .AnyAsync(uc => uc.CourseId == courseId 
+                      && uc.UserId == userId);
     }
 
     public async Task<CourseMemberDetailsDto?> GetByIdAsync(string memberId, int courseId, CurrentUser currentUser)
@@ -97,6 +98,7 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
     public async Task<IEnumerable<UserCourse>> GetEnrolledCourseMembersAsync(int courseId)
     {
         var enrolledCourseMembers = await dbContext.UserCourses
+            .AsNoTracking()
             .Where(uc => uc.CourseId == courseId
                    && uc.IsAccepted)
             .Include(uc => uc.User)
@@ -142,6 +144,7 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
     public async Task<IEnumerable<UserCourse>> GetPendingCourseMembersAsync(int courseId)
     {
         var pendingCourseMembers = await dbContext.UserCourses
+            .AsNoTracking()
             .Where(uc => uc.CourseId == courseId
                    && !uc.IsAccepted)
             .Include(uc => uc.User)
@@ -149,9 +152,6 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
 
         return pendingCourseMembers;
     }
-
-    public Task SaveChangesAsync()
-        => dbContext.SaveChangesAsync();
 
     public async Task<EnrolledCourseMemberWithRoleDto?> GetCourseMemberWithRoleNameAsync(int courseId, string userId)
     {
@@ -202,4 +202,7 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
 
         return result;
     }
+
+    public Task SaveChangesAsync()
+        => dbContext.SaveChangesAsync();
 }

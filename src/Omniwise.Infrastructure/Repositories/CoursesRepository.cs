@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Omniwise.Domain.Entities;
 using Omniwise.Infrastructure.Persistence;
-using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Common.Interfaces.Repositories;
 
 namespace Omniwise.Infrastructure.Repositories;
 
@@ -21,13 +21,10 @@ internal class CoursesRepository(OmniwiseDbContext dbContext) : ICoursesReposito
         await dbContext.SaveChangesAsync();
     }
 
-    public Task SaveChangesAsync()
-       => dbContext.SaveChangesAsync();
-
     public async Task<Course?> GetCourseByIdAsync(int id)
     {
-        var course = await dbContext.Courses.
-            FirstOrDefaultAsync(c => c.Id == id);
+        var course = await dbContext.Courses
+            .FirstOrDefaultAsync(c => c.Id == id);
 
         return course;
     }
@@ -35,6 +32,7 @@ internal class CoursesRepository(OmniwiseDbContext dbContext) : ICoursesReposito
     public async Task<IEnumerable<Course>> GetAllEnrolledCoursesAsync(string id)
     {
         var enrolledCourses = await dbContext.UserCourses
+            .AsNoTracking()
             .Where(uc => uc.UserId == id)
             .Select(uc => uc.Course)
             .ToListAsync();
@@ -45,6 +43,7 @@ internal class CoursesRepository(OmniwiseDbContext dbContext) : ICoursesReposito
     public async Task<IEnumerable<Course>> GetAllOwnedCoursesAsync(string id)
     {
         var ownedCourses = await dbContext.Courses
+            .AsNoTracking()
             .Where(c => c.OwnerId == id)
             .ToListAsync();
 
@@ -54,10 +53,11 @@ internal class CoursesRepository(OmniwiseDbContext dbContext) : ICoursesReposito
     public async Task<IEnumerable<Course>> GetAvailableToEnrollCoursesMatchingAsync(string? searchPhrase, string id)
     {
         var availableCourses = await dbContext.Courses
+            .AsNoTracking()
             .Where(c => !c.Members.Any(m => m.Id == id))
             .Where(c => string.IsNullOrWhiteSpace(searchPhrase)
-                  || c.Name.Contains(searchPhrase.Trim()))
-              .ToListAsync();
+                   || c.Name.Contains(searchPhrase.Trim()))
+            .ToListAsync();
 
         return availableCourses;
     }
@@ -69,4 +69,7 @@ internal class CoursesRepository(OmniwiseDbContext dbContext) : ICoursesReposito
 
         return exists;
     }
+
+    public Task SaveChangesAsync()
+        => dbContext.SaveChangesAsync();
 }

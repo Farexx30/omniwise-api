@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
-using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Common.Interfaces.Repositories;
 using Omniwise.Domain.Entities;
 
-namespace Omniwise.Application.Services.Notifications;
+namespace Omniwise.Application.Common.Services.Notifications;
 
 internal class NotificationService(INotificationsRepository notificationsRepository) : INotificationService
 {
@@ -18,11 +18,19 @@ internal class NotificationService(INotificationsRepository notificationsReposit
         await notificationsRepository.AddNotificationAsync(notification);
     }
 
-    public async Task NotifyUsersAsync(string content, List<string> userIds)
+    public async Task NotifyUsersAsync(string content, IEnumerable<string> userIds)
     {
+        List<Notification> notifications = [];
         foreach (var userId in userIds)
         {
-            await NotifyUserAsync(content, userId);
+            notifications.Add(new Notification
+            {
+                Content = content,
+                SentDate = DateTime.UtcNow,
+                UserId = userId
+            });
         }
+
+        await notificationsRepository.AddNotificationsAsync(notifications);
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Omniwise.Application.AssignmentSubmissionComments.Dtos;
-using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Common.Interfaces.Repositories;
 using Omniwise.Domain.Constants;
 using Omniwise.Domain.Entities;
 using Omniwise.Infrastructure.Persistence;
@@ -36,9 +36,6 @@ internal class AssignmentSubmissionCommentsRepository(OmniwiseDbContext dbContex
         return comment;
     }
 
-    public Task SaveChangesAsync()
-        => dbContext.SaveChangesAsync();
-
     public async Task<AssignmentSubmissionCommentNotificationDto?> GetDetailsToCommentNotificationAsync(int assignmentSubmissionId)
     {
         var result = await dbContext.AssignmentSubmissions
@@ -55,4 +52,7 @@ internal class AssignmentSubmissionCommentsRepository(OmniwiseDbContext dbContex
      
         return result;
     }
+
+    public Task SaveChangesAsync()
+        => dbContext.SaveChangesAsync();
 }

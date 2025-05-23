@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Common.Interfaces.Storage;
 using Omniwise.Domain.Entities;
 using Omniwise.Infrastructure.Persistence.MigrationAppliers;
 using Omniwise.Infrastructure.Persistence.Seeders;

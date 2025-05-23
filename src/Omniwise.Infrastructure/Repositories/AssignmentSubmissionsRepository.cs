@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Omniwise.Application.AssignmentSubmissionComments.Dtos;
 using Omniwise.Application.AssignmentSubmissions.Dtos;
-using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Common.Interfaces.Repositories;
 using Omniwise.Application.CourseMembers.Dtos;
 using Omniwise.Domain.Constants;
 using Omniwise.Domain.Entities;
@@ -101,9 +101,6 @@ internal class AssignmentSubmissionsRepository(OmniwiseDbContext dbContext) : IA
         return exists;
     }
 
-    public Task SaveChangesAsync()
-        => dbContext.SaveChangesAsync();
-
     public async Task<AssignmentSubmissionNotificationDetailsDto?> GetRelatedAssignmentAndCourseNamesAsync(int assignmentSubmissionId)
     {
         var result = await dbContext.AssignmentSubmissions
@@ -117,4 +114,7 @@ internal class AssignmentSubmissionsRepository(OmniwiseDbContext dbContext) : IA
 
         return result;
     }
+
+    public Task SaveChangesAsync()
+        => dbContext.SaveChangesAsync();
 }

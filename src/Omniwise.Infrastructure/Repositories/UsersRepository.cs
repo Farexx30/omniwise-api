@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Common.Interfaces.Repositories;
 using Omniwise.Application.Users.Dtos;
 using Omniwise.Domain.Constants;
 using Omniwise.Domain.Entities;
@@ -32,23 +32,23 @@ internal class UsersRepository(OmniwiseDbContext dbContext) : IUsersRepository
     {
         var userDtos = await dbContext.Users
             .Join(dbContext.UserRoles,
-                 user => user.Id,
-                 userRole => userRole.UserId,
-                 (user, userRole) => new { User = user, UserRole = userRole })
+                  user => user.Id,
+                  userRole => userRole.UserId,
+                  (user, userRole) => new { User = user, UserRole = userRole })
             .Join(dbContext.Roles,
-                  firstJoinResult => firstJoinResult.UserRole.RoleId,
+                  currentResult => currentResult.UserRole.RoleId,
                   role => role.Id,
-                  (firstJoinResult, role) => new { firstJoinResult.User, Role = role })
-            .Where(secondJoinResult => secondJoinResult.User.Status == status
-                   && secondJoinResult.Role.NormalizedName != Roles.Admin)
-            .Select(secondJoinResult => new UserWithRoleDto
+                  (currentResult, role) => new { currentResult.User, Role = role })
+            .Where(currentResult => currentResult.User.Status == status
+                   && currentResult.Role.Name != Roles.Admin)
+            .Select(finalResult => new UserWithRoleDto
             {
-                Id = secondJoinResult.User.Id,
-                FirstName = secondJoinResult.User.FirstName,
-                LastName = secondJoinResult.User.LastName,
-                Email = secondJoinResult.User.Email!,
-                Status = secondJoinResult.User.Status,
-                RoleName = secondJoinResult.Role.Name!
+                Id = finalResult.User.Id,
+                FirstName = finalResult.User.FirstName,
+                LastName = finalResult.User.LastName,
+                Email = finalResult.User.Email!,
+                Status = finalResult.User.Status,
+                RoleName = finalResult.Role.Name!
             })
             .ToListAsync();
 
