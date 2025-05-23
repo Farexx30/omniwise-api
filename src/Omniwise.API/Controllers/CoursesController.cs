@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Omniwise.Application.Courses.Commands.CreateCourse;
 using Omniwise.Application.Courses.Commands.DeleteCourse;
 using Omniwise.Application.Courses.Commands.UpdateCourse;
+using Omniwise.Application.Courses.Dtos;
 using Omniwise.Application.Courses.Queries.GetAvailableToEnrollCourses;
 using Omniwise.Application.Courses.Queries.GetCourseById;
 using Omniwise.Application.Courses.Queries.GetEnrolledCourses;
@@ -46,34 +47,37 @@ public class CoursesController(IMediator mediator) : ControllerBase
         return NoContent();
     }
 
-
     [HttpGet("{courseId}")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetCourseById([FromRoute] int courseId)
+    public async Task<ActionResult<CourseDto>> GetCourseById([FromRoute] int courseId)
     {
         var course = await mediator.Send(new GetCourseByIdQuery(courseId));
+
         return Ok(course);
     }
 
     [HttpGet("enrolled")]
-    public async Task<IActionResult> GetEnrolledCourses()
+    public async Task<ActionResult<IEnumerable<CourseDto>>> GetEnrolledCourses()
     {
         var enrolledCourses = await mediator.Send(new GetEnrolledCoursesQuery());
+
         return Ok(enrolledCourses);
     }
 
     [HttpGet("owned")]
     [Authorize(Roles = Roles.Teacher)]
-    public async Task<IActionResult> GetOwnedCourses()
+    public async Task<ActionResult<IEnumerable<CourseDto>>> GetOwnedCourses()
     {
         var ownedCourses = await mediator.Send(new GetOwnedCoursesQuery());
+
         return Ok(ownedCourses);
     }
 
     [HttpGet("available")]
-    public async Task<IActionResult> GetAvailableToEnrollCourses([FromQuery] GetAvailableToEnrollCoursesQuery query)
+    public async Task<ActionResult<IEnumerable<CourseDto>>> GetAvailableToEnrollCourses([FromQuery] GetAvailableToEnrollCoursesQuery query)
     {
         var availableCourses = await mediator.Send(query);
+
         return Ok(availableCourses);
     }
 }
