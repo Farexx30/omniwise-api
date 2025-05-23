@@ -17,11 +17,13 @@ internal class MustBeEnrolledInCourseForAssignmentSubmissionRequirementHandler(O
     {
         var currentUserId = context.User.GetUserId();
 
-        var relatedAssignment = await dbContext.Assignments
-            .FirstAsync(asub => asub.Id == resource.AssignmentId);
+        var relatedCourseId = await dbContext.Assignments
+            .Where(a => a.Id == resource.AssignmentId)
+            .Select(a => a.CourseId)
+            .FirstAsync();
 
         var isCourseMember = await dbContext.UserCourses
-            .Where(uc => uc.CourseId == relatedAssignment.CourseId
+            .Where(uc => uc.CourseId == relatedCourseId
                    && uc.UserId == currentUserId
                    && uc.IsAccepted)
             .AnyAsync();

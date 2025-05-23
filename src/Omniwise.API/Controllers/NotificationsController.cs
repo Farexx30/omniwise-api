@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Omniwise.Application.Notifications.Commands.DeleteNotification;
+using Omniwise.Application.Notifications.Dtos;
 using Omniwise.Application.Notifications.Queries.GetNotifications;
 using Omniwise.Domain.Constants;
 
@@ -13,9 +14,10 @@ namespace Omniwise.API.Controllers;
 public class NotificationsController(IMediator mediator) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetNotifications()
+    public async Task<ActionResult<IEnumerable<NotificationDto>>> GetNotifications()
     {
         var notifications = await mediator.Send(new GetNotificationsQuery());
+
         return Ok(notifications);
     }
 
@@ -25,7 +27,7 @@ public class NotificationsController(IMediator mediator) : ControllerBase
     {
         var command = new DeleteNotificationCommand { NotificationId = notificationId };
         await mediator.Send(command);
+
         return NoContent();
     }
-
 }

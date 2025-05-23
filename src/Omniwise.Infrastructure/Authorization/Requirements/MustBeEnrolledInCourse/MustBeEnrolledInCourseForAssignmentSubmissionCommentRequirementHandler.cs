@@ -18,13 +18,13 @@ internal class MustBeEnrolledInCourseForAssignmentSubmissionCommentRequirementHa
     {
         var currentUserId = context.User.GetUserId();
 
-        var relatedAssignment = await dbContext.AssignmentSubmissions
+        var relatedCourseId = await dbContext.AssignmentSubmissions
             .Where(asub => asub.Id == resource.AssignmentSubmissionId)
-            .Select(asub => asub.Assignment)
+            .Select(asub => asub.Assignment.CourseId)
             .FirstAsync();
 
         var isCourseMember = await dbContext.UserCourses
-            .Where(uc => uc.CourseId == relatedAssignment.CourseId
+            .Where(uc => uc.CourseId == relatedCourseId
                    && uc.UserId == currentUserId
                    && uc.IsAccepted)
             .AnyAsync();

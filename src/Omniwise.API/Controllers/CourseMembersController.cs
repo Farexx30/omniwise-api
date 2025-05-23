@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Omniwise.Application.CourseMembers.Commands.AcceptCourseMember;
 using Omniwise.Application.CourseMembers.Commands.AddPendingCourseMember;
 using Omniwise.Application.CourseMembers.Commands.RemoveCourseMember;
+using Omniwise.Application.CourseMembers.Dtos;
 using Omniwise.Application.CourseMembers.Queries.GetCourseMemberById;
 using Omniwise.Application.CourseMembers.Queries.GetEnrolledCourseMembers;
 using Omniwise.Application.CourseMembers.Queries.GetPendingCourseMembers;
@@ -19,10 +20,7 @@ public class CourseMembersController(IMediator mediator) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> AddPendingCourseMember([FromRoute] int courseId)
     {
-        var command = new AddPendingCourseMemberCommand
-        {
-            CourseId = courseId
-        };
+        var command = new AddPendingCourseMemberCommand { CourseId = courseId };
         await mediator.Send(command);
 
         return NoContent();
@@ -31,7 +29,7 @@ public class CourseMembersController(IMediator mediator) : ControllerBase
     [HttpGet]
     [Route("pending")]
     [Authorize(Roles = Roles.Teacher)]
-    public async Task<IActionResult> GetPendingCourseMembers([FromRoute] int courseId)
+    public async Task<ActionResult<IEnumerable<PendingCourseMemberDto>>> GetPendingCourseMembers([FromRoute] int courseId)
     {
         var query = new GetPendingCourseMembersQuery { CourseId = courseId };
         var pendingCourseMembers = await mediator.Send(query);
@@ -41,7 +39,7 @@ public class CourseMembersController(IMediator mediator) : ControllerBase
 
     [HttpGet]
     [Route("enrolled")]
-    public async Task<IActionResult> GetEnrolledMembers([FromRoute] int courseId)
+    public async Task<ActionResult<IEnumerable<EnrolledCourseMemberDto>>> GetEnrolledMembers([FromRoute] int courseId)
     {
         var query = new GetEnrolledCourseMembersQuery { CourseId = courseId };
         var enrolledMembers = await mediator.Send(query);
@@ -51,7 +49,7 @@ public class CourseMembersController(IMediator mediator) : ControllerBase
 
     [HttpGet]
     [Route("{memberId}")]
-    public async Task<IActionResult> GetCourseMemberById([FromRoute] string memberId, [FromRoute] int courseId)
+    public async Task<ActionResult<CourseMemberDetailsDto>> GetCourseMemberById([FromRoute] string memberId, [FromRoute] int courseId)
     {
         var query = new GetCourseMemberByIdQuery
         {
@@ -74,6 +72,7 @@ public class CourseMembersController(IMediator mediator) : ControllerBase
             UserId = memberId
         };
         await mediator.Send(command);
+
         return NoContent();
     }
 
@@ -88,6 +87,7 @@ public class CourseMembersController(IMediator mediator) : ControllerBase
             UserId = memberId
         };
         await mediator.Send(command);
+
         return NoContent();
     }
 }

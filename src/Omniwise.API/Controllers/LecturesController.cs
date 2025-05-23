@@ -9,6 +9,7 @@ using Omniwise.Application.Lectures.Commands.UpdateLecture;
 using Omniwise.Application.Lectures.Queries.GetLectureById;
 using Omniwise.Application.Lectures.Queries.GetAllCourseLectures;
 using Omniwise.Domain.Constants;
+using Omniwise.Application.Lectures.Dtos;
 
 namespace Omniwise.API.Controllers;
 
@@ -50,7 +51,7 @@ public class LecturesController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("lectures/{lectureId}")]
-    public async Task<ActionResult<AssignmentDto>> GetLectureById([FromRoute] int lectureId)
+    public async Task<ActionResult<LectureDto>> GetLectureById([FromRoute] int lectureId)
     {
         var query = new GetLectureByIdQuery { LectureId = lectureId };
         var lecture = await mediator.Send(query);
@@ -59,7 +60,7 @@ public class LecturesController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("courses/{courseId}/lectures")]
-    public async Task<IActionResult> GetAllCourseLectures([FromRoute] int courseId)
+    public async Task<ActionResult<IEnumerable<LectureToGetAllDto>>> GetAllCourseLectures([FromRoute] int courseId)
     {
         var query = new GetAllCourseLecturesQuery { CourseId = courseId };
         var lectures = await mediator.Send(query);

@@ -34,7 +34,7 @@ public class UsersController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<UserWithRoleDto>> GetAllUsersByStatus([FromQuery] GetAllUsersByStatusQuery query)
+    public async Task<ActionResult<IEnumerable<UserWithRoleDto>>> GetAllUsersByStatus([FromQuery] GetAllUsersByStatusQuery query)
     {
         var users = await mediator.Send(query);
 
