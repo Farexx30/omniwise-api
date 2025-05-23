@@ -97,39 +97,44 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
     public async Task<IEnumerable<UserCourse>> GetEnrolledCourseMembersAsync(int courseId)
     {
         var enrolledCourseMembers = await dbContext.UserCourses
+            .Where(uc => uc.CourseId == courseId
+                   && uc.IsAccepted)
             .Include(uc => uc.User)
-            .Where(uc => uc.CourseId == courseId && uc.IsAccepted == true)
             .ToListAsync();
 
         return enrolledCourseMembers;
     }
+
     public async Task<IEnumerable<EnrolledCourseMemberWithRoleDto>> GetEnrolledCourseMembersWithRolesAsync(int courseId)
     {
         var enrolledCourseMembers = await dbContext.UserCourses
-            .Include(uc => uc.User)
-            .Where(uc => uc.CourseId == courseId && uc.IsAccepted == true)
+            .Where(uc => uc.CourseId == courseId 
+                   && uc.IsAccepted)
             .Join(dbContext.UserRoles,
-                  member => member.UserId,
+                  userCourse => userCourse.UserId,
                   userRole => userRole.UserId,
-                  (member, userRole) => new { Member = member, UserRole = userRole })
+                  (userCourse, userRole) => new { userCourse.User, UserRole = userRole })
             .Join(dbContext.Roles,
-                  firstJoinResult => firstJoinResult.UserRole.RoleId,
+                  currentResult => currentResult.UserRole.RoleId,
                   role => role.Id,
-                  (firstJoinResult, role) => new EnrolledCourseMemberWithRoleDto
+                  (currentResult, role) => new EnrolledCourseMemberWithRoleDto
                   {
-                      UserId = firstJoinResult.Member.UserId,
-                      FirstName = firstJoinResult.Member.User.FirstName,
-                      LastName = firstJoinResult.Member.User.LastName,
+                      UserId = currentResult.User.Id,
+                      FirstName = currentResult.User.FirstName,
+                      LastName = currentResult.User.LastName,
                       RoleName = role.Name!
                   })
             .ToListAsync();
 
         return enrolledCourseMembers;
     }
+
     public async Task<UserCourse?> GetPendingCourseMemberAsync(int courseId, string userId)
     {
         var pendingCourseMember = await dbContext.UserCourses
-            .FirstOrDefaultAsync(uc => uc.CourseId == courseId && uc.UserId == userId && uc.IsAccepted == false);
+            .FirstOrDefaultAsync(uc => uc.CourseId == courseId 
+                                 && uc.UserId == userId 
+                                 && !uc.IsAccepted);
 
         return pendingCourseMember;
     }
@@ -137,8 +142,9 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
     public async Task<IEnumerable<UserCourse>> GetPendingCourseMembersAsync(int courseId)
     {
         var pendingCourseMembers = await dbContext.UserCourses
+            .Where(uc => uc.CourseId == courseId
+                   && !uc.IsAccepted)
             .Include(uc => uc.User)
-            .Where(uc => uc.CourseId == courseId && uc.IsAccepted == false)
             .ToListAsync();
 
         return pendingCourseMembers;
@@ -150,20 +156,20 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
     public async Task<EnrolledCourseMemberWithRoleDto?> GetCourseMemberWithRoleNameAsync(int courseId, string userId)
     {
         var courseMember = await dbContext.UserCourses
+            .Where(uc => uc.CourseId == courseId
+                   && uc.UserId == userId)
             .Join(dbContext.UserRoles,
                   userCourse => userCourse.UserId,
                   userRole => userRole.UserId,
                   (userCourse, userRole) => new { UserCourse = userCourse, UserRole = userRole })
             .Join(dbContext.Roles,
-                  firstJoinResult => firstJoinResult.UserRole.RoleId,
+                  currentResult => currentResult.UserRole.RoleId,
                   role => role.Id,
-                  (firstJoinResult, role) => new { firstJoinResult.UserCourse, Role = role })
-            .Where(secondJoinResult => secondJoinResult.UserCourse.CourseId == courseId 
-                   && secondJoinResult.UserCourse.UserId == userId)
-            .Select(secondJoinResult => new EnrolledCourseMemberWithRoleDto
+                  (currentResult, role) => new { currentResult.UserCourse, Role = role })
+            .Select(finalResult => new EnrolledCourseMemberWithRoleDto
             {
-                UserId = secondJoinResult.UserCourse.UserId,
-                RoleName = secondJoinResult.Role.Name!
+                UserId = finalResult.UserCourse.UserId,
+                RoleName = finalResult.Role.Name!
             })
             .FirstOrDefaultAsync();
 
@@ -180,17 +186,17 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
     public async Task<List<string>> GetTeacherIdsAsync(int courseId)
     {
         var result = await dbContext.UserCourses
-            .Include(uc => uc.User)
-            .Where(uc => uc.CourseId == courseId && uc.IsAccepted == true)
+            .Where(uc => uc.CourseId == courseId
+                   && uc.IsAccepted)
             .Join(dbContext.UserRoles,
-                  member => member.UserId,
+                  userCourse => userCourse.UserId,
                   userRole => userRole.UserId,
-                  (member, userRole) => new { Member = member, UserRole = userRole })
+                  (userCourse, userRole) => new { userCourse.User, UserRole = userRole })
             .Join(dbContext.Roles,
-                  firstJoinResult => firstJoinResult.UserRole.RoleId,
+                  currentResult => currentResult.UserRole.RoleId,
                   role => role.Id,
-                  (firstJoinResult, role) => new { firstJoinResult.Member.UserId, Role = role })
-            .Where(result => result.Role.Name == Roles.Teacher)
+                  (currentResult, role) => new { UserId = currentResult.User.Id, RoleName = role.Name })
+            .Where(currentResult => currentResult.RoleName == Roles.Teacher)
             .Select(result => result.UserId)
             .ToListAsync();
 
