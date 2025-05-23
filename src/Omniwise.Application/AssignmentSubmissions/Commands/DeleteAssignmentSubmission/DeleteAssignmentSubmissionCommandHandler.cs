@@ -27,11 +27,10 @@ public class DeleteAssignmentSubmissionCommandHandler(IAssignmentSubmissionsRepo
 {
     public async Task Handle(DeleteAssignmentSubmissionCommand request, CancellationToken cancellationToken)
     {
-        //TODO: Implement the logic to delete an assignment submission
         var currentUser = userContext.GetCurrentUser();
         var assignmentSubmissionId = request.AssignmentSubmissionId;
 
-        var assignmentSubmission = await assignmentSubmissionsRepository.GetByIdAsync(assignmentSubmissionId)
+        var assignmentSubmission = await assignmentSubmissionsRepository.GetByIdAsync(assignmentSubmissionId, includeFiles: true)
             ?? throw new NotFoundException($"Assignment submission with id = {assignmentSubmissionId} not found.");
 
         var authorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, assignmentSubmission, Policies.SameOwner);

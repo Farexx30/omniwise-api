@@ -28,10 +28,10 @@ public class GetAssignmentSubmissionByIdQueryHandler(IAssignmentSubmissionsRepos
 {
     public async Task<AssignmentSubmissionDto> Handle(GetAssignmentSubmissionByIdQuery request, CancellationToken cancellationToken)
     {
-       var currentUser = userContext.GetCurrentUser();
-       var assignmentSubmissionId = request.AssignmentSubmissionId;
+        var currentUser = userContext.GetCurrentUser();
+        var assignmentSubmissionId = request.AssignmentSubmissionId;
 
-        var assignmentSubmission = await assignmentSubmissionsRepository.GetByIdAsync(assignmentSubmissionId)
+        var assignmentSubmission = await assignmentSubmissionsRepository.GetByIdAsync(assignmentSubmissionId, includeFiles: true, includeComments: true)
             ?? throw new NotFoundException($"{nameof(AssignmentSubmission)} with id = {assignmentSubmissionId} not found.");
 
         var courseMemberAuthorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, assignmentSubmission, Policies.MustBeEnrolledInCourse);

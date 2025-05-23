@@ -30,7 +30,7 @@ class UpdateAssignmentSubmissionCommandHandler(IAssignmentSubmissionsRepository 
         var currentUser = userContext.GetCurrentUser();
         var assignmentSubmissionId = request.AssignmentSubmissionId;
 
-        var assignmentSubmission = await assignmentSubmissionsRepository.GetByIdAsync(assignmentSubmissionId)
+        var assignmentSubmission = await assignmentSubmissionsRepository.GetByIdAsync(assignmentSubmissionId, includeFiles: true)
             ?? throw new NotFoundException($"Assignment submission with id = {assignmentSubmissionId} not found.");
 
         var authorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, assignmentSubmission, Policies.SameOwner);
