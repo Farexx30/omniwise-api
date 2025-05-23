@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Omniwise.Application.Common.Interfaces;
+namespace Omniwise.Application.Common.Interfaces.Repositories;
 
 public interface IAssignmentsRepository
 {

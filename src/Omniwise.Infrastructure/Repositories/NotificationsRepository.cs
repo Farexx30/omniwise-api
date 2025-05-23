@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Common.Interfaces.Repositories;
 using Omniwise.Domain.Entities;
 using Omniwise.Infrastructure.Persistence;
 
@@ -7,11 +7,12 @@ namespace Omniwise.Infrastructure.Repositories;
 
 internal class NotificationsRepository(OmniwiseDbContext dbContext) : INotificationsRepository
 {
-   public async Task<IEnumerable<Notification>> GetAllNotificationsAsync(string userId)
+    public async Task<IEnumerable<Notification>> GetAllNotificationsAsync(string userId)
     {
         var notifications = await dbContext.Notifications
-           .Where(n => n.UserId == userId)
-           .ToListAsync();
+            .AsNoTracking()
+            .Where(n => n.UserId == userId)
+            .ToListAsync();
 
         return notifications;
     }
@@ -19,7 +20,8 @@ internal class NotificationsRepository(OmniwiseDbContext dbContext) : INotificat
     public async Task<Notification?> GetByIdAsync(int notificationId, string userId)
     {
         var notification = await dbContext.Notifications
-            .FirstOrDefaultAsync(n => n.Id == notificationId && n.UserId == userId);
+            .FirstOrDefaultAsync(n => n.Id == notificationId 
+                                 && n.UserId == userId);
 
         return notification;
     }
@@ -36,4 +38,9 @@ internal class NotificationsRepository(OmniwiseDbContext dbContext) : INotificat
         await dbContext.SaveChangesAsync();
     }
 
+    public async Task AddNotificationsAsync(IEnumerable<Notification> notifications)
+    {
+        dbContext.Notifications.AddRange(notifications);
+        await dbContext.SaveChangesAsync();
+    }
 }

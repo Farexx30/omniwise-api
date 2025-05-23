@@ -3,7 +3,7 @@ using Azure.Storage.Blobs.Models;
 using Azure.Storage.Sas;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Common.Interfaces.Storage;
 using Omniwise.Domain.Exceptions;
 using System;
 using System.Collections.Generic;

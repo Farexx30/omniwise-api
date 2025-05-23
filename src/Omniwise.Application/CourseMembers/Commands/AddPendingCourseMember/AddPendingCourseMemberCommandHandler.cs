@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Omniwise.Application.Common.Interfaces;
-using Omniwise.Application.Services.Notifications;
+using Omniwise.Application.Common.Interfaces.Identity;
+using Omniwise.Application.Common.Interfaces.Repositories;
+using Omniwise.Application.Common.Services.Notifications;
 using Omniwise.Domain.Entities;
 using Omniwise.Domain.Exceptions;
 

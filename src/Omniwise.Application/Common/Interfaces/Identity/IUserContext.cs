@@ -1,7 +1,7 @@
 ﻿using Omniwise.Application.Common.Types;
 using System.Security.Claims;
 
-namespace Omniwise.Application.Common.Interfaces;
+namespace Omniwise.Application.Common.Interfaces.Identity;
 
 public interface IUserContext
 {

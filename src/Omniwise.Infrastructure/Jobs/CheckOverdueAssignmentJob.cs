@@ -1,5 +1,5 @@
-﻿using Omniwise.Application.Common.Interfaces;
-using Omniwise.Application.Services.Notifications;
+﻿using Omniwise.Application.Common.Interfaces.Repositories;
+using Omniwise.Application.Common.Services.Notifications;
 using Omniwise.Domain.Constants;
 using Omniwise.Domain.Exceptions;
 using Quartz;

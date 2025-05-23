@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Common.Interfaces.Repositories;
 using Omniwise.Domain.Entities;
 using Omniwise.Infrastructure.Persistence;
 using System;
