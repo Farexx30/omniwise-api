@@ -39,15 +39,28 @@ internal class AssignmentSubmissionsRepository(OmniwiseDbContext dbContext) : IA
             .ExecuteDeleteAsync();
     }
 
-    public async Task<AssignmentSubmission?> GetByIdAsync(int assignmentSubmissionId)
+    public async Task<AssignmentSubmission?> GetByIdAsync(int assignmentSubmissionId, bool includeFiles = false, bool includeComments = false)
     {
-        var assignmentSubmission = await dbContext.AssignmentSubmissions
-            .Include(asub => asub.Files)
-            .Include(asub => asub.Comments)
-                .ThenInclude(c => c.Author)
+        var mainQuery = dbContext.AssignmentSubmissions
+            .AsQueryable();
+
+        if (includeFiles)
+        {
+            mainQuery = mainQuery
+                .Include(asub => asub.Files);
+        }
+
+        if (includeComments)
+        {
+            mainQuery = mainQuery
+                .Include(asub => asub.Comments)
+                    .ThenInclude(c => c.Author);
+        }
+
+        var assignmentSubmission = await mainQuery
             .FirstOrDefaultAsync(asub => asub.Id == assignmentSubmissionId);
 
-        if (assignmentSubmission is not null)
+        if (includeComments && assignmentSubmission is not null)
         {
             assignmentSubmission.Comments = [.. assignmentSubmission.Comments.OrderBy(c => c.SentDate)];
         }

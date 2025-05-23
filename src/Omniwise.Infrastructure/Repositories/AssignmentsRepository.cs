@@ -28,25 +28,29 @@ internal class AssignmentsRepository(OmniwiseDbContext dbContext) : IAssignments
         await dbContext.SaveChangesAsync();
     }
 
-    public async Task<Assignment?> GetByIdAsync(int assignmentId, CurrentUser? currentUser = default, bool includeAssignmentSubmissions = false)
+    public async Task<Assignment?> GetByIdAsync(int assignmentId, CurrentUser? currentUser = default, bool includeFiles = false, bool includeAssignmentSubmissions = false)
     {
-        IQueryable<Assignment> query = dbContext.Assignments
-            .Include(a => a.Files);
+        var mainQuery = dbContext.Assignments
+            .AsQueryable();
 
-        if (includeAssignmentSubmissions)
+        if (includeFiles)
         {
-            if (currentUser is not null)
-            {
-                var isCurrentUserTeacher = currentUser.IsInRole(Roles.Teacher);
-
-                query = query
-                    .Include(a => a.Submissions
-                        .Where(asub => isCurrentUserTeacher || asub.AuthorId == currentUser!.Id))
-                        .ThenInclude(asub => asub.Author);
-            }
+            mainQuery = mainQuery
+                .Include(a => a.Files);
         }
 
-        var assignment = await query.FirstOrDefaultAsync(a => a.Id == assignmentId);
+        if (includeAssignmentSubmissions && currentUser is not null)
+        {
+            var isCurrentUserTeacher = currentUser.IsInRole(Roles.Teacher);
+
+            mainQuery = mainQuery
+                .Include(a => a.Submissions
+                    .Where(asub => isCurrentUserTeacher || asub.AuthorId == currentUser!.Id))
+                    .ThenInclude(asub => asub.Author);
+        }
+
+        var assignment = await mainQuery
+            .FirstOrDefaultAsync(a => a.Id == assignmentId);
 
         return assignment;
     }
