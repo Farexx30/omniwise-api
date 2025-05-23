@@ -58,8 +58,9 @@ public class GradeAssignmentSubmissionCommandHandler(IAssignmentSubmissionsRepos
 
         await assignmentSubmissionsRepository.SaveChangesAsync();
 
-        var notificationDetails = await assignmentSubmissionsRepository.GetAssignmentAndCourseNames(assignmentSubmissionId) 
+        var notificationDetails = await assignmentSubmissionsRepository.GetRelatedAssignmentAndCourseNamesAsync(assignmentSubmissionId) 
             ?? throw new NotFoundException($"Assignment submission with id = {assignmentSubmissionId} not found.");
+
         var courseName = notificationDetails.CourseName;
         var assignmentName = notificationDetails.AssignmentName;
         var notificationContent = $"Assignment \"{assignmentName}\" in course \"{courseName}\" was graded. " +

@@ -14,5 +14,5 @@ public interface IAssignmentSubmissionCommentsRepository
     Task<AssignmentSubmissionComment?> GetByIdAsync(int assignmentSubmissionCommentId);
     Task DeleteAsync(AssignmentSubmissionComment comment);
     Task SaveChangesAsync();
-    Task<AssignmentSubmissionCommentNotificationDto?> GetDetailsToCommentNotification(int assignmentSubmissionId);
+    Task<AssignmentSubmissionCommentNotificationDto?> GetDetailsToCommentNotificationAsync(int assignmentSubmissionId);
 }

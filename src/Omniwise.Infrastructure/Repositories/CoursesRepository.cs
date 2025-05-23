@@ -23,17 +23,20 @@ internal class CoursesRepository(OmniwiseDbContext dbContext) : ICoursesReposito
 
     public Task SaveChangesAsync()
        => dbContext.SaveChangesAsync();
+
     public async Task<Course?> GetCourseByIdAsync(int id)
     {
-        var course = await dbContext.Courses.FirstOrDefaultAsync(c => c.Id == id);
+        var course = await dbContext.Courses.
+            FirstOrDefaultAsync(c => c.Id == id);
+
         return course;
     }
 
     public async Task<IEnumerable<Course>> GetAllEnrolledCoursesAsync(string id)
     {
-        var enrolledCourses = await dbContext.Courses
-            .Include(c => c.Members)
-            .Where(c => c.Members.Any(m => m.Id == id))
+        var enrolledCourses = await dbContext.UserCourses
+            .Where(uc => uc.UserId == id)
+            .Select(uc => uc.Course)
             .ToListAsync();
 
         return enrolledCourses;
@@ -50,22 +53,18 @@ internal class CoursesRepository(OmniwiseDbContext dbContext) : ICoursesReposito
 
     public async Task<IEnumerable<Course>> GetAvailableToEnrollCoursesMatchingAsync(string? searchPhrase, string id)
     {
-        var searchPhraseLower = searchPhrase?.ToLower();
-
         var availableCourses = await dbContext.Courses
-            .Include(c => c.Members)
-            .Where(c => c.OwnerId != id)
             .Where(c => !c.Members.Any(m => m.Id == id))
-            .Where(c => string.IsNullOrWhiteSpace(searchPhraseLower)
-                || c.Name.Contains(searchPhraseLower))
-            .ToListAsync();
+            .Where(c => string.IsNullOrWhiteSpace(searchPhrase)
+                  || c.Name.Contains(searchPhrase.Trim()))
+              .ToListAsync();
 
         return availableCourses;
     }
 
-    public Task<bool> ExistsAsync(int courseId)
+    public async Task<bool> ExistsAsync(int courseId)
     {
-        var exists = dbContext.Courses
+        var exists = await dbContext.Courses
             .AnyAsync(c => c.Id == courseId);
 
         return exists;

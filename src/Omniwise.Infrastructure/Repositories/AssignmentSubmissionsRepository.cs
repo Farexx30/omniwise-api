@@ -84,7 +84,7 @@ internal class AssignmentSubmissionsRepository(OmniwiseDbContext dbContext) : IA
         return assignmentSubmissionIds;
     }
 
-    public async Task<bool> IsAlreadySubmitted(int assignmentSubmissionId, string userId)
+    public async Task<bool> IsAlreadySubmittedAsync(int assignmentSubmissionId, string userId)
     {
         var isAlreadySubmitted = await dbContext.AssignmentSubmissions
             .AnyAsync(asub => asub.AssignmentId == assignmentSubmissionId
@@ -104,11 +104,9 @@ internal class AssignmentSubmissionsRepository(OmniwiseDbContext dbContext) : IA
     public Task SaveChangesAsync()
         => dbContext.SaveChangesAsync();
 
-    public async Task<AssignmentSubmissionNotificationDetailsDto?> GetAssignmentAndCourseNames(int assignmentSubmissionId)
+    public async Task<AssignmentSubmissionNotificationDetailsDto?> GetRelatedAssignmentAndCourseNamesAsync(int assignmentSubmissionId)
     {
         var result = await dbContext.AssignmentSubmissions
-            .Include(asub => asub.Assignment)
-                .ThenInclude(a => a.Course)
             .Where(asub => asub.Id == assignmentSubmissionId)
             .Select(asub => new AssignmentSubmissionNotificationDetailsDto
             { 

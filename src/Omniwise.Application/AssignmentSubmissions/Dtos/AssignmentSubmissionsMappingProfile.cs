@@ -21,5 +21,9 @@ public class AssignmentSubmissionsMappingProfile : Profile
             .ForMember(dest => dest.Files, opt => opt.Ignore());
 
         CreateMap<AssignmentSubmission, AssignmentSubmissionDto>();
+
+        CreateMap<AssignmentSubmission, BasicAssignmentSubmissionDto>()
+            .ForMember(dest => dest.AuthorFullName, 
+                opt => opt.MapFrom(src => $"{src.Author.FirstName} {src.Author.LastName}"));
     }
 }

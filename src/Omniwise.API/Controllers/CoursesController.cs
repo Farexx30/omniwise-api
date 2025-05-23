@@ -63,6 +63,7 @@ public class CoursesController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("owned")]
+    [Authorize(Roles = Roles.Teacher)]
     public async Task<IActionResult> GetOwnedCourses()
     {
         var ownedCourses = await mediator.Send(new GetOwnedCoursesQuery());

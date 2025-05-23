@@ -39,29 +39,20 @@ internal class AssignmentSubmissionCommentsRepository(OmniwiseDbContext dbContex
     public Task SaveChangesAsync()
         => dbContext.SaveChangesAsync();
 
-    public async Task<AssignmentSubmissionCommentNotificationDto?> GetDetailsToCommentNotification(int assignmentSubmissionId)
+    public async Task<AssignmentSubmissionCommentNotificationDto?> GetDetailsToCommentNotificationAsync(int assignmentSubmissionId)
     {
-      var result = await dbContext.AssignmentSubmissions
-                .Include(asub => asub.Assignment)
-                    .ThenInclude(a => a.Course)
-                        .ThenInclude(c => c.Members)
-            .Where(asub => asub.Id == assignmentSubmissionId)
-            .Select(asub => new AssignmentSubmissionCommentNotificationDto
-            {
-                CourseName = asub.Assignment.Course.Name,
-                CourseId = asub.Assignment.Course.Id,
-                AssignmentName = asub.Assignment.Name,
-                AssignmentSubmissionAuthorFirstName = asub.Assignment.Course.Members
-                    .Where(member => member.Id == asub.AuthorId)
-                    .Select(member => member.FirstName)
-                    .First(),
-                AssignmentSubmissionAuthorLastName = asub.Assignment.Course.Members
-                    .Where(member => member.Id == asub.AuthorId)
-                    .Select(member => member.LastName)
-                    .First(),
-            })
-            .FirstOrDefaultAsync();
-        
+        var result = await dbContext.AssignmentSubmissions
+             .Where(asub => asub.Id == assignmentSubmissionId)
+             .Select(asub => new AssignmentSubmissionCommentNotificationDto
+             {
+                 CourseName = asub.Assignment.Course.Name,
+                 CourseId = asub.Assignment.Course.Id,
+                 AssignmentName = asub.Assignment.Name,
+                 AssignmentSubmissionAuthorFirstName = asub.Author.FirstName,
+                 AssignmentSubmissionAuthorLastName = asub.Author.LastName,
+             })
+             .FirstOrDefaultAsync();
+     
         return result;
     }
 }

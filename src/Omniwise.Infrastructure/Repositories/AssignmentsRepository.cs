@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Common.Types;
+using Omniwise.Domain.Constants;
 using Omniwise.Domain.Entities;
 using Omniwise.Infrastructure.Persistence;
 using System;
@@ -26,11 +28,25 @@ internal class AssignmentsRepository(OmniwiseDbContext dbContext) : IAssignments
         await dbContext.SaveChangesAsync();
     }
 
-    public async Task<Assignment?> GetByIdAsync(int assignmentId)
+    public async Task<Assignment?> GetByIdAsync(int assignmentId, CurrentUser? currentUser = default, bool includeAssignmentSubmissions = false)
     {
-        var assignment = await dbContext.Assignments
-            .Include(a => a.Files)
-            .FirstOrDefaultAsync(a => a.Id == assignmentId);
+        IQueryable<Assignment> query = dbContext.Assignments
+            .Include(a => a.Files);
+
+        if (includeAssignmentSubmissions)
+        {
+            if (currentUser is not null)
+            {
+                var isCurrentUserTeacher = currentUser.IsInRole(Roles.Teacher);
+
+                query = query
+                    .Include(a => a.Submissions
+                        .Where(asub => isCurrentUserTeacher || asub.AuthorId == currentUser!.Id))
+                        .ThenInclude(asub => asub.Author);
+            }
+        }
+
+        var assignment = await query.FirstOrDefaultAsync(a => a.Id == assignmentId);
 
         return assignment;
     }

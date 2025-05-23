@@ -18,8 +18,8 @@ public interface IAssignmentSubmissionsRepository
     Task<IEnumerable<int>> GetAllIdsByAssignmentIdAsync(int assignmentId);
     Task<IEnumerable<int>> GetAllIdsByAssignmentIdsAsync(IEnumerable<int> assignmentIds);
     Task<IEnumerable<int>> GetAllIdsByAuthorIdAsync(string authorId);
-    Task<bool> IsAlreadySubmitted(int assignmentSubmissionId, string userId);
+    Task<bool> IsAlreadySubmittedAsync(int assignmentSubmissionId, string userId);
     Task<bool> ExistsAsync(int assignmentSubmissionId);
     Task SaveChangesAsync();
-    Task<AssignmentSubmissionNotificationDetailsDto?> GetAssignmentAndCourseNames(int assignmentSubmissionId);
+    Task<AssignmentSubmissionNotificationDetailsDto?> GetRelatedAssignmentAndCourseNamesAsync(int assignmentSubmissionId);
 }

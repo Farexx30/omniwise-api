@@ -4,6 +4,7 @@ public class AssignmentMemberSubmissionDto
 {
     public int Id { get; set; }
     public string Name { get; set; } = default!;
+    public DateTime LatestSubmissionDate { get; set; }
     public DateTime Deadline { get; set; }
     public float? Grade { get; set; }
 }

@@ -11,4 +11,5 @@ public class UserCourse : ICourseResource
 
     //References:
     public User User { get; set; } = default!;
+    public Course Course { get; set; } = default!;
 }

@@ -55,7 +55,7 @@ public class CreateAssignmentSubmissionCommandHandler(IAssignmentSubmissionsRepo
             throw new ForbiddenException($"You are not allowed to create {nameof(AssignmentSubmission)} for {nameof(Assignment)} with id = {assignmentId}");
         }
 
-        var isAlreadySubmitted = await assignmentSubmissionsRepository.IsAlreadySubmitted(assignmentId, currentUser.Id!);
+        var isAlreadySubmitted = await assignmentSubmissionsRepository.IsAlreadySubmittedAsync(assignmentId, currentUser.Id!);
         if (isAlreadySubmitted)
         {
             throw new ForbiddenException("You can't create new submission for the same assignment again.");
