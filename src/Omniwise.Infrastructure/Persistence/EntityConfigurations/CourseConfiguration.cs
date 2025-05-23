@@ -34,7 +34,7 @@ internal class CourseConfiguration : IEntityTypeConfiguration<Course>
                     .HasForeignKey(fk => fk.UserId)
                     .OnDelete(DeleteBehavior.Restrict),
 
-                r => r.HasOne<Course>()
+                r => r.HasOne<Course>(uc => uc.Course)
                     .WithMany()
                     .HasForeignKey(fk => fk.CourseId)
                     .OnDelete(DeleteBehavior.Cascade),
