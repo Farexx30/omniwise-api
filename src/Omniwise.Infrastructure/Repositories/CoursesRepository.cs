@@ -29,11 +29,13 @@ internal class CoursesRepository(OmniwiseDbContext dbContext) : ICoursesReposito
         return course;
     }
 
-    public async Task<IEnumerable<Course>> GetAllEnrolledCoursesAsync(string id)
+    public async Task<IEnumerable<Course>> GetAllEnrolledCoursesMatchingAsync(string? searchPhrase, string id)
     {
         var enrolledCourses = await dbContext.UserCourses
             .AsNoTracking()
-            .Where(uc => uc.UserId == id)
+            .Where(uc => uc.UserId == id
+                   && (string.IsNullOrWhiteSpace(searchPhrase) 
+                   || uc.Course.Name.Contains(searchPhrase.Trim())))
             .Select(uc => uc.Course)
             .ToListAsync();
 

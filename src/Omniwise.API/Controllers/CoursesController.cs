@@ -57,9 +57,9 @@ public class CoursesController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("enrolled")]
-    public async Task<ActionResult<IEnumerable<CourseDto>>> GetEnrolledCourses()
+    public async Task<ActionResult<IEnumerable<CourseDto>>> GetEnrolledCourses([FromQuery] GetEnrolledCoursesQuery query)
     {
-        var enrolledCourses = await mediator.Send(new GetEnrolledCoursesQuery());
+        var enrolledCourses = await mediator.Send(query);
 
         return Ok(enrolledCourses);
     }

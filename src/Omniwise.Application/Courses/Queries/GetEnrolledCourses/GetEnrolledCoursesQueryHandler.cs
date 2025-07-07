@@ -20,7 +20,7 @@ public class GetEnrolledCoursesQueryHandler(ILogger<GetEnrolledCoursesQueryHandl
 
         logger.LogInformation("Fetching all enrolled courses for user with id: {UserId} from the repository.", currentUser.Id);
 
-        var enrolledCourses = await coursesRepository.GetAllEnrolledCoursesAsync(currentUser.Id!);
+        var enrolledCourses = await coursesRepository.GetAllEnrolledCoursesMatchingAsync(request.SearchPhrase, currentUser.Id!);
 
         List<string?> imgUrls = [];
         foreach (var course in enrolledCourses)
