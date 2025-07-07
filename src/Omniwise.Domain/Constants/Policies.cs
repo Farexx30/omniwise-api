@@ -10,4 +10,5 @@ public static class Policies
 {
     public const string SameOwner = "SameOwner";
     public const string MustBeEnrolledInCourse = "MustBeEnrolledInCourse";
+    public const string AllowLocalDevelopment = "AllowLocalDevelopment";
 }

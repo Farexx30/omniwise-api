@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Omniwise.API.Extensions;
 using Omniwise.API.Handlers;
 using Omniwise.Application.Extensions;
+using Omniwise.Domain.Constants;
 using Omniwise.Domain.Entities;
 using Omniwise.Infrastructure.Extensions;
 using Serilog;
@@ -16,6 +17,8 @@ try
 
 
     var app = builder.Build();
+
+    app.UseCors(Policies.AllowLocalDevelopment);
 
     await app.Services.InitializeDatabaseAsync();
     await app.Services.InitializeBlobStorageAsync();
