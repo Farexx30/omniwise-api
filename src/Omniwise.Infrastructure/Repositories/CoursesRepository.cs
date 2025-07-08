@@ -34,6 +34,7 @@ internal class CoursesRepository(OmniwiseDbContext dbContext) : ICoursesReposito
         var enrolledCourses = await dbContext.UserCourses
             .AsNoTracking()
             .Where(uc => uc.UserId == id
+                   && uc.IsAccepted == true
                    && (string.IsNullOrWhiteSpace(searchPhrase) 
                    || uc.Course.Name.Contains(searchPhrase.Trim())))
             .Select(uc => uc.Course)
