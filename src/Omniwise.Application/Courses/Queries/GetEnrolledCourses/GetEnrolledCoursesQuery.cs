@@ -5,4 +5,5 @@ namespace Omniwise.Application.Courses.Queries.GetEnrolledCourses;
 
 public class GetEnrolledCoursesQuery : IRequest<IEnumerable<CourseDto>>
 {
+    public string? SearchPhrase { get; set; }
 }
