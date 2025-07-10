@@ -1,4 +1,5 @@
 ﻿using Omniwise.Application.AssignmentSubmissions.Dtos;
+using Omniwise.Application.Common.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,6 @@ public class AssignmentDto
     public string? Content { get; set; }
     public DateTime Deadline { get; set; }
     public float MaxGrade { get; set; }
-    public List<string> FileUrls { get; set; } = [];
+    public List<FileInfoDto> FileInfos { get; set; } = [];
     public IEnumerable<BasicAssignmentSubmissionDto> Submissions { get; set; } = [];
 }
