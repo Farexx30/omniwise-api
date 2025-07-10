@@ -24,7 +24,7 @@ public class AssignmentSubmissionsController(IMediator mediator) : ControllerBas
         command.AssignmentId = assignmentId;
         var assignmentSubmissionId = await mediator.Send(command);
 
-        return CreatedAtAction(nameof(GetAssignmentSubmissionById), new { assignmentSubmissionId }, null);
+        return CreatedAtAction(nameof(GetAssignmentSubmissionById), new { assignmentSubmissionId }, new { assignmentSubmissionId });
     }
 
     [HttpPatch("assignment-submissions/{assignmentSubmissionId}")]
