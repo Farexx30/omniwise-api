@@ -35,6 +35,7 @@ public class CreateAssignmentSubmissionCommentCommandHandler(IAssignmentSubmissi
             ?? throw new NotFoundException($"Assignment submission with id = {assignmentSubmissionId} not found.");
 
         var assignmentSubmissionComment = mapper.Map<AssignmentSubmissionComment>(request);
+        assignmentSubmissionComment.Content = assignmentSubmissionComment.Content.Trim();
         assignmentSubmissionComment.SentDate = DateTime.UtcNow;
         assignmentSubmissionComment.AuthorId = currentUser.Id!;
 
