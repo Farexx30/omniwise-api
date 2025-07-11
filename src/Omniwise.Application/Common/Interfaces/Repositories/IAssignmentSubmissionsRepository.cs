@@ -14,7 +14,7 @@ public interface IAssignmentSubmissionsRepository
     Task<int> CreateAsync(AssignmentSubmission assignmentSubmission);
     Task DeleteAsync(AssignmentSubmission assignmentSubmission);
     Task DeleteByAuthorIdAsync(string authorId);
-    Task<AssignmentSubmission?> GetByIdAsync(int assignmentSubmissionId, bool includeFiles = false, bool includeComments = false);
+    Task<AssignmentSubmission?> GetByIdAsync(int assignmentSubmissionId, bool includeAuthor = false, bool includeFiles = false, bool includeAssignmentInfo = false, bool includeComments = false);
     Task<IEnumerable<int>> GetAllIdsByAssignmentIdAsync(int assignmentId);
     Task<IEnumerable<int>> GetAllIdsByAssignmentIdsAsync(IEnumerable<int> assignmentIds);
     Task<IEnumerable<int>> GetAllIdsByAuthorIdAsync(string authorId);

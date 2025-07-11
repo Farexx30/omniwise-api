@@ -32,7 +32,7 @@ public class GetAssignmentSubmissionByIdQueryHandler(IAssignmentSubmissionsRepos
         var currentUser = userContext.GetCurrentUser();
         var assignmentSubmissionId = request.AssignmentSubmissionId;
 
-        var assignmentSubmission = await assignmentSubmissionsRepository.GetByIdAsync(assignmentSubmissionId, includeFiles: true, includeComments: true)
+        var assignmentSubmission = await assignmentSubmissionsRepository.GetByIdAsync(assignmentSubmissionId, includeAuthor: true, includeFiles: true, includeAssignmentInfo: true, includeComments: true)
             ?? throw new NotFoundException($"{nameof(AssignmentSubmission)} with id = {assignmentSubmissionId} not found.");
 
         var courseMemberAuthorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, assignmentSubmission, Policies.MustBeEnrolledInCourse);

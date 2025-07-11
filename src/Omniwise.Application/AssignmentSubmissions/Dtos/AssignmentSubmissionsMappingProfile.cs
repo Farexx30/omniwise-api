@@ -20,7 +20,17 @@ public class AssignmentSubmissionsMappingProfile : Profile
         CreateMap<UpdateAssignmentSubmissionCommand, AssignmentSubmission>()
             .ForMember(dest => dest.Files, opt => opt.Ignore());
 
-        CreateMap<AssignmentSubmission, AssignmentSubmissionDto>();
+        CreateMap<AssignmentSubmission, AssignmentSubmissionDto>()
+            .ForMember(dest => dest.AuthorFullName,
+                opt => opt.MapFrom(src => $"{src.Author.FirstName} {src.Author.LastName}"))
+            .ForMember(dest => dest.AssignmentId,
+                opt => opt.MapFrom(src => src.Assignment.Id))
+            .ForMember(dest => dest.AssignmentName,
+                opt => opt.MapFrom(src => src.Assignment.Name))
+            .ForMember(dest => dest.MaxGrade,
+                opt => opt.MapFrom(src => src.Assignment.MaxGrade))
+            .ForMember(dest => dest.Deadline,
+                opt => opt.MapFrom(src => src.Assignment.Deadline));
 
         CreateMap<AssignmentSubmission, BasicAssignmentSubmissionDto>()
             .ForMember(dest => dest.AuthorFullName, 
