@@ -14,6 +14,10 @@ using Omniwise.Domain.Entities;
 using Omniwise.Infrastructure.Extensions;
 using Omniwise.Application.Identity.Requests;
 using Omniwise.Application.Common.Interfaces;
+using Omniwise.Application.Common.Types;
+using Omniwise.Application.Common.Interfaces.Identity;
+using Omniwise.Application.Identity.Responses;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Omniwise.API.Extensions;
 
@@ -143,7 +147,7 @@ public static class IdentityExtensions
             }
 
             //Check if user has appropriate status to sign in:
-            var userStatus = user.Status;
+            var userStatus = user.Status;            
 
             if (userStatus == UserStatus.Pending)
             {
@@ -175,7 +179,7 @@ public static class IdentityExtensions
                 {
                     signInResult = await signInManager.TwoFactorRecoveryCodeSignInAsync(login.TwoFactorRecoveryCode);
                 }
-            }         
+            }
 
             if (!signInResult.Succeeded)
             {
@@ -184,6 +188,25 @@ public static class IdentityExtensions
 
             // The signInManager already produced the needed response in the form of a cookie or bearer token.
             return TypedResults.Empty;
+        });
+
+        routeGroup.MapPost("/my-role", Results<Ok<RoleResponse>, UnauthorizedHttpResult>
+                    ([FromServices] IServiceProvider sp) =>
+        {
+            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+            var userContext = sp.GetRequiredService<IUserContext>();
+
+            var currentUser = userContext.GetCurrentUser();
+
+            if (currentUser is null
+                || currentUser.Roles.IsNullOrEmpty())
+            {
+                return TypedResults.Unauthorized();
+            }
+
+            var roles = currentUser.Roles;
+           
+            return TypedResults.Ok(new RoleResponse { Role = roles.First() });
         });
 
         routeGroup.MapPost("/refresh", async Task<Results<Ok<AccessTokenResponse>, UnauthorizedHttpResult, SignInHttpResult, ChallengeHttpResult>>
