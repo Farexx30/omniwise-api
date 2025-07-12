@@ -38,6 +38,8 @@ public class CreateAssignmentCommandHandler(IAssignmentsRepository assignmentsRe
             ?? throw new NotFoundException($"Course not found.");
 
         var assignment = mapper.Map<Assignment>(request);
+        assignment.Name = assignment.Name.Trim();
+        assignment.Content = assignment.Content?.Trim();
 
         var authorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, assignment, Policies.MustBeEnrolledInCourse);
         if (!authorizationResult.Succeeded)

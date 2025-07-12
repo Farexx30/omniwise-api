@@ -33,6 +33,8 @@ public class CreateLectureCommandHandler(ILogger<CreateLectureCommandHandler> lo
             ?? throw new NotFoundException($"Course with id = {courseId} not found.");
 
         var lecture = mapper.Map<Lecture>(request);
+        lecture.Name = lecture.Name.Trim();
+        lecture.Content = lecture.Content?.Trim();
 
         var authorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, lecture, Policies.MustBeEnrolledInCourse);
         if (!authorizationResult.Succeeded)

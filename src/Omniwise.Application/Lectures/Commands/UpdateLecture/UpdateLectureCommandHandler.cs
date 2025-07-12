@@ -44,6 +44,8 @@ public class UpdateLectureCommandHandler(ILogger<UpdateLectureCommandHandler> lo
         await unitOfWork.ExecuteTransactionalAsync(async () =>
         {
             mapper.Map(request, lecture);
+            lecture.Name = lecture.Name.Trim();
+            lecture.Content = lecture.Content?.Trim();
 
             await fileService.CompareAndUpdateAsync(files, lecture.Files, lectureId);
 
