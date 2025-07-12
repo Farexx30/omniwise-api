@@ -40,6 +40,7 @@ public class UpdateAssignmentSubmissionCommentCommandHandler(IAssignmentSubmissi
         }
 
         mapper.Map(request, assignmentSubmissionComment);
+        assignmentSubmissionComment.Content = assignmentSubmissionComment.Content.Trim();
 
         await assignmentSubmissionCommentsRepository.SaveChangesAsync();
     }

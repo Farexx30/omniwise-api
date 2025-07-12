@@ -190,7 +190,7 @@ public static class IdentityExtensions
             return TypedResults.Empty;
         });
 
-        routeGroup.MapPost("/my-role", Results<Ok<RoleResponse>, UnauthorizedHttpResult>
+        routeGroup.MapPost("/my-basic-data", Results<Ok<BasicUserDataResponse>, UnauthorizedHttpResult>
                     ([FromServices] IServiceProvider sp) =>
         {
             var userManager = sp.GetRequiredService<UserManager<TUser>>();
@@ -206,7 +206,7 @@ public static class IdentityExtensions
 
             var roles = currentUser.Roles;
            
-            return TypedResults.Ok(new RoleResponse { Role = roles.First() });
+            return TypedResults.Ok(new BasicUserDataResponse { UserId = currentUser.Id!, Role = roles.First() });
         });
 
         routeGroup.MapPost("/refresh", async Task<Results<Ok<AccessTokenResponse>, UnauthorizedHttpResult, SignInHttpResult, ChallengeHttpResult>>
