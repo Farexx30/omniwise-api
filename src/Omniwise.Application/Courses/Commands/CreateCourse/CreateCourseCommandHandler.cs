@@ -33,6 +33,7 @@ namespace Omniwise.Application.Courses.Commands.CreateCourse
 
             var course = mapper.Map<Course>(request);
             course.OwnerId = currentUser.Id!;
+            course.Name = course.Name.Trim();
 
             int courseId = 0;
             await unitOfWork.ExecuteTransactionalAsync(async () =>

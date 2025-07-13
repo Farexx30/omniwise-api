@@ -50,7 +50,7 @@ public class GetAssignmentByIdQueryHandler(IAssignmentsRepository assignmentsRep
         foreach (var file in assignment.Files)
         {
             var fileSasUrl = await fileService.GetFileSasUrl(file.BlobName);
-            assignmentDto.FileUrls.Add(fileSasUrl);
+            assignmentDto.FileInfos.Add(new FileInfoDto(Name: file.OriginalName, Url: fileSasUrl));
         }
 
         return assignmentDto;

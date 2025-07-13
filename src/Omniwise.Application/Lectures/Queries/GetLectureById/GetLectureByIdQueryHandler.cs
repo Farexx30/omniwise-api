@@ -6,6 +6,7 @@ using Omniwise.Application.AssignmentSubmissions.Dtos;
 using Omniwise.Application.Common.Interfaces.Identity;
 using Omniwise.Application.Common.Interfaces.Repositories;
 using Omniwise.Application.Common.Services.Files;
+using Omniwise.Application.Common.Types;
 using Omniwise.Application.Lectures.Dtos;
 using Omniwise.Domain.Constants;
 using Omniwise.Domain.Entities;
@@ -44,7 +45,7 @@ public class GetLectureByIdQueryHandler(ILogger<GetLectureByIdQueryHandler> logg
         foreach (var file in lecture.Files)
         {
             var fileSasUrl = await fileService.GetFileSasUrl(file.BlobName);
-            lectureDto.FileUrls.Add(fileSasUrl);
+            lectureDto.FileInfos.Add(new FileInfoDto(Name: file.OriginalName, Url: fileSasUrl));
         }
 
         return lectureDto;

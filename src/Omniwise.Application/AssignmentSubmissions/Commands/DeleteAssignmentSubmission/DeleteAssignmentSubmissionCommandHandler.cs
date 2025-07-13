@@ -30,7 +30,7 @@ public class DeleteAssignmentSubmissionCommandHandler(IAssignmentSubmissionsRepo
         var currentUser = userContext.GetCurrentUser();
         var assignmentSubmissionId = request.AssignmentSubmissionId;
 
-        var assignmentSubmission = await assignmentSubmissionsRepository.GetByIdAsync(assignmentSubmissionId, includeFiles: true)
+        var assignmentSubmission = await assignmentSubmissionsRepository.GetByIdAsync(assignmentSubmissionId, includeFiles: true, includeAssignmentInfo: true)
             ?? throw new NotFoundException($"Assignment submission with id = {assignmentSubmissionId} not found.");
 
         var authorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, assignmentSubmission, Policies.SameOwner);
@@ -41,6 +41,12 @@ public class DeleteAssignmentSubmissionCommandHandler(IAssignmentSubmissionsRepo
                 assignmentSubmissionId);
 
             throw new ForbiddenException($"You are not allowed to delete {nameof(AssignmentSubmission)} with id = {assignmentSubmissionId}");
+        }
+
+        var hasDeadlinePassed = assignmentSubmission.Assignment.Deadline < DateTime.UtcNow;
+        if (hasDeadlinePassed)
+        {
+            throw new ForbiddenException("You can't delete submission after deadline.");
         }
 
         if (assignmentSubmission.Grade is not null)

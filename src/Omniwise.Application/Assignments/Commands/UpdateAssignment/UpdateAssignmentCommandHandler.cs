@@ -50,6 +50,8 @@ public class UpdateAssignmentCommandHandler(IAssignmentsRepository assignmentsRe
         await unitOfWork.ExecuteTransactionalAsync(async () =>
         {
             mapper.Map(request, assignment);
+            assignment.Name = assignment.Name.Trim();
+            assignment.Content = assignment.Content?.Trim();
 
             await fileService.CompareAndUpdateAsync(files, assignment.Files, assignmentId);
 

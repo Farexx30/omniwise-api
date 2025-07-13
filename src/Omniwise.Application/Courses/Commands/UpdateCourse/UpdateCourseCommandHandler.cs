@@ -44,6 +44,7 @@ public class UpdateCourseCommandHandler(ICoursesRepository coursesRepository,
         await unitOfWork.ExecuteTransactionalAsync(async () =>
         {
             mapper.Map(request, course);
+            course.Name = course.Name.Trim();
 
             var currentCourseImgBlobName = course.ImgBlobName;
             if (currentCourseImgBlobName is not null)

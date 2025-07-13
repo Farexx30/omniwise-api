@@ -26,7 +26,7 @@ public class LecturesController(IMediator mediator) : ControllerBase
         command.CourseId = courseId;
         int lectureId = await mediator.Send(command);
 
-        return CreatedAtAction(nameof(GetLectureById), new { lectureId }, null);
+        return CreatedAtAction(nameof(GetLectureById), new { lectureId }, new { lectureId });
     }
 
     [HttpPatch("lectures/{lectureId}")]

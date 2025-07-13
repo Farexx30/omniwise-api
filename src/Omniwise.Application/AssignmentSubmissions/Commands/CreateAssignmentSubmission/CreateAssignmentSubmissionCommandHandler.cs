@@ -35,8 +35,8 @@ public class CreateAssignmentSubmissionCommandHandler(IAssignmentSubmissionsRepo
         var currentUser = userContext.GetCurrentUser();
         var assignmentId = request.AssignmentId;
 
-        var isAssignmentExist = await assignmentsRepository.ExistsAsync(assignmentId);
-        if (!isAssignmentExist)
+        var assignment = await assignmentsRepository.GetByIdAsync(assignmentId);
+        if (assignment is null)
         {
             logger.LogWarning("Assignment with id = {assignmentId} doesn't exist.", assignmentId);
             throw new NotFoundException($"{nameof(Assignment)} with id = {assignmentId} doesn't exist.");
@@ -55,6 +55,12 @@ public class CreateAssignmentSubmissionCommandHandler(IAssignmentSubmissionsRepo
                 assignmentId);
 
             throw new ForbiddenException($"You are not allowed to create {nameof(AssignmentSubmission)} for {nameof(Assignment)} with id = {assignmentId}");
+        }
+
+        var hasDeadlinePassed = assignment.Deadline < DateTime.UtcNow;
+        if (hasDeadlinePassed)
+        {
+            throw new ForbiddenException("You can't create submission after deadline.");
         }
 
         var isAlreadySubmitted = await assignmentSubmissionsRepository.IsAlreadySubmittedAsync(assignmentId, currentUser.Id!);

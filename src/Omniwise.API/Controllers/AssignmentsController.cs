@@ -8,6 +8,7 @@ using Omniwise.Application.Assignments.Dtos;
 using Omniwise.Application.Assignments.Queries.GetAllCourseAssignments;
 using Omniwise.Application.Assignments.Queries.GetAssignmentById;
 using Omniwise.Domain.Constants;
+using Omniwise.Domain.Entities;
 
 namespace Omniwise.API.Controllers;
 
@@ -24,7 +25,7 @@ public class AssignmentsController(IMediator mediator) : ControllerBase
         command.CourseId = courseId;
         var assignmentId = await mediator.Send(command);
 
-        return CreatedAtAction(nameof(GetAssignmentById), new { assignmentId }, null);
+        return CreatedAtAction(nameof(GetAssignmentById), new { assignmentId }, new { assignmentId });
     }
 
     [HttpPatch("assignments/{assignmentId}")]

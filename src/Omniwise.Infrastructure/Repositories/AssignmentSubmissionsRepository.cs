@@ -39,15 +39,27 @@ internal class AssignmentSubmissionsRepository(OmniwiseDbContext dbContext) : IA
             .ExecuteDeleteAsync();
     }
 
-    public async Task<AssignmentSubmission?> GetByIdAsync(int assignmentSubmissionId, bool includeFiles = false, bool includeComments = false)
+    public async Task<AssignmentSubmission?> GetByIdAsync(int assignmentSubmissionId, bool includeAuthor = false, bool includeFiles = false, bool includeAssignmentInfo = false, bool includeComments = false)
     {
         var mainQuery = dbContext.AssignmentSubmissions
             .AsQueryable();
+
+        if (includeAuthor)
+        {
+            mainQuery = mainQuery
+                .Include(asub => asub.Author);
+        }
 
         if (includeFiles)
         {
             mainQuery = mainQuery
                 .Include(asub => asub.Files);
+        }
+
+        if (includeAssignmentInfo)
+        {
+            mainQuery = mainQuery
+                .Include(asub => asub.Assignment);
         }
 
         if (includeComments)

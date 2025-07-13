@@ -7,6 +7,7 @@ using Omniwise.Application.AssignmentSubmissions.Dtos;
 using Omniwise.Application.Common.Interfaces.Identity;
 using Omniwise.Application.Common.Interfaces.Repositories;
 using Omniwise.Application.Common.Services.Files;
+using Omniwise.Application.Common.Types;
 using Omniwise.Domain.Constants;
 using Omniwise.Domain.Entities;
 using Omniwise.Domain.Exceptions;
@@ -31,7 +32,7 @@ public class GetAssignmentSubmissionByIdQueryHandler(IAssignmentSubmissionsRepos
         var currentUser = userContext.GetCurrentUser();
         var assignmentSubmissionId = request.AssignmentSubmissionId;
 
-        var assignmentSubmission = await assignmentSubmissionsRepository.GetByIdAsync(assignmentSubmissionId, includeFiles: true, includeComments: true)
+        var assignmentSubmission = await assignmentSubmissionsRepository.GetByIdAsync(assignmentSubmissionId, includeAuthor: true, includeFiles: true, includeAssignmentInfo: true, includeComments: true)
             ?? throw new NotFoundException($"{nameof(AssignmentSubmission)} with id = {assignmentSubmissionId} not found.");
 
         var courseMemberAuthorizationResult = await authorizationService.AuthorizeAsync(userContext.ClaimsPrincipalUser!, assignmentSubmission, Policies.MustBeEnrolledInCourse);
@@ -63,7 +64,7 @@ public class GetAssignmentSubmissionByIdQueryHandler(IAssignmentSubmissionsRepos
         foreach (var file in assignmentSubmission.Files)
         {
             var fileSasUrl = await fileService.GetFileSasUrl(file.BlobName);
-            assignmentSubmissionDto.FileUrls.Add(fileSasUrl);
+            assignmentSubmissionDto.FileInfos.Add(new FileInfoDto(Name: file.OriginalName, Url: fileSasUrl));
         }
 
         return assignmentSubmissionDto;

@@ -24,7 +24,7 @@ public class CoursesController(IMediator mediator) : ControllerBase
     {
         int courseId = await mediator.Send(command);
 
-        return CreatedAtAction(nameof(GetCourseById), new { courseId }, null);
+        return CreatedAtAction(nameof(GetCourseById), new { courseId }, new { courseId });
     }
 
     [HttpPatch("{courseId}")]
