@@ -8,4 +8,5 @@ public class PendingCourseMemberDto
 
     public string FirstName { get; set; } = default!;
     public string LastName { get; set; } = default!;
+    public string Role { get; set; } = default!;
 }
