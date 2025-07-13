@@ -176,10 +176,11 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
         return courseMember;
     }
 
-    public async Task DeleteByUserIdAsync(string userId)
+    public async Task DeleteByUserIdAsync(string userId, int courseId)
     {
         await dbContext.UserCourses
-            .Where(uc => uc.UserId == userId)
+            .Where(uc => uc.UserId == userId
+                    && uc.CourseId == courseId)
             .ExecuteDeleteAsync();
     }
 

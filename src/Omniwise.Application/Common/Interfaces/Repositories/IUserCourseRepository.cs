@@ -15,7 +15,7 @@ public interface IUserCourseRepository
     Task<CourseMemberDetailsDto?> GetByIdAsync(string memberId, int courseId, CurrentUser currentUser);
     Task<UserCourse?> GetPendingCourseMemberAsync(int courseId, string userId);
     Task<EnrolledCourseMemberWithRoleDto?> GetCourseMemberWithRoleNameAsync(int courseId, string userId);
-    Task DeleteByUserIdAsync(string userId);
+    Task DeleteByUserIdAsync(string userId, int courseId);
     Task<List<string>> GetTeacherIdsAsync(int courseId);
     Task SaveChangesAsync();
 }
