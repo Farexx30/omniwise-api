@@ -12,7 +12,6 @@ using Omniwise.Domain.Exceptions;
 namespace Omniwise.Application.CourseMembers.Queries.GetPendingCourseMembers;
 
 public class GetPendingCourseMembersQueryHandler(ILogger<GetPendingCourseMembersQueryHandler> logger,
-    IMapper mapper,
     IUserContext userContext,
     ICoursesRepository coursesRepository,
     IUserCourseRepository userCourseRepository,
@@ -38,8 +37,7 @@ public class GetPendingCourseMembersQueryHandler(ILogger<GetPendingCourseMembers
 
         logger.LogInformation("Fetching all pending course members for course with id: {CourseId} from the repository.", request.CourseId);
         
-        var pendingCourseMembers = await userCourseRepository.GetPendingCourseMembersAsync(courseId);
-        var pendingCourseMembersDtos = mapper.Map<IEnumerable<PendingCourseMemberDto>>(pendingCourseMembers);
+        var pendingCourseMembersDtos = await userCourseRepository.GetPendingCourseMembersAsync(courseId);
 
         return pendingCourseMembersDtos;
     }

@@ -43,6 +43,14 @@ public class RemoveCourseMemberCommandHandler(ILogger<RemoveCourseMemberCommandH
                 throw new ForbiddenException($"You are not allowed to remove this member from course.");
             }
 
+            if (isOwnerAuthorizationResult.Succeeded && courseMember.UserId == userId)
+            {
+                logger.LogWarning("You are not allowed to remove owner from course.");
+
+                throw new ForbiddenException($"You are not allowed to remove owner from course.");
+            }
+
+
             await userCourseRepository.DeleteByUserIdAsync(courseMember.UserId, courseId);
         }
 
