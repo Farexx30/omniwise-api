@@ -16,6 +16,20 @@ public class CoursesMappingProfile : Profile
     {
         CreateMap<CreateCourseCommand, Course>();
         CreateMap<UpdateCourseCommand, Course>();
-        CreateMap<Course, CourseDto>();
+        CreateMap<Course, CourseDto>()
+            .ForMember(dest => dest.ImgName,
+                opt => opt.MapFrom(src => GetImgOriginalName(src.ImgBlobName)));
+    }
+
+    private static string? GetImgOriginalName(string? imgBlobName)
+    {
+        if (imgBlobName is null)
+        {
+            return null;
+        }
+
+        var withoutPrefix = imgBlobName["course-images/".Length..];
+        int resourceIdDashIndex = withoutPrefix.IndexOf('-');
+        return withoutPrefix[(resourceIdDashIndex + 1)..];
     }
 }
