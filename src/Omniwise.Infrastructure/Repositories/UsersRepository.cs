@@ -41,6 +41,9 @@ internal class UsersRepository(OmniwiseDbContext dbContext) : IUsersRepository
                   (currentResult, role) => new { currentResult.User, Role = role })
             .Where(currentResult => currentResult.User.Status == status
                    && currentResult.Role.Name != Roles.Admin)
+            .OrderBy(finalResult => finalResult.User.LastName)
+                .ThenBy(finalResult => finalResult.User.FirstName)
+                    .ThenByDescending(finalResult => finalResult.Role.Name)
             .Select(finalResult => new UserWithRoleDto
             {
                 Id = finalResult.User.Id,

@@ -102,6 +102,8 @@ internal class UserCourseRepository(OmniwiseDbContext dbContext) : IUserCourseRe
             .Where(uc => uc.CourseId == courseId
                    && uc.IsAccepted)
             .Include(uc => uc.User)
+            .OrderBy(uc => uc.User.LastName)
+                .ThenBy(uc => uc.User.FirstName)
             .ToListAsync();
 
         return enrolledCourseMembers;

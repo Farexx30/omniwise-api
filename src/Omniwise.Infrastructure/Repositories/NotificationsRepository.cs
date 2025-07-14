@@ -12,6 +12,7 @@ internal class NotificationsRepository(OmniwiseDbContext dbContext) : INotificat
         var notifications = await dbContext.Notifications
             .AsNoTracking()
             .Where(n => n.UserId == userId)
+            .OrderByDescending(n => n.SentDate)
             .ToListAsync();
 
         return notifications;

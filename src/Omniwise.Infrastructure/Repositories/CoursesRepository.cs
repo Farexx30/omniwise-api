@@ -38,6 +38,7 @@ internal class CoursesRepository(OmniwiseDbContext dbContext) : ICoursesReposito
                    && (string.IsNullOrWhiteSpace(searchPhrase) 
                    || uc.Course.Name.Contains(searchPhrase.Trim())))
             .Select(uc => uc.Course)
+            .OrderByDescending(c => c.Id)
             .ToListAsync();
 
         return enrolledCourses;
@@ -48,6 +49,7 @@ internal class CoursesRepository(OmniwiseDbContext dbContext) : ICoursesReposito
         var ownedCourses = await dbContext.Courses
             .AsNoTracking()
             .Where(c => c.OwnerId == id)
+            .OrderByDescending(c => c.Id)   
             .ToListAsync();
 
         return ownedCourses;
@@ -60,6 +62,7 @@ internal class CoursesRepository(OmniwiseDbContext dbContext) : ICoursesReposito
             .Where(c => !c.Members.Any(m => m.Id == id))
             .Where(c => string.IsNullOrWhiteSpace(searchPhrase)
                    || c.Name.Contains(searchPhrase.Trim()))
+            .OrderByDescending(c => c.Id)
             .ToListAsync();
 
         return availableCourses;

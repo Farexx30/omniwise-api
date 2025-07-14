@@ -20,7 +20,8 @@ public class CreateAssignmentCommandValidator : AbstractValidator<CreateAssignme
             .WithMessage("Deadline must be in the future.");
 
         RuleFor(a => a.MaxGrade)
-            .GreaterThan(0f);
+            .GreaterThan(0f)
+            .Must(value => value.ToString().Length < 7);
 
         RuleFor(a => a.Files)
             .Custom((value, context) =>
