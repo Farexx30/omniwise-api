@@ -34,6 +34,11 @@ public class AcceptCourseMemberCommandHandler(ILogger<AcceptCourseMemberCommandH
         var pendingCourseMember = await userCoursesRepository.GetPendingCourseMemberAsync(courseId, request.UserId)
             ?? throw new NotFoundException($"Pending course member not found.");
 
+        if (pendingCourseMember.IsAccepted)
+        {
+            throw new ForbiddenException("User already in course.");
+        }
+
         logger.LogInformation("Accepting course member for course {courseName}.", course.Name);
 
         pendingCourseMember.IsAccepted = true;

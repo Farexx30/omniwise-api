@@ -23,6 +23,11 @@ public class UpdateAssignmentCommandValidator : AbstractValidator<UpdateAssignme
             .GreaterThan(0f)
             .Must(value => value.ToString().Length < 7);
 
+        RuleFor(a => a.Content)
+            .Must(content => content is null || content.Length <= 4500)
+            .WithMessage("Content must be 4500 characters or fewer.");
+
+
         RuleFor(a => a.Files)
             .Custom((value, context) =>
             {

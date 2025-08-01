@@ -12,7 +12,7 @@ public class GradeAssignmentSubmissionCommandValidator : AbstractValidator<Grade
     public GradeAssignmentSubmissionCommandValidator()
     {
         RuleFor(a => a.Grade)
-            .Must(grade => grade is null || grade >= 0)
-            .WithMessage("Grade must be greater than or equal to 0.");
+            .Must(grade => grade is null || (grade >= 0 && grade.ToString()!.Length < 7))
+            .WithMessage("Grade must be greater than or equal to 0 and its length cannot exceed 7 characters.");
     }
 }
